@@ -105,13 +105,15 @@ already-installed Chromium instead, set `CHROMIUM_PATH=/path/to/chrome`.
 
 ## Publishing
 
-GitHub Actions publishes the site to GitHub Pages (`.github/workflows/pages.yml`). In the repo's
-Settings → Pages, the source must be **GitHub Actions**.
+GitHub Actions publishes the site to GitHub Pages (`.github/workflows/pages.yml`). Repo settings needed:
+Settings → Pages → Source: **GitHub Actions**, and Settings → Environments → `github-pages` must allow
+deployments from `main`.
 
 - Every run rebuilds the whole site: `main` at the root, and the head of each open pull request at
   `<site>/pr-preview/pr-<number>/`. `tools/`, `docs/`, `.claude/` and `CLAUDE.md` are left out.
-- It runs on pushes to `main` and when a pull request is opened, updated, reopened or closed. The preview
-  link is posted (and kept up to date) as a comment on the pull request; closing the PR removes the preview.
+- It runs on pushes to `main`, and after `pr-preview-trigger.yml` (which runs when a pull request is opened,
+  updated, reopened or closed). The preview link is posted, and kept up to date, as a comment on the pull
+  request; closing the PR removes the preview.
+- `pages.yml` always runs from `main` (via `workflow_run`), so pull request code is only copied, never run,
+  and changes to `pages.yml` itself only take effect once merged. Pull requests from forks are not previewed.
 - Previews share the live site's origin, so they see the same saved data (theme etc.) as the live decks.
-- Pull requests from forks are not previewed. The workflow runs from `main`'s copy of the file, so changes
-  to the workflow itself only take effect once merged.

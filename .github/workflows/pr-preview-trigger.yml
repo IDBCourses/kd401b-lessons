@@ -1,0 +1,16 @@
+# Signals that a pull request changed, so "Deploy site and PR previews" (pages.yml) rebuilds the site.
+# It runs nothing from the pull request and has no permissions: pages.yml does the work from main,
+# via its workflow_run trigger.
+name: PR preview trigger
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+
+permissions: {}
+
+jobs:
+  signal:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Pull request ${{ github.event.number }} was ${{ github.event.action }}; the site will rebuild."
