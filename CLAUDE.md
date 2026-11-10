@@ -105,8 +105,13 @@ already-installed Chromium instead, set `CHROMIUM_PATH=/path/to/chrome`.
 
 ## Publishing
 
-GitHub Actions publishes the site to GitHub Pages on every push to `main` (`.github/workflows/deploy.yml`:
-it collects the site files, leaving out `tools/`, `docs/`, `.claude/` and `CLAUDE.md`, and deploys them with
-`actions/deploy-pages`). It can also be run by hand from the Actions tab. In the repo's Settings → Pages,
-the source must be **GitHub Actions**. There are no pull-request previews: check a deck locally
-(`python3 -m http.server`) before merging.
+GitHub Actions publishes the site to GitHub Pages (`.github/workflows/pages.yml`). In the repo's
+Settings → Pages, the source must be **GitHub Actions**.
+
+- Every run rebuilds the whole site: `main` at the root, and the head of each open pull request at
+  `<site>/pr-preview/pr-<number>/`. `tools/`, `docs/`, `.claude/` and `CLAUDE.md` are left out.
+- It runs on pushes to `main` and when a pull request is opened, updated, reopened or closed. The preview
+  link is posted (and kept up to date) as a comment on the pull request; closing the PR removes the preview.
+- Previews share the live site's origin, so they see the same saved data (theme etc.) as the live decks.
+- Pull requests from forks are not previewed. The workflow runs from `main`'s copy of the file, so changes
+  to the workflow itself only take effect once merged.
