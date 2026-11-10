@@ -71,7 +71,7 @@ var WEEKS=[
   {id:"51",label:"Week 51",topic:"A2 oral exam",cards:[
     ["Fri 18 Dec","You present and discuss your A2 design as a group. Groups are split between morning and afternoon.","pink"]]},
   {id:"52",label:"Week 52",topic:"Work on your A1 critique",cards:[
-    ["No teaching","Time to write your A1 critical analysis of an interface.","teal"]]},
+    ["No teaching","Time to write your A1 critical analysis of an interface. A1 is due on Wednesday 30 Dec.","teal"]]},
   {id:"1",label:"Week 1",topic:"Designing for intuition, animation and motion",cards:[
     ["Thu 7 Jan · design","Designing for intuition, then animation, motion and space. Exercise in Figma.","teal"],
     ["Fri 8 Jan · HTML and CSS","CSS states, transitions and animation. Exercise: interaction and motion in HTML and CSS.","plum"]]},
@@ -137,7 +137,7 @@ Deck.start([
     h(P.Card,{title:"Fridays · David",tone:"plum"},h("ul",null,h("li",null,"HTML and CSS lecture"),h("li",null,"Then implementation exercises")))))}},
 
 {id:"weeks",sec:"Structure",title:"The weeks ahead",demo:"Weeks",
- notes:"Click a week (or use the arrow keys once a tab has focus). Week 50 is group work on A2, week 51 the A2 oral exam, week 52 is time for the A1 critique. TODO before presenting: the A1 deadline (30 Dec in Notion and Canvas, 5 Jan in TimeEdit) and the 18 Dec exam times are still being reconciled, so they are not on the slide yet.",
+ notes:"Click a week (or use the arrow keys once a tab has focus). Week 50 is group work on A2, week 51 the A2 oral exam (no times on the slide; groups get theirs separately), week 52 is time for the A1 critique, due Wed 30 Dec.",
  render:function(n){return h(P.ContentSlide,{title:"The weeks ahead",number:n,footer:FOOT},
   h("div",{className:"wide"},h(P.Tabs,{tabs:weekTabs,label:"Weeks"})))}},
 
@@ -158,7 +158,7 @@ Deck.start([
       p("Pairs · 3 hp · LO2–3 · Due Fri 11 Dec · Oral exam Fri 18 Dec","facts"))},
     {id:"a1",label:"A1 Critical analysis",content:h("div",{className:"stack"},
       p("An individual analysis of an interface design, using the theory introduced in the course. Short, and deep rather than broad.","lead"),
-      p("Individual · 1 hp · LO1 · Written in week 52","facts"))}
+      p("Individual · 1 hp · LO1 · Due Wed 30 Dec","facts"))}
   ]})))}},
 
 {id:"a3",sec:"Assessment",title:"A3 Portfolio",
