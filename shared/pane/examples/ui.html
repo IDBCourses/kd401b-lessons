@@ -1,0 +1,12 @@
+<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pane UI starter</title>
+<link rel="stylesheet" href="../tokens/tokens.css"><link rel="stylesheet" href="../components/bundle.css"></head>
+<body class="pn-base" style="padding:var(--space-6);max-width:var(--measure)"><div id="root"></div>
+<script src="../vendor/react.production.min.js"></script><script src="../vendor/react-dom.production.min.js"></script><script src="../components/bundle.js"></script>
+<script>
+const P=window.Pane,h=React.createElement;
+ReactDOM.createRoot(document.getElementById('root')).render(h('div',{style:{display:'grid',gap:24}},
+ h(P.Logo,{height:48}),
+ h(P.Alert,{tone:'info',title:'Starter page'},'Everything here uses Pane tokens and components.'),
+ h(P.TextField,{label:'Email',hint:'We only use it to reply.'}),
+ h(P.Button,null,'Send')));
+</script></body></html>

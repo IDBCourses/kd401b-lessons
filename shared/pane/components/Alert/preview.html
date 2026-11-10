@@ -1,0 +1,11 @@
+<!doctype html><html lang="en"><head><link rel="stylesheet" href="../../tokens/tokens.css"><link rel="stylesheet" href="../bundle.css"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Alert</title></head>
+<body class="pn-base"><div id="root"></div><script src="../../vendor/react.production.min.js"></script><script src="../../vendor/react-dom.production.min.js"></script><script src="../bundle.js"></script>
+<script>
+const P = window.Pane, h = React.createElement;
+const App = () => h('div',{style:{display:'grid',gap:16,maxWidth:560}},
+  h(P.Alert,{tone:'info',title:'Slides are on the course page'},'Download them after the lecture.'),
+  h(P.Alert,{tone:'success',title:'Submission received'},'You will get an email receipt.'),
+  h(P.Alert,{tone:'warning',title:'Deadline is tomorrow'}),
+  h(P.Alert,{tone:'danger',title:'Upload failed'},'The file is larger than 20 MB.'));
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+</script></body></html>

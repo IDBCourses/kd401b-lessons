@@ -1,0 +1,14 @@
+<!doctype html><html lang="en"><head><link rel="stylesheet" href="../../tokens/tokens.css"><link rel="stylesheet" href="../bundle.css"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FigureSlide</title></head>
+<body class="pn-base"><div id="root"></div><script src="../../vendor/react.production.min.js"></script><script src="../../vendor/react-dom.production.min.js"></script><script src="../bundle.js"></script>
+<script>
+const P = window.Pane, h = React.createElement;
+const App = () => h(P.FigureSlide, {title:['Screens','as evidence'], number:'18', footer:'GUI course',
+  figure:h('svg',{viewBox:'0 0 640 360',role:'img','aria-label':'Wireframe of a login form'},
+    h('rect',{width:640,height:360,fill:'var(--surface-300)'}),
+    h('rect',{x:200,y:70,width:240,height:36,fill:'var(--surface-200)',stroke:'var(--ink)',strokeWidth:3}),
+    h('rect',{x:200,y:130,width:240,height:36,fill:'var(--surface-200)',stroke:'var(--ink)',strokeWidth:3}),
+    h('rect',{x:200,y:200,width:110,height:44,fill:'var(--plum)',stroke:'var(--ink)',strokeWidth:3})),
+  caption:'Figure 3. Login wireframe, first iteration.'},
+  h('p',null,'Frame every screenshot with a border and a hard shadow. Always write alt text and a caption.'));
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+</script></body></html>

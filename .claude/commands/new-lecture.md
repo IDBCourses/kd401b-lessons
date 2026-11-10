@@ -26,12 +26,14 @@ open. Don't start building until David answers.
 - `cp -r _template $ARGUMENTS` (folder name: short, lowercase), then set `<title>` and `data-lecture`.
 - Use Pane components (TitleSlide, SectionSlide, ContentSlide, FigureSlide, QuoteSlide, Card, Tabs, Alert,
   CodeBlock, Button). Every slide gets speaker notes.
+- Slides are objects in `Deck.start([...])` (see `docs/slide-patterns.md`). Follow `shared/pane/SKILL.md`.
 - Tone: light but not overly cheery, especially in instructions.
 
 ## 4. Check
 
 - Run `python3 tools/check_deck.py $ARGUMENTS`. Fix every overflow and error.
 - Look at each screenshot in `tools/out/$ARGUMENTS/`. Exercise each interactive slide once.
+- Press `T` to check the slides in the dark and high-contrast themes.
 
 ## 5. Finish
 

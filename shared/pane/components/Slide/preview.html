@@ -1,0 +1,9 @@
+<!doctype html><html lang="en"><head><link rel="stylesheet" href="../../tokens/tokens.css"><link rel="stylesheet" href="../bundle.css"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Slide</title></head>
+<body class="pn-base"><div id="root"></div><script src="../../vendor/react.production.min.js"></script><script src="../../vendor/react-dom.production.min.js"></script><script src="../bundle.js"></script>
+<script>
+const P = window.Pane, h = React.createElement;
+const App = () => h('div', {style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))',gap:16}},
+  ['paper','ink','plum','teal','pink'].map(t => h(P.Slide, {key:t, tone:t, number:'07', footer:'GUI course', label:t+' slide'},
+    h('div',{style:{position:'absolute',left:120,top:120,right:120}}, h(P.PaneFrame,{lines:['Tone: '+t],size:96,tone:t==='plum'?'ink':'plum'})))));
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+</script></body></html>

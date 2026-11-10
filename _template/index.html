@@ -1,63 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>LECTURE TITLE · KD401B Interaction Design: Graphical User Interfaces</title>
-<link rel="stylesheet" href="../shared/pane/bundle.css">
+<link rel="stylesheet" href="../shared/pane/tokens/tokens.css">
+<link rel="stylesheet" href="../shared/pane/components/bundle.css">
 <link rel="stylesheet" href="../shared/deck.css">
 <style>
-/* styles used only by this lecture */
+/* styles used only by this lecture: layout only, colours and sizes from Pane tokens */
 </style>
 </head>
 <!-- data-lecture: a short unique name; it namespaces this lecture's saved data -->
 <body data-lecture="LECTURE-NAME" data-home="../">
-<main id="stage">
-<div id="deck">
+<main id="stage"><div id="deck"></div></main>
 
-<section class="slide title-slide" id="cover" data-sec="Opening">
-  <div class="kicker">KD401B · Week NN</div>
-  <h1>Lecture title</h1>
-  <p class="subtitle">One line on what this session covers</p>
-  <aside class="nt">Speaker notes go here. Press N to show them.</aside>
-</section>
-
-<section class="slide section-slide" id="section-1" data-sec="Section name">
-  <div class="kicker">Section name</div>
-  <h2>A section opener</h2>
-  <p>Optional line under the heading.</p>
-  <aside class="nt">Notes for this slide.</aside>
-</section>
-
-<section class="slide content-slide" id="example" data-sec="Section name">
-  <div class="kicker">Section name</div>
-  <h2>A content slide</h2>
-  <div class="body">
-    <div class="card"><h3>Card title</h3><p>Cards, tabs, alerts and code blocks: see docs/slide-patterns.md.</p></div>
-  </div>
-  <aside class="nt">Notes for this slide.</aside>
-</section>
-
-<section class="slide content-slide" id="your-turn" data-sec="Section name" data-ex="Short exercise name">
-  <span class="turn">Your turn</span>
-  <div class="kicker">Section name · Exercise</div>
-  <h2>An exercise slide</h2>
-  <div class="body">
-    <pre class="code-block">&lt;p&gt;Hello&lt;/p&gt;</pre>
-  </div>
-  <aside class="nt">data-ex makes E jump here and marks it "Your turn" in the index.</aside>
-</section>
-
-</div>
-</main>
-
-<script src="../shared/pane/bundle.js"></script>
+<script src="../shared/pane/vendor/react.production.min.js"></script>
+<script src="../shared/pane/vendor/react-dom.production.min.js"></script>
+<script src="../shared/pane/components/bundle.js"></script>
 <script src="../shared/deck.js"></script>
 <script>
 (function(){
 "use strict";
-var D=Deck,$=D.$;
-/* One small block per interactive slide. */
+var P=window.Pane,h=React.createElement;
+var FOOT="KD401B · Lecture title";
+
+Deck.start([
+{id:"cover",sec:"Opening",title:"Lecture title",
+ notes:"Speaker notes go here. Press N to show them.",
+ render:function(){return h(P.TitleSlide,{title:["Headline as","a sentence"],subtitle:"One line on what this session covers",meta:"David · KD401B HT26 · Week NN"})}},
+
+{id:"section-1",sec:"Section name",title:"Section opener",
+ notes:"One SectionSlide per section, three to five in a deck.",
+ render:function(){return h(P.SectionSlide,{title:["Section name"],tone:"teal",footer:FOOT})}},
+
+{id:"example",sec:"Section name",title:"A content slide",
+ notes:"Body is a short list or one or two short paragraphs. Wrap grids of cards in className:'wide'.",
+ render:function(n){return h(P.ContentSlide,{title:"Say the point as a sentence",number:n,footer:FOOT,aside:"A rule of thumb or definition.",asideTitle:"Rule"},
+  h("p",null,"Body text at 36px."))}},
+
+{id:"code",sec:"Section name",title:"Code example",
+ notes:"CodeBlock with size slide.",
+ render:function(n){return h(P.ContentSlide,{title:"Code on a slide",number:n,footer:FOOT},
+  h(P.CodeBlock,{size:"slide",label:"index.html"},"<p>Hello</p>"))}},
+
+{id:"your-turn",sec:"Section name",title:"Exercise",ex:"Short exercise name",
+ notes:"ex marks a 'Your turn' slide; E jumps between them.",
+ render:function(n){return h(P.ContentSlide,{title:"Your turn",number:n,footer:FOOT},
+  h("p",null,"What to do, in one or two sentences."))}}
+]);
 })();
 </script>
 </body>

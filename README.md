@@ -7,9 +7,9 @@ Published with GitHub Pages from `main`.
 
 ```
 index.html            course home: list of lectures and course links
-shared/pane/          Pane design system (bundle.css, bundle.js)
-shared/deck.css       deck frame: stage, scaling, bottom bar, panels
-shared/deck.js        navigation, slide index, speaker notes, helpers (window.Deck)
+shared/pane/          Pane design system package (tokens, React components, fonts, docs)
+shared/deck.css       deck frame, bottom bar, slide-size Pane components
+shared/deck.js        Deck.start(): renders Pane slides, navigation, notes, theme switch
 intro/                one folder per lecture; index.html is the deck
 _template/            starting point for a new lecture (not linked from the home page)
 tools/check_deck.py   checks every slide fits and nothing errors; screenshots to tools/out/
@@ -22,14 +22,14 @@ docs/                 design system and slide-pattern reference
 
 1. Copy `_template/` to a new folder named after the lecture, e.g. `colour/`.
 2. In its `index.html`, set the `<title>` and `data-lecture="colour"` on `<body>`.
-3. Write slides as `<section class="slide …">` inside `#deck` (see `docs/slide-patterns.md`).
+3. Write slides as objects in `Deck.start([...])`, built from Pane components (see `docs/slide-patterns.md`).
 4. Add an `<li>` for it to the list in the root `index.html`.
 
 Or, in Claude Code: `/new-lecture colour`.
 
 ## Keys
 
-`←` `→` move · `E` next exercise · `I` slide index · `N` notes · `F` full screen · `Esc` closes panels
+`←` `→` move · `E` next exercise · `T` theme (light, dark, high contrast) · `I` slide index · `N` notes · `F` full screen · `Esc` closes panels
 
 ## Publishing
 

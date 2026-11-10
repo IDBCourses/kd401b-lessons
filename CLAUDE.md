@@ -27,29 +27,31 @@ Read these before building anything:
 
 ```
 index.html            course home: lecture list (add each new lecture here)
-shared/pane/          Pane design system: bundle.css + bundle.js (used by every page)
-shared/deck.css       deck frame: stage, scaling, bottom bar, index and notes panels
-shared/deck.js        navigation, slide index, speaker notes, scaling, helpers (window.Deck)
+shared/pane/          Pane design system package, unchanged (tokens, components, fonts, React, docs)
+shared/deck.css       deck frame, bottom bar, panels, slide-size Pane components, layout helpers
+shared/deck.js        Deck.start(): renders slides, navigation, index, notes, theme switch
 <lecture>/index.html  one folder per lecture, named after the topic: intro/, colour/, type/ …
 _template/            copy this to start a lecture
 tools/check_deck.py   verifies decks (run it before saying a deck is done)
 docs/                 reference for you; not linked from the site
 ```
 
-Plain HTML, CSS and JavaScript. **No build step, no frameworks, no npm packages, no CDNs** for code.
+Plain HTML, CSS and JavaScript, plus the React copy that ships with Pane. **No build step, no JSX, no npm
+packages, no CDNs** for code.
 Everything must work by opening the files from a static server.
 
 ## Design system: Pane
 
-All visuals use the **Pane** design system: `shared/pane/bundle.css` and `shared/pane/bundle.js`, loaded by
-every page. Use its components: **TitleSlide, SectionSlide, ContentSlide, FigureSlide, QuoteSlide, Card,
-Tabs, Alert, CodeBlock, Button**. Don't write new visual styles when a Pane component does the job; keep
-lecture-local CSS to layout (grids, spacing) and small one-off pieces.
+All visuals use the **Pane** design system, kept unchanged in `shared/pane/` (from `pane-design-system.zip`).
+Start with `shared/pane/SKILL.md` and follow its hard rules. Pane's components are React components on
+`window.Pane`; use them: **TitleSlide, SectionSlide, ContentSlide, FigureSlide, QuoteSlide, Card, Tabs,
+Alert, CodeBlock, Button**, with `tokens.css`, `bundle.css` and `bundle.js`. React is vendored in
+`shared/pane/vendor/`, so nothing loads from the network.
 
-> **Status:** the files in `shared/pane/` are currently a **placeholder** written before
-> `pane-design-system.zip` was added. When the zip is available, replace `shared/pane/` with its
-> bundle.css/bundle.js (and any fonts/assets), update `docs/design-system.md` with its real class names
-> and API, update the decks' markup to match, and remove this note.
+- Never edit `shared/pane/`. Slide-size versions of the UI components and layout helpers live in
+  `shared/deck.css` (see `docs/design-system.md`). Lecture-local CSS is for layout only.
+- Tokens only, never hex values. Every slide must work in light, dark and high-contrast themes (`T`).
+- Slides are 1920×1080. Body text 36px minimum, nothing below 28px. One idea and one Pane frame per slide.
 
 ## Where lecture content comes from
 
@@ -70,6 +72,7 @@ Use `/new-lecture <topic>` for a new deck. The workflow:
 2. **Propose an outline before building**, unless David has already given one: one line per slide,
    grouped by the plan's sections, saying which slides are interactive and what the student does.
 3. **Build** in `<topic>/index.html`, copied from `_template/`. Set `<title>` and `data-lecture="<topic>"`.
+   Slides are objects passed to `Deck.start([...])`; see `docs/slide-patterns.md`.
 4. **Check**: run `python3 tools/check_deck.py <topic>` and look at the screenshots it writes to
    `tools/out/<topic>/`. Fix any slide that overflows or errors. Click through interactive slides.
 5. **List it** on the home page (`index.html`): add an `<li class="card">` with the week, title, one-line
@@ -77,13 +80,13 @@ Use `/new-lecture <topic>` for a new deck. The workflow:
 
 ## Rules that are easy to get wrong
 
-- Slides are a fixed 1280×720 canvas, scaled to fit. Everything must fit at that size; never rely on scrolling.
+- Slides are a fixed 1920×1080 canvas, scaled to fit. Everything must fit at that size; never rely on scrolling.
 - Interactive slides (only where they help) need both a presenter use (David drives it on the projector)
   and a student use (on their own laptop with the same link). Keep state per viewer; never require a server.
 - Save per-viewer data only with `Deck.store` (this lecture) or `Deck.courseStore` (shared).
 - Escape anything a student types before putting it in HTML (`Deck.esc`), or use `textContent`.
-- Every slide gets speaker notes (`<aside class="nt">`): what to say, what to ask, common mistakes. No times.
-- Keep JavaScript ES5-compatible in style (`var`, `function`) to match the existing files.
+- Every slide gets speaker notes (its `notes` field): what to say, what to ask, common mistakes. No times.
+- Keep JavaScript in the existing style (`var`, `function`, `h = React.createElement`); no JSX, no build step.
 - HTML in the decks should itself be valid and semantic: this course teaches W3C-validated markup.
 
 ## Changing shared files

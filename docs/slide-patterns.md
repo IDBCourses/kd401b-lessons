@@ -1,77 +1,65 @@
 # Slide patterns
 
-Every slide is a `<section class="slide …">` inside `#deck`. `intro/index.html` uses all of these.
+A deck is a list of slide objects passed to `Deck.start([...])`. `intro/index.html` uses every pattern
+below; `_template/index.html` is the starting point.
 
-## Slide attributes
+```js
+var P=window.Pane,h=React.createElement;
+var FOOT="KD401B · Lecture title";
+Deck.start([
+  { id:"weeks",                  // the slide's #link; unique
+    sec:"Structure",             // section name in the bottom bar
+    title:"The weeks ahead",     // name in the slide index (I)
+    notes:"…",                   // speaker notes (N); every slide has them; no times
+    ex:"Name",                   // optional: a "Your turn" exercise (E jumps here)
+    demo:"Name",                 // optional: an interactive demo
+    render:function(n){ return h(P.ContentSlide,{title:"…",number:n,footer:FOOT}, …) } }
+]);
+```
 
-- `id="…"` becomes the slide's link: `…/intro/#weeks`. Required and unique.
-- `data-sec="…"` is the section name shown in the bottom bar.
-- `data-ex="…"` marks an exercise: add `<span class="turn">Your turn</span>`; `E` jumps between them.
-- `data-demo="…"` marks an interactive demo.
-- `<aside class="nt">…</aside>` holds speaker notes (press `N`). Every slide has them.
+`n` is the slide number: pass it as `number` to Content, Figure and Quote slides. Don't pass `number`
+to `SectionSlide`: there it becomes a huge section numeral.
 
 ## Slide types
 
-```html
-<section class="slide title-slide" id="cover" data-sec="Opening">
-  <div class="kicker">KD401B · Week 46</div>
-  <h1>Title</h1>
-  <p class="subtitle">Subtitle</p>
-  <div class="meta"><span>David</span><span>KD401B HT26</span></div>
-  <aside class="nt">…</aside>
-</section>
-
-<section class="slide section-slide" id="layout" data-sec="Layout">
-  <div class="kicker">Section</div><h2>Heading</h2><p>Line</p>
-  <aside class="nt">…</aside>
-</section>
-
-<section class="slide content-slide" id="x" data-sec="…">
-  <div class="kicker">Section</div><h2>Heading</h2>
-  <div class="body"> cards, tabs, alerts, code </div>
-  <aside class="nt">…</aside>
-</section>
-
-<section class="slide figure-slide" id="y" data-sec="…">
-  <div><div class="kicker">Section</div><h2>Heading</h2><p>Text</p></div>
-  <figure><img src="img/example.png" alt="…"><figcaption>Caption</figcaption></figure>
-  <aside class="nt">…</aside>
-</section>
-
-<section class="slide quote-slide" id="z" data-sec="…">
-  <div class="kicker">Section</div>
-  <blockquote>A question or quote.</blockquote><cite>Attribution or prompt</cite>
-  <aside class="nt">…</aside>
-</section>
+```js
+h(P.TitleSlide,{title:["Headline as","a sentence"],subtitle:"One sentence",meta:"David · KD401B HT26"})
+h(P.SectionSlide,{title:["Section name"],tone:"teal",footer:FOOT})        // tone: teal | ink | plum | pink (pink once per deck)
+h(P.ContentSlide,{title:"Say the point",number:n,footer:FOOT,aside:"…",asideTitle:"Rule"}, children)
+h(P.FigureSlide,{title:"…",number:n,footer:FOOT,caption:"Figure 1. …",
+  figure:h("img",{src:"img/x.png",alt:"…"})}, children)
+h(P.QuoteSlide,{quote:"Two lines at most.",source:["Author, Year"],number:n,footer:FOOT})
 ```
 
-## Components
+Titles: a string, an array of lines, or a string with `|` between lines. Two to four lines.
 
-```html
-<div class="card"><div class="card-label">Label</div><h3>Title</h3><p>Text</p></div>
+## Components on slides
 
-<div class="tabs">
-  <div role="tablist" aria-label="…">
-    <button role="tab" id="tab-a" aria-controls="panel-a" aria-selected="true">A</button>
-    <button role="tab" id="tab-b" aria-controls="panel-b">B</button>
-  </div>
-  <div role="tabpanel" id="panel-a" aria-labelledby="tab-a">…</div>
-  <div role="tabpanel" id="panel-b" aria-labelledby="tab-b" hidden>…</div>
-</div>
-
-<div class="alert warning" role="note"><div><strong>Heading.</strong>Text.</div></div>
-
-<pre class="code-block">&lt;h1&gt;Hello&lt;/h1&gt;</pre>
-
-<a class="button" href="…">Primary</a> <a class="button secondary" href="…">Secondary</a>
+```js
+h(P.Card,{title:"Title",tone:"teal"}, h("p",null,"Text"))                 // tone: paper | plum | teal | pink
+h(P.Card,{interactive:true,className:"linkcard"}, h("a",{className:"pn-link",href:"…"},"Link"))
+h(P.Tabs,{label:"Weeks",tabs:[{id:"a",label:"A",content:…},{id:"b",label:"B",content:…}]})
+h(P.Alert,{tone:"warning",title:"What to do."},"Detail.")                 // info | success | warning | danger
+h(P.CodeBlock,{size:"slide",label:"index.html"},"<p>Hello</p>")
+h(P.Button,{variant:"primary",onClick:fn},"Show the answer")             // actions only; use links to navigate
 ```
 
-Lecture-local layout helpers used in `intro/` (copy into the page's `<style>` if needed):
-`.grid2`, `.grid3`, `.grid2x2`.
+Body layout (from `shared/deck.css`):
+
+```js
+h("div",{className:"wide grid2"}, card1, card2)     // .wide = use the full slide width
+h("div",{className:"wide grid3"}, a, b, c)
+h("div",{className:"wide stack"}, row, alert)
+h("ul",{className:"tags"}, h("li",null,"Colour"), …)
+```
+
+Keep to about six lines of body text; split rather than shrink. Run `python3 tools/check_deck.py <lecture>`:
+it flags anything outside the slide or running past the bottom of the content area.
 
 ## Interactive slides
 
-Put each slide's script in its own small block in the page's final `<script>`, using `Deck` helpers:
-`Deck.$`, `Deck.$$`, `Deck.esc`, `Deck.fb`, `Deck.store`, `Deck.courseStore`, `Deck.go`.
-Example: the week picker on `intro/#weeks` (a list of buttons with `aria-pressed`, and a detail panel
-with `aria-live="polite"`).
+Prefer Pane's own interactive components (`Tabs`, `Button`, form fields) inside the slide. For custom
+behaviour, write a small React function component in the lecture script with `React.useState`.
+`deck.js` lets arrow keys, Home and End work inside a tab list without changing slides.
+Helpers on `Deck`: `$`, `$$`, `esc`, `store`, `courseStore`, `go`, `setTheme`, `addButton`, `onEscape`.
+Save per-viewer data only with `Deck.store` / `Deck.courseStore`.

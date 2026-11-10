@@ -2,9 +2,10 @@
 """Check KD401B lecture decks.
 
 Serves the repo over HTTP, opens each lecture in headless Chromium, steps through every slide, and reports:
-  - content that overflows the 1280x720 slide (speaker notes are ignored)
+  - content that overflows the 1920x1080 slide (decorative pane art is ignored)
   - JavaScript errors and failed requests (Google Fonts failures are reported separately)
-  - slides missing speaker notes, duplicate slide ids, exercises without a "Your turn" chip
+  - slides missing speaker notes, duplicate slide ids
+  - slide bodies that run past the bottom of a Pane layout's content area
 Screenshots of every slide go to tools/out/<lecture>/NN-<id>.png.
 
 Usage:
@@ -39,17 +40,26 @@ def serve():
 
 SLIDE_INFO = """() => {
   const s=[...document.querySelectorAll('#deck .slide')].find(x=>!x.hidden);
-  const r=s.getBoundingClientRect(), k=r.width/1280, bad=[];
-  s.querySelectorAll('*').forEach(el=>{
-    if(el.closest(".nt")) return;
+  const w=s.querySelector('.pn-slide-wrap'), r=w.getBoundingClientRect(), k=r.width/1920, bad=[];
+  const name=el=>el.id?'#'+el.id:el.tagName.toLowerCase()+(el.className&&typeof el.className==='string'?'.'+el.className.trim().split(/\\s+/).join('.'):'');
+  // 1. anything outside the slide (decorative pane art and dot grids are ignored)
+  w.querySelectorAll('.pn-slide *').forEach(el=>{
+    if(el.closest('.pn-title__art,.pn-dots,.turn')) return;
     const b=el.getBoundingClientRect();
     if(!b.width||!b.height) return;
     if(b.bottom>r.bottom+1||b.right>r.right+1||b.left<r.left-1)
-      bad.push((el.id?'#'+el.id:el.tagName.toLowerCase()+(el.className&&typeof el.className==='string'?'.'+el.className.trim().split(/\\s+/).join('.'):''))
-        +' by '+Math.round(Math.max(b.bottom-r.bottom,b.right-r.right,r.left-b.left)/k)+'px');
+      bad.push(name(el)+' by '+Math.round(Math.max(b.bottom-r.bottom,b.right-r.right,r.left-b.left)/k)+'px');
   });
-  return {id:s.id, overflow:[...new Set(bad)].slice(0,5),
-          notes:!!s.querySelector('.nt'), ex:!!s.dataset.ex, chip:!!s.querySelector('.turn')};
+  // 2. slide body running into the footer margin of a Pane layout
+  s.querySelectorAll('.pn-content,.pn-quote').forEach(box=>{
+    const c=box.getBoundingClientRect();
+    box.querySelectorAll('*').forEach(el=>{
+      const b=el.getBoundingClientRect();
+      if(b.width&&b.height&&b.bottom>c.bottom+1) bad.push(name(el)+' past the content area by '+Math.round((b.bottom-c.bottom)/k)+'px');
+    });
+  });
+  const d=Deck.defs.find(x=>x.id===s.id)||{};
+  return {id:s.id, overflow:[...new Set(bad)].slice(0,5), notes:!!d.notes};
 }"""
 
 async def check(page, base, name):
@@ -69,7 +79,7 @@ async def check(page, base, name):
     page.on("requestfailed", on_fail)
 
     await page.goto(f"{base}/{name}/")
-    await page.wait_for_function("window.Deck !== undefined", timeout=10000)
+    await page.wait_for_function("window.Deck && Deck.ready", timeout=10000)
     n = await page.evaluate("document.querySelectorAll('#deck .slide').length")
     ids = await page.evaluate("[...document.querySelectorAll('#deck .slide')].map(s=>s.id)")
     dupes = {i for i in ids if ids.count(i) > 1 or not i}
@@ -83,7 +93,6 @@ async def check(page, base, name):
         label = f"{i+1:02d} #{info['id']}"
         if info["overflow"]: problems.append(f"{label}: overflows: {', '.join(info['overflow'])}")
         if not info["notes"]: problems.append(f"{label}: no speaker notes")
-        if info["ex"] and not info["chip"]: problems.append(f"{label}: data-ex but no .turn chip")
         await page.screenshot(path=str(outdir / f"{i+1:02d}-{info['id']}.png"))
     return n, problems + errors, fonts
 

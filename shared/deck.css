@@ -1,40 +1,70 @@
-/* KD401B deck frame: stage, slide canvas, bottom bar, index and notes panels.
-   Only the frame lives here. Everything you see on a slide (slide layouts, cards, tabs,
-   alerts, buttons, code blocks) comes from the Pane bundle in shared/pane/. */
+/* KD401B deck frame: stage, bottom bar, index and notes panels, plus the slide-size
+   versions of Pane's UI components. Every colour and size comes from Pane's tokens
+   (shared/pane/tokens/tokens.css); nothing here edits the Pane bundle itself. */
 
 html,body{margin:0;height:100%}
-body{background:var(--deck-backdrop,#1d1d1f);overflow:hidden}
+body{background:var(--surface-300);color:var(--ink);overflow:hidden;font-family:var(--font-display)}
 
-/* stage fills the window above the bar; the deck is a fixed 1280x720 canvas scaled by deck.js */
-#stage{position:fixed;left:0;right:0;top:0;bottom:var(--barh,48px);overflow:hidden}
-#deck{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:center center}
-#deck>.slide{position:absolute;inset:0;width:1280px;height:720px;box-sizing:border-box;overflow:hidden}
+/* stage fills the window above the bar; deck.js sizes #deck to the largest 16:9 box that fits.
+   Each Pane slide scales itself to the width of #deck. */
+#stage{position:fixed;left:0;right:0;top:0;bottom:var(--barh,56px);overflow:hidden}
+#deck{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+#deck>.slide{position:relative;width:100%}
 #deck>.slide[hidden]{display:none}
-.slide.rise{animation:deck-rise .28s ease-out}
-@keyframes deck-rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.slide.rise{animation:none}}
-
-/* speaker notes stay in the markup but are never shown on the slide */
-.slide .nt{display:none}
 
 /* "Your turn" chip on exercise slides */
-.slide .turn{position:absolute;top:28px;right:32px;font:600 13px/1 system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;padding:8px 12px;border-radius:999px;background:#111;color:#fff}
+.slide .turn{position:absolute;z-index:2;top:2%;right:2%;font:700 16px/1 var(--font-display);padding:8px 12px;background:var(--pink);color:var(--on-pink);border:2px solid var(--ink)}
 
 /* bottom bar */
-#bar{position:fixed;left:0;right:0;bottom:0;display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:6px 10px;background:#111;color:#ddd;font:14px/1.2 system-ui,sans-serif;z-index:10}
-#rail{position:absolute;left:0;top:0;height:3px;background:#8aa4ff;transition:width .2s}
-#bar .cb{appearance:none;border:0;background:transparent;color:inherit;font:inherit;padding:8px 10px;border-radius:6px;cursor:pointer;text-decoration:none;display:inline-flex;gap:8px;align-items:center}
-#bar .cb:hover{background:#2a2a2a;color:#fff}
-#bar .cb:focus-visible{outline:2px solid #8aa4ff;outline-offset:1px}
-#bar kbd{font:12px ui-monospace,monospace;border:1px solid #555;border-radius:4px;padding:0 5px;color:#aaa}
-#where{margin:0 auto;display:flex;gap:12px;color:#aaa}
+#bar{position:fixed;left:0;right:0;bottom:0;display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:6px 10px;background:var(--surface-100);color:var(--ink);border-top:2px solid var(--ink);font:500 16px/24px var(--font-display);z-index:10}
+#rail{position:absolute;left:0;top:-2px;height:4px;background:var(--plum);transition:width .12s}
+#bar .cb{appearance:none;min-height:var(--target-min);border:0;background:transparent;color:inherit;font:inherit;padding:0 12px;border-radius:var(--radius-md);cursor:pointer;text-decoration:none;display:inline-flex;gap:8px;align-items:center}
+#bar .cb:hover{background:var(--surface-300)}
+#bar kbd{font:14px/20px var(--font-mono);border:1px solid var(--border-control);border-radius:var(--radius-sm);padding:0 5px;color:var(--ink-muted)}
+#where{margin:0 auto;display:flex;gap:12px;color:var(--ink-muted)}
 #where-n{font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){#rail{transition:none}}
 
 /* index and notes panels */
-.sheet{position:fixed;right:12px;bottom:calc(var(--barh,48px) + 12px);width:min(440px,calc(100vw - 24px));max-height:calc(100vh - var(--barh,48px) - 24px);overflow:auto;background:#fff;color:#111;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.35);padding:18px 20px;font:16px/1.5 system-ui,sans-serif;z-index:11}
-.sheet h2{font-size:13px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 10px;color:#555}
-#idxlist button{display:flex;gap:12px;width:100%;text-align:left;border:0;background:none;padding:8px 6px;border-radius:6px;font:inherit;cursor:pointer;color:inherit}
-#idxlist button:hover,#idxlist button.cur{background:#eef1ff}
-#idxlist b{font-variant-numeric:tabular-nums;color:#777;font-weight:500}
-#idxlist .t{margin-left:auto;font-size:12px;color:#555}
+.sheet{position:fixed;right:12px;bottom:calc(var(--barh,56px) + 12px);width:min(460px,calc(100vw - 24px));max-height:calc(100vh - var(--barh,56px) - 24px);overflow:auto;background:var(--surface-200);color:var(--ink);border:2px solid var(--ink);box-shadow:var(--shadow-pane-md);padding:var(--space-5);font:18px/28px var(--font-text);z-index:11}
+.sheet h2{font:700 20px/28px var(--font-display);margin:0 0 var(--space-3)}
+#idxlist button{display:flex;gap:12px;width:100%;min-height:var(--target-min);text-align:left;border:0;background:none;padding:6px 8px;border-radius:var(--radius-md);font:500 16px/24px var(--font-display);cursor:pointer;color:inherit;align-items:center}
+#idxlist button:hover{background:var(--surface-300)}
+#idxlist button.cur{background:var(--plum-tint)}
+#idxlist b{font-variant-numeric:tabular-nums;color:var(--ink-muted);font-weight:500}
+#idxlist .t{margin-left:auto;font-size:14px;color:var(--ink-muted)}
 #notetext p{margin:0}
+
+/* ===== Pane UI components at slide size =====
+   Pane's Card, Tabs, Alert, Button and links are sized for interfaces (16–20px).
+   On a 1920x1080 slide they use the slide type scale instead: body 36px (slide-body),
+   block labels 44px (slide-h3), nothing below 28px (slide-caption). */
+.pn-slide .pn-card{padding:var(--space-6)}
+.pn-slide .pn-card__title{font-size:44px;line-height:52px;font-weight:600;margin-bottom:var(--space-3)}
+.pn-slide .pn-card ul{margin:0;padding-left:1.1em}
+.pn-slide .pn-card li{margin-bottom:var(--space-2)}
+.pn-slide .pn-tabs__list{gap:var(--space-2)}
+.pn-slide .pn-tab{font-size:36px;line-height:44px;padding:var(--space-4) var(--space-6);border-bottom-width:8px}
+.pn-slide .pn-tabs__panel{padding:var(--space-7) 0 0}
+.pn-slide .pn-alert{padding:var(--space-5) var(--space-6);gap:var(--space-5)}
+.pn-slide .pn-alert svg{width:44px;height:44px}
+.pn-slide .pn-alert__title{font-size:36px;line-height:48px}
+.pn-slide .pn-alert__body{font-size:36px;line-height:54px;margin-top:var(--space-2)}
+.pn-slide .pn-btn{font-size:36px;line-height:44px;padding:var(--space-4) var(--space-6)}
+.pn-slide .pn-link{text-decoration-thickness:3px}
+
+/* Content wider than the 1040px reading column (grids of cards, tabs). */
+.pn-slide .pn-content__text:has(> .wide){max-width:none}
+.pn-slide .wide{width:100%}
+
+/* Layout helpers for slide bodies */
+.pn-slide .row{display:grid;gap:var(--space-7);grid-auto-flow:column;grid-auto-columns:1fr;align-items:start}
+.pn-slide .grid2{display:grid;gap:var(--space-6);grid-template-columns:1fr 1fr}
+.pn-slide .grid3{display:grid;gap:var(--space-6);grid-template-columns:repeat(3,1fr)}
+.pn-slide .stack{display:flex;flex-direction:column;gap:var(--space-6)}
+.pn-slide .muted{color:var(--ink-muted)}
+.pn-slide .h3{font-family:var(--font-display);font-weight:600;font-size:44px;line-height:52px;margin:0 0 var(--space-5)}
+.pn-slide .lead{font-size:44px;line-height:60px;max-width:1040px;margin:0}
+/* tags: radius-sm, ink border, caption type (Pane: "tags use radius-sm") */
+.pn-slide .tags{display:flex;flex-wrap:wrap;gap:var(--space-4);margin:0;padding:0;list-style:none}
+.pn-slide .tags li{margin:0;font-family:var(--font-display);font-weight:500;font-size:32px;line-height:40px;padding:var(--space-2) var(--space-5);border:2px solid var(--ink);border-radius:var(--radius-sm);background:var(--surface-200);color:var(--ink)}
