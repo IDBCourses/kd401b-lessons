@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LECTURE TITLE · KD401B Interaction Design: Graphical User Interfaces</title>
+<link rel="stylesheet" href="../shared/pane/bundle.css">
+<link rel="stylesheet" href="../shared/deck.css">
+<style>
+/* styles used only by this lecture */
+</style>
+</head>
+<!-- data-lecture: a short unique name; it namespaces this lecture's saved data -->
+<body data-lecture="LECTURE-NAME" data-home="../">
+<main id="stage">
+<div id="deck">
+
+<section class="slide title-slide" id="cover" data-sec="Opening">
+  <div class="kicker">KD401B · Week NN</div>
+  <h1>Lecture title</h1>
+  <p class="subtitle">One line on what this session covers</p>
+  <aside class="nt">Speaker notes go here. Press N to show them.</aside>
+</section>
+
+<section class="slide section-slide" id="section-1" data-sec="Section name">
+  <div class="kicker">Section name</div>
+  <h2>A section opener</h2>
+  <p>Optional line under the heading.</p>
+  <aside class="nt">Notes for this slide.</aside>
+</section>
+
+<section class="slide content-slide" id="example" data-sec="Section name">
+  <div class="kicker">Section name</div>
+  <h2>A content slide</h2>
+  <div class="body">
+    <div class="card"><h3>Card title</h3><p>Cards, tabs, alerts and code blocks: see docs/slide-patterns.md.</p></div>
+  </div>
+  <aside class="nt">Notes for this slide.</aside>
+</section>
+
+<section class="slide content-slide" id="your-turn" data-sec="Section name" data-ex="Short exercise name">
+  <span class="turn">Your turn</span>
+  <div class="kicker">Section name · Exercise</div>
+  <h2>An exercise slide</h2>
+  <div class="body">
+    <pre class="code-block">&lt;p&gt;Hello&lt;/p&gt;</pre>
+  </div>
+  <aside class="nt">data-ex makes E jump here and marks it "Your turn" in the index.</aside>
+</section>
+
+</div>
+</main>
+
+<script src="../shared/pane/bundle.js"></script>
+<script src="../shared/deck.js"></script>
+<script>
+(function(){
+"use strict";
+var D=Deck,$=D.$;
+/* One small block per interactive slide. */
+})();
+</script>
+</body>
+</html>

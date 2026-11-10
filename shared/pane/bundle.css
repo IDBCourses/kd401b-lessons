@@ -1,0 +1,79 @@
+/* =====================================================================
+   PLACEHOLDER — replace with bundle.css from pane-design-system.zip.
+   This file stands in for the real Pane stylesheet so the decks work before
+   the design system is added. It only covers the components the decks use,
+   under the class names listed in docs/design-system.md:
+     .title-slide .section-slide .content-slide .figure-slide .quote-slide
+     .card .tabs .alert .code-block .button
+   When the real bundle arrives, copy its files into shared/pane/ and
+   update the markup if its class names differ (see docs/design-system.md).
+   ===================================================================== */
+
+:root{
+  --pane-bg:#f6f5f2;
+  --pane-surface:#ffffff;
+  --pane-ink:#17171a;
+  --pane-ink-soft:#55565c;
+  --pane-line:#dcdad4;
+  --pane-accent:#3346d3;
+  --pane-accent-soft:#e7eafc;
+  --pane-warn:#a15c00;
+  --pane-warn-soft:#fdf1df;
+  --pane-radius:14px;
+  --pane-font:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --pane-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+
+/* ---------- slides ---------- */
+.slide{background:var(--pane-bg);color:var(--pane-ink);font-family:var(--pane-font);font-size:24px;line-height:1.45;padding:64px 80px}
+.slide h1,.slide h2,.slide h3{margin:0;letter-spacing:-.02em;line-height:1.1}
+.slide p{margin:0}
+.slide .kicker{font-size:15px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--pane-ink-soft);margin-bottom:18px}
+.slide .lede{font-size:28px;color:var(--pane-ink-soft);max-width:40ch}
+
+.title-slide{display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:88px}
+.title-slide h1{font-size:76px;font-weight:700;max-width:16ch}
+.title-slide .subtitle{font-size:34px;color:var(--pane-ink-soft);margin-top:20px}
+.title-slide .meta{margin-top:48px;display:flex;gap:32px;font-size:20px;color:var(--pane-ink-soft)}
+
+.section-slide{display:flex;flex-direction:column;justify-content:center;background:var(--pane-ink);color:var(--pane-bg)}
+.section-slide .kicker{color:#a9abb6}
+.section-slide h2{font-size:84px;font-weight:700;max-width:18ch}
+.section-slide p{font-size:28px;color:#c9cad2;margin-top:24px;max-width:40ch}
+
+.content-slide{display:flex;flex-direction:column}
+.content-slide>h2{font-size:48px;font-weight:700;margin-bottom:32px}
+.content-slide .body{flex:1;min-height:0}
+
+.figure-slide{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.figure-slide figure{margin:0}
+.figure-slide figcaption{font-size:18px;color:var(--pane-ink-soft);margin-top:12px}
+
+.quote-slide{display:flex;flex-direction:column;justify-content:center}
+.quote-slide blockquote{margin:0;font-size:60px;font-weight:600;line-height:1.15;letter-spacing:-.02em;max-width:22ch}
+.quote-slide cite{display:block;margin-top:28px;font-size:22px;font-style:normal;color:var(--pane-ink-soft)}
+
+/* ---------- components ---------- */
+.card{background:var(--pane-surface);border:1px solid var(--pane-line);border-radius:var(--pane-radius);padding:28px 32px}
+.card h3{font-size:28px;font-weight:700;margin-bottom:10px}
+.card .card-label{font-size:14px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--pane-accent);margin-bottom:10px}
+.card ul{margin:0;padding-left:22px}
+.card li+li{margin-top:6px}
+
+.tabs{display:flex;flex-direction:column;gap:20px}
+.tabs [role=tablist]{display:flex;gap:6px;border-bottom:1px solid var(--pane-line)}
+.tabs [role=tab]{appearance:none;border:0;background:none;font:600 20px var(--pane-font);color:var(--pane-ink-soft);padding:12px 18px;border-bottom:3px solid transparent;margin-bottom:-1px;cursor:pointer}
+.tabs [role=tab][aria-selected=true]{color:var(--pane-ink);border-bottom-color:var(--pane-accent)}
+.tabs [role=tab]:focus-visible{outline:2px solid var(--pane-accent);outline-offset:2px}
+.tabs [role=tabpanel][hidden]{display:none}
+
+.alert{display:flex;gap:16px;align-items:flex-start;border-radius:var(--pane-radius);padding:20px 24px;background:var(--pane-accent-soft);border-left:6px solid var(--pane-accent);font-size:22px}
+.alert strong{display:block;margin-bottom:4px}
+.alert.warning{background:var(--pane-warn-soft);border-left-color:var(--pane-warn)}
+
+.code-block{font-family:var(--pane-mono);font-size:20px;line-height:1.5;background:#17171a;color:#eceae4;border-radius:var(--pane-radius);padding:22px 26px;margin:0;white-space:pre;overflow:hidden}
+
+.button{display:inline-flex;align-items:center;gap:10px;font:600 20px var(--pane-font);color:#fff;background:var(--pane-accent);border:0;border-radius:10px;padding:12px 20px;text-decoration:none;cursor:pointer}
+.button:hover{filter:brightness(1.1)}
+.button.secondary{background:var(--pane-surface);color:var(--pane-ink);border:1px solid var(--pane-line)}
+.button:focus-visible{outline:3px solid var(--pane-accent);outline-offset:3px}
