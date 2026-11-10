@@ -10,15 +10,19 @@
 <style>
 /* styles used only by this lecture */
 
-/* who we are: photo placeholder in a Pane-style frame (square, ink border, hard shadow) */
+/* who we are: photos from the MAU staff pages, in a Pane-style frame (square, ink border, hard shadow) */
 .person{display:flex;gap:var(--space-7);align-items:center}
-.photo{flex:none;width:240px;height:240px;border:2px solid var(--ink);box-shadow:var(--shadow-pane-md);background:var(--surface-300);display:grid;place-items:center;font-family:var(--font-display);font-weight:500;font-size:28px;color:var(--ink-muted)}
+.photo{flex:none;display:block;width:240px;height:240px;object-fit:cover;border:2px solid var(--ink);box-shadow:var(--shadow-pane-md);background:var(--surface-300)}
 .role{font-family:var(--font-display);font-weight:500;font-size:28px;line-height:38px;color:var(--ink-muted);margin:0 0 var(--space-2)}
 
 /* title slide: the full course name is longer than TitleSlide's 144px frame allows,
    so this one frame is set at slide-h1 size (104px) with a slightly wider column */
 #cover .pn-title{width:1200px}
 #cover .pn-frame{font-size:104px!important}
+
+/* the weeks ahead: nine week tabs need less side padding to fit on one row */
+#weeks .pn-tab{padding-left:var(--space-4);padding-right:var(--space-4)}
+.when{font-family:var(--font-display);font-weight:500;font-size:32px;line-height:40px;margin-top:var(--space-4)}
 
 /* assessment facts under a card */
 .facts{font-family:var(--font-display);font-weight:500;font-size:32px;line-height:40px;margin-top:var(--space-5)}
@@ -46,27 +50,47 @@ var FOOT="KD401B · Course introduction";
 function card(title,body,tone){return h(P.Card,{title:title,tone:tone||"paper"},body)}
 function p(t,cls){return h("p",cls?{className:cls}:null,t)}
 
-/* The weeks ahead: one tab per week, Thursday and Friday side by side. From the HT26 day-pairing plan. */
+/* The weeks ahead: one tab per week. Dates and sessions from the Course Elements database in Notion
+   (GUIs HT26). Each card: [title, text, tone]. */
 var WEEKS=[
-  ["46","Week 46","Colour","Course introduction, then Colour. Exercise: colour in Figma.","Introduction to HTML and CSS, colour in CSS. Exercise: colour in HTML and CSS."],
-  ["47","Week 47","Type, sketching and design process","Type, sketching and the design process.","HTML document structure and CSS typography."],
-  ["48","Week 48","Content and UX writing, icons","Content and UX writing, icons and symbols.","Semantic HTML for navigation and forms, SVG icons."],
-  ["49","Week 49","Design systems, composition and layout","Consistency and design systems, composition and layout.","CSS custom properties, components, the box model and Flexbox."],
-  ["51","Week 51","Pointing, input and accessibility","Pointing, input and accessibility.","Keyboard navigation, screen readers and a WCAG audit."],
-  ["1","Week 1","Designing for intuition, animation and motion","Designing for intuition, animation and motion.","Hover states, CSS transitions, keyframe animations and basic JavaScript events."],
-  ["2-3","Weeks 2–3","Portfolio prep","Portfolio preparation.","Portfolio work sessions."]
+  {id:"46",label:"Week 46",topic:"Colour",cards:[
+    ["Thu 12 Nov · design","Course introduction, then Colour. Exercise: colour in Figma.","teal"],
+    ["Fri 13 Nov · HTML and CSS","Introduction to HTML and CSS, colour in CSS. Exercise: colour in HTML and CSS.","plum"]]},
+  {id:"47",label:"Week 47",topic:"Type, sketching and design process",cards:[
+    ["Thu 19 Nov · design","Type, then sketching and the design process. Exercise: type and sketching in Figma.","teal"],
+    ["Fri 20 Nov · HTML and CSS","HTML document structure and CSS typography. Exercise: type in HTML and CSS.","plum"]]},
+  {id:"48",label:"Week 48",topic:"Content and UX writing, icons",cards:[
+    ["Thu 26 Nov · design","Content and UX writing, then icons and symbols. Exercise: content and icons in Figma.","teal"],
+    ["Fri 27 Nov · HTML and CSS","Semantic HTML, forms and SVG icons. Exercise: semantic HTML, forms and icons.","plum"]]},
+  {id:"49",label:"Week 49",topic:"Design systems, composition and layout",cards:[
+    ["Thu 3 Dec · design","Consistency and design systems, then composition and layout. Exercise in Figma.","teal"],
+    ["Fri 4 Dec · HTML and CSS","CSS custom properties, components and Flexbox. Exercise: components and layout.","plum"]]},
+  {id:"50",label:"Week 50",topic:"Group work on your A2 project",cards:[
+    ["Thu 10 Dec","A full day of group work sessions on your A2 design activity, with us there to help.","pink"],
+    ["Fri 11 Dec","Another day of group work sessions. A2 is due at the end of the day.","pink"]]},
+  {id:"51",label:"Week 51",topic:"A2 oral exam",cards:[
+    ["Fri 18 Dec","You present and discuss your A2 design as a group. Groups are split between morning and afternoon.","pink"]]},
+  {id:"52",label:"Week 52",topic:"Work on your A1 critique",cards:[
+    ["No teaching","Time to write your A1 critical analysis of an interface.","teal"]]},
+  {id:"1",label:"Week 1",topic:"Designing for intuition, animation and motion",cards:[
+    ["Thu 7 Jan · design","Designing for intuition, then animation, motion and space. Exercise in Figma.","teal"],
+    ["Fri 8 Jan · HTML and CSS","CSS states, transitions and animation. Exercise: interaction and motion in HTML and CSS.","plum"]]},
+  {id:"2",label:"Week 2",topic:"Portfolio",cards:[
+    ["Wed 13 Jan","Portfolio coaching.","plum"],
+    ["Thu 14 – Fri 15 Jan","Portfolio work sessions. A3 is due on Friday 15 Jan.","plum"]]}
 ];
-var weekTabs=WEEKS.map(function(w){return {id:w[0],label:w[1],content:h("div",null,
-  h("h3",{className:"h3"},w[2]),
-  h("div",{className:"grid2"},card("Thursday · design",p(w[3]),"teal"),card("Friday · HTML and CSS",p(w[4]),"plum")))}});
+var weekTabs=WEEKS.map(function(w){return {id:w.id,label:w.label,content:h("div",null,
+  h("h3",{className:"h3"},w.topic),
+  h("div",{className:"grid2"},w.cards.map(function(c){return h(P.Card,{key:c[0],title:c[0],tone:c[2]},p(c[1]))})))}});
 
-var CANVAS=[
-  ["Modules","modules","Week by week"],
-  ["Assignments","assignments","Briefs and deadlines"],
-  ["Course software","pages/course-software","What to install"],
-  ["Course literature","pages/course-literature","What to read"],
-  ["Figma tutorials","pages/figma-tutorials","Getting started in Figma"],
-  ["Design portfolios","pages/design-portfolios","Examples to look at"]
+var CANVAS_URL="https://mau.instructure.com/courses/22861/";
+var LINKS=[
+  ["Modules",CANVAS_URL+"modules","Week by week, on Canvas"],
+  ["Assignments",CANVAS_URL+"assignments","Briefs and deadlines, on Canvas"],
+  ["Course software",CANVAS_URL+"pages/course-software","What to install, on Canvas"],
+  ["Course literature",CANVAS_URL+"pages/course-literature","What to read, on Canvas"],
+  ["Figma tutorials",CANVAS_URL+"pages/figma-tutorials","Getting started in Figma, on Canvas"],
+  ["Syllabus","https://utbildningsinfo.mau.se/kurs/kursplan/en/cc3ff7f4-d4ec-11f0-b415-d312a71c4fd5/20262","The official course syllabus, Autumn 2026"]
 ];
 
 Deck.start([
@@ -75,13 +99,13 @@ Deck.start([
  render:function(){return h(P.TitleSlide,{title:["Interaction","Design: Graphical","User Interfaces"],subtitle:"Course introduction",meta:"David and Johannes · KD401B HT26"})}},
 
 {id:"who",sec:"Welcome",title:"Who we are",
- notes:"Replace the photo placeholders with real photos (put them in intro/img/ and swap the .photo divs for img elements with alt text). A sentence or two each about background; the slide only says what each of us does in the course.",
+ notes:"Johannes first: he teaches Thursdays, which come first each week. A sentence or two each about background. David is course coordinator: questions about the course as a whole (registration, Nais adjustments, re-exams) go to him. Photos are from our MAU staff pages.",
  render:function(n){return h(P.ContentSlide,{title:"Who we are",number:n,footer:FOOT},
   h("div",{className:"wide grid2"},
-    h(P.Card,null,h("div",{className:"person"},h("div",{className:"photo","aria-hidden":true},"Photo"),
-      h("div",null,p("Fridays · HTML and CSS","role"),h("h3",{className:"h3",style:{marginBottom:8}},"David"),p("HTML and CSS lectures and exercises. Grades the portfolio.")))),
-    h(P.Card,null,h("div",{className:"person"},h("div",{className:"photo","aria-hidden":true},"Photo"),
-      h("div",null,p("Thursdays · design","role"),h("h3",{className:"h3",style:{marginBottom:8}},"Johannes"),p("Design lectures and Figma exercises. Grades A1 and A2."))))))}},
+    h(P.Card,null,h("div",{className:"person"},h("img",{className:"photo",src:"img/johannes.jpg",alt:"Photo of Johannes",width:240,height:240}),
+      h("div",null,p("Thursdays · design","role"),h("h3",{className:"h3",style:{marginBottom:8}},"Johannes"),p("Design lectures and Figma exercises. Grades A1 and A2.")))),
+    h(P.Card,null,h("div",{className:"person"},h("img",{className:"photo",src:"img/david.jpg",alt:"Photo of David",width:240,height:240}),
+      h("div",null,p("Fridays · HTML and CSS","role"),h("h3",{className:"h3",style:{marginBottom:8}},"David"),p("Course coordinator. HTML and CSS lectures and exercises. Grades the portfolio."))))))}},
 
 {id:"icebreaker",sec:"Welcome",title:"Icebreaker",
  notes:"Pairs first, then take three or four answers from the room. Push for the specific thing: a button that was hard to find, text too small, an error that didn't say what was wrong. Those are the things this course gives words for: colour, type, layout, input, accessibility.",
@@ -113,28 +137,28 @@ Deck.start([
     h(P.Card,{title:"Fridays · David",tone:"plum"},h("ul",null,h("li",null,"HTML and CSS lecture"),h("li",null,"Then implementation exercises")))))}},
 
 {id:"weeks",sec:"Structure",title:"The weeks ahead",demo:"Weeks",
- notes:"Click a week (or use the arrow keys once a tab has focus) to show its Thursday and Friday. No teaching in week 50. Weeks 2–3 are for portfolio preparation.",
+ notes:"Click a week (or use the arrow keys once a tab has focus). Week 50 is group work on A2, week 51 the A2 oral exam, week 52 is time for the A1 critique. TODO before presenting: the A1 deadline (30 Dec in Notion and Canvas, 5 Jan in TimeEdit) and the 18 Dec exam times are still being reconciled, so they are not on the slide yet.",
  render:function(n){return h(P.ContentSlide,{title:"The weeks ahead",number:n,footer:FOOT},
   h("div",{className:"wide"},h(P.Tabs,{tabs:weekTabs,label:"Weeks"})))}},
 
 {id:"assessment",sec:"Assessment",title:"Assessment overview",
- notes:"Overview only; details on the next two slides. 7.5 hp in total. Johannes grades A1 and A2, David grades A3.",
+ notes:"Overview only; details on the next two slides. In the order they happen: A2 in December, A1 over the break, A3 in January. 7.5 hp in total. Johannes grades A1 and A2, David grades A3.",
  render:function(n){return h(P.ContentSlide,{title:"Assessment overview",number:n,footer:FOOT},
   h("div",{className:"wide grid3"},
-    h(P.Card,{title:"A1 Critical analysis",tone:"teal"},p("Analyse an interface using the course theory."),p("Individual · 1 hp · LO1","facts")),
     h(P.Card,{title:"A2 Design activity",tone:"pink"},p("Sketch and design an interface together."),p("Pairs · 3 hp · LO2–3","facts")),
+    h(P.Card,{title:"A1 Critical analysis",tone:"teal"},p("Analyse an interface using the course theory."),p("Individual · 1 hp · LO1","facts")),
     h(P.Card,{title:"A3 Portfolio",tone:"plum"},p("A site you build in HTML and CSS."),p("Individual · 3.5 hp · LO4","facts"))))}},
 
-{id:"a1-a2",sec:"Assessment",title:"A1 and A2",
- notes:"Johannes presents. Click the tabs to switch. Briefs, dates and grading criteria are on Canvas under Assignments. Johannes: add anything about the A2 brief to announce today (the plan mentions kiosk and ordering interfaces as possible briefs; not on the slide until confirmed).",
- render:function(n){return h(P.ContentSlide,{title:"A1 and A2",number:n,footer:"KD401B · Course introduction · Johannes"},
+{id:"a2-a1",sec:"Assessment",title:"A2 and A1",
+ notes:"Johannes presents. A2 first, since it comes first. Click the tabs to switch. Briefs, dates and grading criteria are on Canvas under Assignments. Johannes: add anything about the A2 brief to announce today (the plan mentions kiosk and ordering interfaces as possible briefs; not on the slide until confirmed).",
+ render:function(n){return h(P.ContentSlide,{title:"A2 and A1",number:n,footer:"KD401B · Course introduction · Johannes"},
   h("div",{className:"wide"},h(P.Tabs,{label:"Assessments",tabs:[
-    {id:"a1",label:"A1 Critical analysis",content:h("div",{className:"stack"},
-      p("An individual analysis of an interface design, using the theory introduced in the course. Short, and deep rather than broad.","lead"),
-      p("Individual · 1 hp · LO1","facts"))},
     {id:"a2",label:"A2 Design activity",content:h("div",{className:"stack"},
       p("In pairs, you take a design problem from sketches to a screen design in Figma. The Thursday sketching and Figma exercises lead into it.","lead"),
-      p("Pairs · 3 hp · LO2–3","facts"))}
+      p("Pairs · 3 hp · LO2–3 · Due Fri 11 Dec · Oral exam Fri 18 Dec","facts"))},
+    {id:"a1",label:"A1 Critical analysis",content:h("div",{className:"stack"},
+      p("An individual analysis of an interface design, using the theory introduced in the course. Short, and deep rather than broad.","lead"),
+      p("Individual · 1 hp · LO1 · Written in week 52","facts"))}
   ]})))}},
 
 {id:"a3",sec:"Assessment",title:"A3 Portfolio",
@@ -149,12 +173,12 @@ Deck.start([
       h(P.Alert,{tone:"warning",title:"Accept the GitHub invitation the same day you get it."},"Invitations expire. If yours has, tell David."),
       h(P.Alert,{tone:"info",title:"Don't create your own repository from the template."},"Use the one we create for you."))))}},
 
-{id:"canvas",sec:"Practical",title:"Canvas",
- notes:"Click through one or two live. Modules is week by week; Assignments has the A1–A3 briefs and deadlines. Design portfolios has examples worth looking at before starting A3.",
- render:function(n){return h(P.ContentSlide,{title:"Where to find things on Canvas",number:n,footer:FOOT},
-  h("div",{className:"wide grid3"},CANVAS.map(function(c){
-    return h(P.Card,{key:c[1],interactive:true,className:"linkcard"},
-      h("a",{className:"pn-link",href:"https://mau.instructure.com/courses/22861/"+c[1],target:"_blank",rel:"noopener"},c[0]),
+{id:"canvas",sec:"Practical",title:"Where to find things",
+ notes:"Click through one or two live. Modules is week by week; Assignments has the A1–A3 briefs and deadlines. The syllabus is the official description of the course: learning outcomes and the three examinations.",
+ render:function(n){return h(P.ContentSlide,{title:"Where to find things",number:n,footer:FOOT},
+  h("div",{className:"wide grid3"},LINKS.map(function(c){
+    return h(P.Card,{key:c[0],interactive:true,className:"linkcard"},
+      h("a",{className:"pn-link",href:c[1],target:"_blank",rel:"noopener"},c[0]),
       p(c[2],"muted"));
   })))}},
 
