@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KD401B Interaction Design: Graphical User Interfaces · HT2026</title>
+<link rel="stylesheet" href="shared/pane/tokens/tokens.css">
+<link rel="stylesheet" href="shared/pane/components/bundle.css">
+<style>
+/* Home page layout. Colours, type and components come from Pane (pn-* classes and tokens). */
+body.pn-base{padding:0}
+.wrap{max-width:1040px;margin:0 auto;padding:0 var(--space-5)}
+header{padding:var(--space-9) 0 var(--space-8);position:relative;overflow:hidden}
+.kicker{font-family:var(--font-display);font-weight:500;font-size:16px;line-height:24px;color:var(--ink-muted);margin:0 0 var(--space-5)}
+header .pn-frame{font-size:clamp(36px,7vw,72px)}
+header p.intro{font-size:20px;line-height:30px;max-width:var(--measure);margin:var(--space-6) 0 0}
+main{padding:0 0 var(--space-9)}
+h2{font-family:var(--font-display);font-weight:700;font-size:28px;line-height:36px;margin:0 0 var(--space-4)}
+.lectures{list-style:none;margin:0 0 var(--space-8);padding:0;display:flex;flex-direction:column;gap:var(--space-4)}
+.lectures .pn-card{display:grid;grid-template-columns:72px 1fr auto;gap:var(--space-2) var(--space-5);align-items:baseline;position:relative}
+.wk{font-family:var(--font-display);font-weight:700;font-size:32px;line-height:1;font-variant-numeric:tabular-nums}
+.lectures a{font-family:var(--font-display);font-weight:700;font-size:24px;line-height:32px}
+.lectures a::after{content:"";position:absolute;inset:0}
+.lectures p{margin:var(--space-1) 0 0}
+.when{font-family:var(--font-display);font-weight:500;font-size:16px;color:var(--ink-muted);white-space:nowrap}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5)}
+.cols ul{margin:0;padding-left:20px}
+.cols li{margin:var(--space-1) 0}
+kbd{font-family:var(--font-mono);font-size:15px;border:1px solid var(--border-control);border-radius:var(--radius-sm);padding:0 6px;background:var(--surface-200)}
+@media (max-width:720px){.lectures .pn-card{grid-template-columns:48px 1fr}.when{grid-column:2}.cols{grid-template-columns:1fr}.wk{font-size:24px}}
+</style>
+</head>
+<body class="pn-base">
+<header>
+  <div class="wrap">
+    <p class="kicker">KD401B · Malmö University · Autumn 2026</p>
+    <h1 class="pn-frame pn-frame--plum">
+      <span class="pn-frame__line">Interaction Design: </span>
+      <span class="pn-frame__line" style="margin-left:.9em">Graphical User </span>
+      <span class="pn-frame__line" style="margin-left:.35em">Interfaces</span>
+    </h1>
+    <p class="intro">Lecture slides for the course. Open a lecture to follow along on your own laptop.</p>
+  </div>
+</header>
+<main>
+  <div class="wrap">
+    <h2>Lectures</h2>
+    <!-- One <li> per lecture, in course order. Folder name = lecture name. -->
+    <ol class="lectures">
+      <li class="pn-card pn-card--interactive">
+        <span class="wk">46</span>
+        <div><a class="pn-link" href="intro/">Course introduction</a><p>Who we are, what the course covers, how the weeks run, and the three assessments.</p></div>
+        <span class="when">Thu 12 Nov</span>
+      </li>
+    </ol>
+
+    <div class="cols">
+      <div class="pn-card">
+        <h2>Course links</h2>
+        <ul class="pn-prose">
+          <li><a href="https://mau.instructure.com/courses/22861/modules">Canvas modules</a></li>
+          <li><a href="https://mau.instructure.com/courses/22861/assignments">Assignments</a></li>
+          <li><a href="https://mau.instructure.com/courses/22861/pages/course-software">Course software</a></li>
+          <li><a href="https://mau.instructure.com/courses/22861/pages/course-literature">Course literature</a></li>
+        </ul>
+      </div>
+      <div class="pn-card">
+        <h2>Using the slides</h2>
+        <ul>
+          <li><kbd>←</kbd> <kbd>→</kbd> move between slides</li>
+          <li><kbd>T</kbd> switch theme: light, dark, high contrast</li>
+          <li><kbd>I</kbd> list of all slides · <kbd>F</kbd> full screen</li>
+          <li>On a phone or tablet, swipe</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+/* use the theme chosen in the slides */
+try{var t=localStorage.getItem("kd401b:theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}
+</script>
+</body>
+</html>

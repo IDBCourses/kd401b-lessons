@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LECTURE TITLE · KD401B Interaction Design: Graphical User Interfaces</title>
+<link rel="stylesheet" href="../shared/pane/tokens/tokens.css">
+<link rel="stylesheet" href="../shared/pane/components/bundle.css">
+<link rel="stylesheet" href="../shared/deck.css">
+<style>
+/* styles used only by this lecture: layout only, colours and sizes from Pane tokens */
+</style>
+</head>
+<!-- data-lecture: a short unique name; it namespaces this lecture's saved data -->
+<body data-lecture="LECTURE-NAME" data-home="../">
+<main id="stage"><div id="deck"></div></main>
+
+<script src="../shared/pane/vendor/react.production.min.js"></script>
+<script src="../shared/pane/vendor/react-dom.production.min.js"></script>
+<script src="../shared/pane/components/bundle.js"></script>
+<script src="../shared/deck.js"></script>
+<script>
+(function(){
+"use strict";
+var P=window.Pane,h=React.createElement;
+var FOOT="KD401B · Lecture title";
+
+Deck.start([
+{id:"cover",sec:"Opening",title:"Lecture title",
+ notes:"Speaker notes go here. Press N to show them.",
+ render:function(){return h(P.TitleSlide,{title:["Headline as","a sentence"],subtitle:"One line on what this session covers",meta:"David · KD401B HT26 · Week NN"})}},
+
+{id:"section-1",sec:"Section name",title:"Section opener",
+ notes:"One SectionSlide per section, three to five in a deck.",
+ render:function(){return h(P.SectionSlide,{title:["Section name"],tone:"teal",footer:FOOT})}},
+
+{id:"example",sec:"Section name",title:"A content slide",
+ notes:"Body is a short list or one or two short paragraphs. Wrap grids of cards in className:'wide'.",
+ render:function(n){return h(P.ContentSlide,{title:"Say the point as a sentence",number:n,footer:FOOT,aside:"A rule of thumb or definition.",asideTitle:"Rule"},
+  h("p",null,"Body text at 36px."))}},
+
+{id:"code",sec:"Section name",title:"Code example",
+ notes:"CodeBlock with size slide.",
+ render:function(n){return h(P.ContentSlide,{title:"Code on a slide",number:n,footer:FOOT},
+  h(P.CodeBlock,{size:"slide",label:"index.html"},"<p>Hello</p>"))}},
+
+{id:"your-turn",sec:"Section name",title:"Exercise",ex:"Short exercise name",
+ notes:"ex marks a 'Your turn' slide; E jumps between them.",
+ render:function(n){return h(P.ContentSlide,{title:"Your turn",number:n,footer:FOOT},
+  h("p",null,"What to do, in one or two sentences."))}}
+]);
+})();
+</script>
+</body>
+</html>

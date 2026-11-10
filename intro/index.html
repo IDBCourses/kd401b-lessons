@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Course introduction · KD401B Interaction Design: Graphical User Interfaces</title>
+<link rel="stylesheet" href="../shared/pane/tokens/tokens.css">
+<link rel="stylesheet" href="../shared/pane/components/bundle.css">
+<link rel="stylesheet" href="../shared/deck.css">
+<style>
+/* styles used only by this lecture */
+
+/* who we are: photo placeholder in a Pane-style frame (square, ink border, hard shadow) */
+.person{display:flex;gap:var(--space-7);align-items:center}
+.photo{flex:none;width:240px;height:240px;border:2px solid var(--ink);box-shadow:var(--shadow-pane-md);background:var(--surface-300);display:grid;place-items:center;font-family:var(--font-display);font-weight:500;font-size:28px;color:var(--ink-muted)}
+.role{font-family:var(--font-display);font-weight:500;font-size:28px;line-height:38px;color:var(--ink-muted);margin:0 0 var(--space-2)}
+
+/* title slide: the full course name is longer than TitleSlide's 144px frame allows,
+   so this one frame is set at slide-h1 size (104px) with a slightly wider column */
+#cover .pn-title{width:1200px}
+#cover .pn-frame{font-size:104px!important}
+
+/* assessment facts under a card */
+.facts{font-family:var(--font-display);font-weight:500;font-size:32px;line-height:40px;margin-top:var(--space-5)}
+
+/* canvas links: the whole card is clickable through its one link */
+.linkcard{position:relative}
+.linkcard a{font-family:var(--font-display);font-weight:600;font-size:44px;line-height:52px}
+.linkcard a::after{content:"";position:absolute;inset:0}
+.linkcard p{margin-top:var(--space-2)}
+</style>
+</head>
+<body data-lecture="intro" data-home="../">
+<main id="stage"><div id="deck"></div></main>
+
+<script src="../shared/pane/vendor/react.production.min.js"></script>
+<script src="../shared/pane/vendor/react-dom.production.min.js"></script>
+<script src="../shared/pane/components/bundle.js"></script>
+<script src="../shared/deck.js"></script>
+<script>
+(function(){
+"use strict";
+var P=window.Pane,h=React.createElement;
+var FOOT="KD401B · Course introduction";
+
+function card(title,body,tone){return h(P.Card,{title:title,tone:tone||"paper"},body)}
+function p(t,cls){return h("p",cls?{className:cls}:null,t)}
+
+/* The weeks ahead: one tab per week, Thursday and Friday side by side. From the HT26 day-pairing plan. */
+var WEEKS=[
+  ["46","Week 46","Colour","Course introduction, then Colour. Exercise: colour in Figma.","Introduction to HTML and CSS, colour in CSS. Exercise: colour in HTML and CSS."],
+  ["47","Week 47","Type, sketching and design process","Type, sketching and the design process.","HTML document structure and CSS typography."],
+  ["48","Week 48","Content and UX writing, icons","Content and UX writing, icons and symbols.","Semantic HTML for navigation and forms, SVG icons."],
+  ["49","Week 49","Design systems, composition and layout","Consistency and design systems, composition and layout.","CSS custom properties, components, the box model and Flexbox."],
+  ["51","Week 51","Pointing, input and accessibility","Pointing, input and accessibility.","Keyboard navigation, screen readers and a WCAG audit."],
+  ["1","Week 1","Designing for intuition, animation and motion","Designing for intuition, animation and motion.","Hover states, CSS transitions, keyframe animations and basic JavaScript events."],
+  ["2-3","Weeks 2–3","Portfolio prep","Portfolio preparation.","Portfolio work sessions."]
+];
+var weekTabs=WEEKS.map(function(w){return {id:w[0],label:w[1],content:h("div",null,
+  h("h3",{className:"h3"},w[2]),
+  h("div",{className:"grid2"},card("Thursday · design",p(w[3]),"teal"),card("Friday · HTML and CSS",p(w[4]),"plum")))}});
+
+var CANVAS=[
+  ["Modules","modules","Week by week"],
+  ["Assignments","assignments","Briefs and deadlines"],
+  ["Course software","pages/course-software","What to install"],
+  ["Course literature","pages/course-literature","What to read"],
+  ["Figma tutorials","pages/figma-tutorials","Getting started in Figma"],
+  ["Design portfolios","pages/design-portfolios","Examples to look at"]
+];
+
+Deck.start([
+{id:"cover",sec:"Welcome",title:"Interaction Design: Graphical User Interfaces",
+ notes:"Welcome. David leads this session; Johannes takes the parts about his Thursdays and A1/A2. Colour, with Johannes, follows straight after.",
+ render:function(){return h(P.TitleSlide,{title:["Interaction","Design: Graphical","User Interfaces"],subtitle:"Course introduction",meta:"David and Johannes · KD401B HT26"})}},
+
+{id:"who",sec:"Welcome",title:"Who we are",
+ notes:"Replace the photo placeholders with real photos (put them in intro/img/ and swap the .photo divs for img elements with alt text). A sentence or two each about background; the slide only says what each of us does in the course.",
+ render:function(n){return h(P.ContentSlide,{title:"Who we are",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h(P.Card,null,h("div",{className:"person"},h("div",{className:"photo","aria-hidden":true},"Photo"),
+      h("div",null,p("Fridays · HTML and CSS","role"),h("h3",{className:"h3",style:{marginBottom:8}},"David"),p("HTML and CSS lectures and exercises. Grades the portfolio.")))),
+    h(P.Card,null,h("div",{className:"person"},h("div",{className:"photo","aria-hidden":true},"Photo"),
+      h("div",null,p("Thursdays · design","role"),h("h3",{className:"h3",style:{marginBottom:8}},"Johannes"),p("Design lectures and Figma exercises. Grades A1 and A2."))))))}},
+
+{id:"icebreaker",sec:"Welcome",title:"Icebreaker",
+ notes:"Pairs first, then take three or four answers from the room. Push for the specific thing: a button that was hard to find, text too small, an error that didn't say what was wrong. Those are the things this course gives words for: colour, type, layout, input, accessibility.",
+ render:function(){return h(P.SectionSlide,{title:["Name an interface you","used today that","annoyed you."],tone:"pink",footer:"Icebreaker · Tell the person next to you what got in the way."})}},
+
+{id:"about",sec:"The course",title:"What this course is about",
+ notes:"Two tracks that meet every week: design (Thursdays) and building (Fridays). The topics run from colour and type through layout and interaction to accessibility. Each Thursday topic gets a matching Friday in code.",
+ render:function(n){return h(P.ContentSlide,{title:"What this course is about",number:n,footer:FOOT},
+  h("div",{className:"wide stack"},
+    h("div",{className:"grid2"},
+      card("Designing graphical user interfaces",p("Looking closely at interfaces, sketching alternatives, and making considered design decisions.")),
+      card("Building them for the screen",p("Turning those designs into real pages in HTML and CSS."))),
+    h("ul",{className:"tags","aria-label":"Topics, in order"},["Colour","Type","Layout","Interaction","Accessibility"].map(function(t){return h("li",{key:t},t)}))))}},
+
+{id:"outcomes",sec:"The course",title:"Learning outcomes",
+ notes:"Walk through the four. 1–3 are mostly Thursdays; 4 is Fridays. Each maps to an assessment, coming up shortly. \"W3C-validated\" means it passes validator.w3.org; we use it from the first Friday.",
+ render:function(n){return h(P.ContentSlide,{title:"Learning outcomes",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    card("1. Analyse",p("interface designs using the theory introduced in the course.")),
+    card("2. Sketch",p("to explore many different design directions.")),
+    card("3. Design",p("for screens using appropriate design principles.")),
+    card("4. Build",p("W3C-validated, semantically correct HTML markup and CSS."))))}},
+
+{id:"week",sec:"Structure",title:"How a week works",
+ notes:"Johannes: a couple of minutes on what Thursdays look like and how Figma runs through the exercises (there's no separate Figma workshop). David: Fridays take the same topic into code, and the Friday exercises feed the portfolio.",
+ render:function(n){return h(P.ContentSlide,{title:"How a week works",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h(P.Card,{title:"Thursdays · Johannes",tone:"teal"},h("ul",null,h("li",null,"Design and theory lecture"),h("li",null,"Then Figma and sketching exercises"))),
+    h(P.Card,{title:"Fridays · David",tone:"plum"},h("ul",null,h("li",null,"HTML and CSS lecture"),h("li",null,"Then implementation exercises")))))}},
+
+{id:"weeks",sec:"Structure",title:"The weeks ahead",demo:"Weeks",
+ notes:"Click a week (or use the arrow keys once a tab has focus) to show its Thursday and Friday. No teaching in week 50. Weeks 2–3 are for portfolio preparation.",
+ render:function(n){return h(P.ContentSlide,{title:"The weeks ahead",number:n,footer:FOOT},
+  h("div",{className:"wide"},h(P.Tabs,{tabs:weekTabs,label:"Weeks"})))}},
+
+{id:"assessment",sec:"Assessment",title:"Assessment overview",
+ notes:"Overview only; details on the next two slides. 7.5 hp in total. Johannes grades A1 and A2, David grades A3.",
+ render:function(n){return h(P.ContentSlide,{title:"Assessment overview",number:n,footer:FOOT},
+  h("div",{className:"wide grid3"},
+    h(P.Card,{title:"A1 Critical analysis",tone:"teal"},p("Analyse an interface using the course theory."),p("Individual · 1 hp · LO1","facts")),
+    h(P.Card,{title:"A2 Design activity",tone:"pink"},p("Sketch and design an interface together."),p("Pairs · 3 hp · LO2–3","facts")),
+    h(P.Card,{title:"A3 Portfolio",tone:"plum"},p("A site you build in HTML and CSS."),p("Individual · 3.5 hp · LO4","facts"))))}},
+
+{id:"a1-a2",sec:"Assessment",title:"A1 and A2",
+ notes:"Johannes presents. Click the tabs to switch. Briefs, dates and grading criteria are on Canvas under Assignments. Johannes: add anything about the A2 brief to announce today (the plan mentions kiosk and ordering interfaces as possible briefs; not on the slide until confirmed).",
+ render:function(n){return h(P.ContentSlide,{title:"A1 and A2",number:n,footer:"KD401B · Course introduction · Johannes"},
+  h("div",{className:"wide"},h(P.Tabs,{label:"Assessments",tabs:[
+    {id:"a1",label:"A1 Critical analysis",content:h("div",{className:"stack"},
+      p("An individual analysis of an interface design, using the theory introduced in the course. Short, and deep rather than broad.","lead"),
+      p("Individual · 1 hp · LO1","facts"))},
+    {id:"a2",label:"A2 Design activity",content:h("div",{className:"stack"},
+      p("In pairs, you take a design problem from sketches to a screen design in Figma. The Thursday sketching and Figma exercises lead into it.","lead"),
+      p("Pairs · 3 hp · LO2–3","facts"))}
+  ]})))}},
+
+{id:"a3",sec:"Assessment",title:"A3 Portfolio",
+ notes:"Invitations come by email from GitHub. If one expires we have to send a new one, which slows everyone down. Anyone who already made their own copy from the template: tell David and stop working in it.",
+ render:function(n){return h(P.ContentSlide,{title:"A3 Portfolio",number:n,footer:"KD401B · Course introduction · David"},
+  h("div",{className:"wide grid2"},
+    h("div",{className:"stack"},
+      p("Built up every Friday, in a personal GitHub repository that we create for you."),
+      p("Each Friday's exercises add to it, so by the end of the course most of it is already there."),
+      p("Individual · 3.5 hp · LO4","facts")),
+    h("div",{className:"stack"},
+      h(P.Alert,{tone:"warning",title:"Accept the GitHub invitation the same day you get it."},"Invitations expire. If yours has, tell David."),
+      h(P.Alert,{tone:"info",title:"Don't create your own repository from the template."},"Use the one we create for you."))))}},
+
+{id:"canvas",sec:"Practical",title:"Canvas",
+ notes:"Click through one or two live. Modules is week by week; Assignments has the A1–A3 briefs and deadlines. Design portfolios has examples worth looking at before starting A3.",
+ render:function(n){return h(P.ContentSlide,{title:"Where to find things on Canvas",number:n,footer:FOOT},
+  h("div",{className:"wide grid3"},CANVAS.map(function(c){
+    return h(P.Card,{key:c[1],interactive:true,className:"linkcard"},
+      h("a",{className:"pn-link",href:"https://mau.instructure.com/courses/22861/"+c[1],target:"_blank",rel:"noopener"},c[0]),
+      p(c[2],"muted"));
+  })))}},
+
+{id:"help",sec:"Practical",title:"Getting help",
+ notes:"Introduce the TAs by name if they're in the room. Contact: Canvas Inbox reaches both of us; change this if you'd rather point to email. Nais: say it plainly and move on; students can write to us privately.",
+ render:function(n){return h(P.ContentSlide,{title:"Getting help",number:n,footer:FOOT},
+  h("div",{className:"wide stack"},
+    h("div",{className:"grid3"},
+      card("Exercise sessions",p("The afternoons after each lecture. The best place to ask.")),
+      card("TAs",p("In the exercise sessions, for Figma, HTML and CSS.")),
+      card("David and Johannes",p("Ask in class, or message us in Canvas Inbox."))),
+    h(P.Alert,{tone:"info",title:"Have a Nais certificate? Let us know early."},"Then adjustments for the assessments can be arranged in good time.")))}},
+
+{id:"questions",sec:"Questions",title:"Questions",
+ notes:"Open the floor. If it's quiet: \"What would you like to be able to make by January?\"",
+ render:function(){return h(P.SectionSlide,{title:"Questions?",tone:"teal",footer:FOOT})}},
+
+{id:"next",sec:"Up next",title:"Up next: Colour",
+ notes:"Hand over to Johannes. Friday continues the topic: colour in HTML and CSS.",
+ render:function(){return h(P.SectionSlide,{title:["Up next: Colour,","with Johannes"],tone:"plum",footer:FOOT})}}
+]);
+})();
+</script>
+</body>
+</html>
