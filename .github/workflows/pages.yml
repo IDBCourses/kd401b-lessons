@@ -3,23 +3,27 @@
 # GitHub Pages (Actions source) serves one site at a time, so every run rebuilds all of it:
 #   /                     main
 #   /pr-preview/pr-<N>/   the head of each open pull request from this repository
-# It runs when main changes and when a pull request is opened, updated, reopened or closed, so a
-# preview appears on open and disappears on close. The preview link is posted as a PR comment.
+#
+# Triggers:
+#   - a push to main
+#   - "PR preview trigger" (pr-preview-trigger.yml) finishing, which happens whenever a pull request is
+#     opened, updated, reopened or closed. workflow_run always runs this file from main, so the
+#     github-pages environment accepts the deployment, and pull request code is only copied, never run.
+#   - by hand, from the Actions tab
+# The preview link is posted on the pull request and updated on each push.
 #
 # Repo settings needed once:
 #   Settings → Pages → Build and deployment → Source: "GitHub Actions"
-#
-# pull_request_target runs this file as it is on main (so the github-pages environment, which only
-# allows main, accepts the deployment). Pull request code is only copied as files, never run, and
-# pull requests from forks are not previewed.
+#   Settings → Environments → github-pages → Deployment branches and tags: allow "main"
 name: Deploy site and PR previews
 
 on:
   push:
     branches:
       - main
-  pull_request_target:
-    types: [opened, reopened, synchronize, closed]
+  workflow_run:
+    workflows: ["PR preview trigger"]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -36,7 +40,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request_target' || github.event.pull_request.head.repo.full_name == github.repository
+    # previews only for pull requests from this repository, not forks
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.head_repository.full_name == github.repository
     steps:
       - uses: actions/checkout@v4
         with:
@@ -85,19 +90,24 @@ jobs:
         uses: actions/deploy-pages@v4
 
       - name: Post the preview link on the pull request
-        if: github.event_name == 'pull_request_target'
+        if: github.event_name == 'workflow_run'
         uses: actions/github-script@v7
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         with:
           script: |
-            const pr = context.payload.pull_request;
+            const run = context.payload.workflow_run;
+            const { owner, repo } = context.repo;
+            // find the pull request this run was for, by its branch and commit
+            const prs = await github.paginate(github.rest.pulls.list,
+              { owner, repo, state: 'all', head: `${owner}:${run.head_branch}`, per_page: 100 });
+            const pr = prs.find(p => p.head.sha === run.head_sha) || prs[0];
+            if (!pr) { core.info('No pull request found for this run.'); return; }
             const marker = '<!-- pr-preview -->';
             const url = `${process.env.PAGE_URL.replace(/\/?$/, '/')}pr-preview/pr-${pr.number}/`;
             const body = pr.state === 'closed'
               ? `${marker}\nPreview removed because this pull request is closed.`
-              : `${marker}\n**Preview:** ${url}\n\nUpdated for ${pr.head.sha.slice(0, 7)}. It can take a minute to appear.`;
-            const { owner, repo } = context.repo;
+              : `${marker}\n**Preview:** ${url}\n\nUpdated for ${run.head_sha.slice(0, 7)}. It can take a minute to appear.`;
             const comments = await github.paginate(github.rest.issues.listComments,
               { owner, repo, issue_number: pr.number, per_page: 100 });
             const mine = comments.find(c => c.user.type === 'Bot' && c.body.includes(marker));
