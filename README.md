@@ -33,5 +33,5 @@ Or, in Claude Code: `/new-lecture colour`.
 
 ## Publishing
 
-Pushing to `main` deploys to the `gh-pages` branch (`.github/workflows/deploy.yml`). Pull requests get a
-preview link (`.github/workflows/preview.yml`). In Settings → Pages, set the source to the `gh-pages` branch.
+Pushing to `main` runs `.github/workflows/deploy.yml`, which publishes the site to GitHub Pages with
+GitHub Actions. One-time setting: Settings → Pages → Build and deployment → Source: **GitHub Actions**.

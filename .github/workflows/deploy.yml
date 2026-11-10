@@ -1,5 +1,5 @@
-# Publishes main to the gh-pages branch, which GitHub Pages serves.
-# Leaves pr-preview/ alone so open PR previews survive a deploy.
+# Publishes the site to GitHub Pages with GitHub Actions on every push to main.
+# Repo setting needed once: Settings → Pages → Build and deployment → Source: "GitHub Actions".
 name: Deploy site
 
 on:
@@ -9,12 +9,17 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
-concurrency: deploy-site
+# One deployment at a time; don't cancel a deployment that is already running.
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,11 +27,21 @@ jobs:
       - name: Collect site files
         run: |
           mkdir _site
-          rsync -a --exclude .git --exclude .github --exclude .claude --exclude _site ./ _site/
+          rsync -a --exclude .git --exclude .github --exclude .claude --exclude _site \
+            --exclude tools --exclude docs --exclude CLAUDE.md ./ _site/
 
-      - uses: JamesIves/github-pages-deploy-action@v4
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
         with:
-          folder: _site
-          branch: gh-pages
-          clean-exclude: pr-preview
-          force: false
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

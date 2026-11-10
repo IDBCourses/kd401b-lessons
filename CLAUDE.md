@@ -105,6 +105,8 @@ already-installed Chromium instead, set `CHROMIUM_PATH=/path/to/chrome`.
 
 ## Publishing
 
-`main` is published to GitHub Pages by `.github/workflows/deploy.yml` (to the `gh-pages` branch). Each pull
-request gets a preview at `<site>/pr-preview/pr-<number>/` from `.github/workflows/preview.yml`.
-In the repo's Settings → Pages, the source must be "Deploy from a branch: gh-pages / (root)".
+GitHub Actions publishes the site to GitHub Pages on every push to `main` (`.github/workflows/deploy.yml`:
+it collects the site files, leaving out `tools/`, `docs/`, `.claude/` and `CLAUDE.md`, and deploys them with
+`actions/deploy-pages`). It can also be run by hand from the Actions tab. In the repo's Settings → Pages,
+the source must be **GitHub Actions**. There are no pull-request previews: check a deck locally
+(`python3 -m http.server`) before merging.
