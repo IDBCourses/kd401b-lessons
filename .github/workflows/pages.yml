@@ -1,0 +1,105 @@
+# Publishes the site to GitHub Pages with GitHub Actions, with a preview of every open pull request.
+#
+# GitHub Pages (Actions source) serves one site at a time, so every run rebuilds all of it:
+#   /                     main
+#   /pr-preview/pr-<N>/   the head of each open pull request from this repository
+# It runs when main changes and when a pull request is opened, updated, reopened or closed, so a
+# preview appears on open and disappears on close. The preview link is posted as a PR comment.
+#
+# Repo settings needed once:
+#   Settings → Pages → Build and deployment → Source: "GitHub Actions"
+#
+# pull_request_target runs this file as it is on main (so the github-pages environment, which only
+# allows main, accepts the deployment). Pull request code is only copied as files, never run, and
+# pull requests from forks are not previewed.
+name: Deploy site and PR previews
+
+on:
+  push:
+    branches:
+      - main
+  pull_request_target:
+    types: [opened, reopened, synchronize, closed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  pull-requests: write
+
+# One deployment at a time. A queued run is replaced by a newer one, which rebuilds everything anyway.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request_target' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Collect main
+        run: |
+          mkdir _site
+          rsync -a --exclude .git --exclude .github --exclude .claude --exclude _site \
+            --exclude tools --exclude docs --exclude CLAUDE.md --exclude pr-preview ./ _site/
+
+      - name: Collect open pull requests
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh pr list --repo "$REPO" --state open --limit 100 \
+            --json number,headRepository,headRepositoryOwner \
+            --jq '.[] | select(.headRepositoryOwner.login + "/" + .headRepository.name == env.REPO) | .number' \
+            > prs.txt
+          while read -r n; do
+            [ -z "$n" ] && continue
+            echo "Preview for #$n"
+            git fetch --quiet origin "refs/pull/$n/head:pr-$n"
+            dest="_site/pr-preview/pr-$n"
+            mkdir -p "$dest"
+            git archive "pr-$n" | tar -x -C "$dest"
+            rm -rf "$dest/.github" "$dest/.claude" "$dest/tools" "$dest/docs" "$dest/CLAUDE.md"
+          done < prs.txt
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Post the preview link on the pull request
+        if: github.event_name == 'pull_request_target'
+        uses: actions/github-script@v7
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const marker = '<!-- pr-preview -->';
+            const url = `${process.env.PAGE_URL.replace(/\/?$/, '/')}pr-preview/pr-${pr.number}/`;
+            const body = pr.state === 'closed'
+              ? `${marker}\nPreview removed because this pull request is closed.`
+              : `${marker}\n**Preview:** ${url}\n\nUpdated for ${pr.head.sha.slice(0, 7)}. It can take a minute to appear.`;
+            const { owner, repo } = context.repo;
+            const comments = await github.paginate(github.rest.issues.listComments,
+              { owner, repo, issue_number: pr.number, per_page: 100 });
+            const mine = comments.find(c => c.user.type === 'Bot' && c.body.includes(marker));
+            if (mine) await github.rest.issues.updateComment({ owner, repo, comment_id: mine.id, body });
+            else await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body });

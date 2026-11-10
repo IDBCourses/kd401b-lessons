@@ -33,5 +33,8 @@ Or, in Claude Code: `/new-lecture colour`.
 
 ## Publishing
 
-Pushing to `main` deploys to the `gh-pages` branch (`.github/workflows/deploy.yml`). Pull requests get a
-preview link (`.github/workflows/preview.yml`). In Settings → Pages, set the source to the `gh-pages` branch.
+`.github/workflows/pages.yml` publishes the site to GitHub Pages with GitHub Actions: `main` at the root,
+and a preview of each open pull request at `pr-preview/pr-<number>/`, linked in a comment on the PR.
+One-time setting: Settings → Pages → Build and deployment → Source: **GitHub Actions**.
+
+At the end of a term, tag it (`git tag ht26`) so that run can always be recovered.
