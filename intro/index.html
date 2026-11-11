@@ -24,6 +24,11 @@
 #weeks .pn-tab{padding-left:var(--space-4);padding-right:var(--space-4)}
 .when{font-family:var(--font-display);font-weight:500;font-size:32px;line-height:40px;margin-top:var(--space-4)}
 
+/* how a week works: morning and afternoon as a definition list inside each day's card */
+.day{margin:0;display:grid;grid-template-columns:auto 1fr;gap:var(--space-4) var(--space-6);align-items:baseline}
+.day dt{font-family:var(--font-display);font-weight:600;font-size:32px;line-height:40px}
+.day dd{margin:0}
+
 /* assessment facts under a card */
 .facts{font-family:var(--font-display);font-weight:500;font-size:32px;line-height:40px;margin-top:var(--space-5)}
 
@@ -132,11 +137,15 @@ Deck.start([
     card("4. Build",p("W3C-validated, semantically correct HTML markup and CSS."))))}},
 
 {id:"week",sec:"Structure",title:"How a week works",
- notes:"Johannes: a couple of minutes on what Thursdays look like and how Figma runs through the exercises (there's no separate Figma workshop). David: Fridays take the same topic into code, and the Friday exercises feed the portfolio.",
+ notes:"Same shape both days: a lecture in the morning, exercises in the afternoon. Johannes: a couple of minutes on Thursdays and how Figma runs through the exercises (there's no separate Figma workshop). David: Fridays take the same topic into code, and the Friday exercises feed the portfolio. The TAs run the afternoons: that's the place to ask questions while you work.",
  render:function(n){return h(P.ContentSlide,{title:"How a week works",number:n,footer:FOOT},
   h("div",{className:"wide grid2"},
-    h(P.Card,{title:"Thursdays · Johannes",className:"fill-teal"},h("ul",null,h("li",null,"Design and theory lecture"),h("li",null,"Then Figma and sketching exercises"))),
-    h(P.Card,{title:"Fridays · David",className:"fill-plum"},h("ul",null,h("li",null,"HTML and CSS lecture"),h("li",null,"Then implementation exercises")))))}},
+    h(P.Card,{title:"Thursdays · design",className:"fill-teal"},h("dl",{className:"day"},
+      h("dt",null,"Morning"),h("dd",null,"Johannes lectures on design and theory."),
+      h("dt",null,"Afternoon"),h("dd",null,"Figma and sketching exercises, with the TAs."))),
+    h(P.Card,{title:"Fridays · HTML and CSS",className:"fill-plum"},h("dl",{className:"day"},
+      h("dt",null,"Morning"),h("dd",null,"David lectures on HTML and CSS."),
+      h("dt",null,"Afternoon"),h("dd",null,"Implementation exercises, with the TAs.")))))}},
 
 {id:"weeks",sec:"Structure",title:"The weeks ahead",demo:"Weeks",
  notes:"Click a week (or use the arrow keys once a tab has focus). Week 50 is group work on A2, week 51 the A2 oral exam (no times on the slide; groups get theirs separately), week 52 is time for the A1 critique, due Wed 30 Dec.",
