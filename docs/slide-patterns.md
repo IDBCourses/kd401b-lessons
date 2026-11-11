@@ -26,6 +26,7 @@ to `SectionSlide`: there it becomes a huge section numeral.
 h(P.TitleSlide,{title:["Headline as","a sentence"],subtitle:"One sentence",meta:"David · KD401B HT26"})
 h(P.SectionSlide,{title:["Section name"],tone:"teal",footer:FOOT})        // tone: teal | ink | plum | pink (pink once per deck)
 h(P.ContentSlide,{title:"Say the point",number:n,footer:FOOT,aside:"…",asideTitle:"Rule"}, children)
+h(P.ContentSlide,{title:"…",tone:"plum",number:n,footer:FOOT}, children)  // tone: paper (default) | plum | teal
 h(P.FigureSlide,{title:"…",number:n,footer:FOOT,caption:"Figure 1. …",
   figure:h("img",{src:"img/x.png",alt:"…"})}, children)
 h(P.QuoteSlide,{quote:"Two lines at most.",source:["Author, Year"],number:n,footer:FOOT})
@@ -37,6 +38,7 @@ Titles: a string, an array of lines, or a string with `|` between lines. Two to 
 
 ```js
 h(P.Card,{title:"Title",tone:"teal"}, h("p",null,"Text"))                 // tone: paper | plum | teal | pink
+h(P.Card,{title:"Title",className:"fill-teal"}, h("p",null,"Text"))      // solid fill: fill-plum | fill-teal | fill-pink
 h(P.Card,{interactive:true,className:"linkcard"}, h("a",{className:"pn-link",href:"…"},"Link"))
 h(P.Tabs,{label:"Weeks",tabs:[{id:"a",label:"A",content:…},{id:"b",label:"B",content:…}]})
 h(P.Alert,{tone:"warning",title:"What to do."},"Detail.")                 // info | success | warning | danger
