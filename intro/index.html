@@ -46,7 +46,22 @@
 .day dd{margin:0}
 
 /* the weeks ahead: nine week tabs need less side padding to fit on one row */
-#weeks .pn-tab{padding-left:var(--space-4);padding-right:var(--space-4)}
+/* course calendar: one row per week; cells tinted by kind of day */
+.cal{width:100%;border-collapse:separate;border-spacing:var(--space-2);margin:calc(-1 * var(--space-2));table-layout:fixed;font-family:var(--font-display)}
+.cal th,.cal td{font-size:28px;line-height:34px;padding:var(--space-2) var(--space-4);text-align:left;vertical-align:middle;border-radius:var(--radius-sm)}
+.cal thead th{font-weight:600;padding-top:0;padding-bottom:0}
+.cal tbody th{font-weight:600;background:var(--surface-200);color:var(--ink);white-space:nowrap}
+.cal tbody th b{font-weight:700}
+.cal tbody th span{font-weight:500;margin-left:var(--space-3)}
+.cal td{font-weight:500;color:var(--ink)}
+.cal .design{background:var(--teal-tint)}
+.cal .code{background:var(--plum-tint)}
+.cal .a2{background:var(--pink-tint)}
+.cal .off{background:var(--surface-300)}
+.cal .empty{background:transparent}
+.cal .due{background:var(--pink);color:var(--on-pink);font-weight:700}
+.cal tr.now th{background:var(--teal);color:var(--on-teal)}
+.cal col.c-week{width:23%}.cal col.c-day{width:27%}.cal col.c-due{width:23%}
 
 /* assessment facts under a card */
 .facts{font-family:var(--font-display);font-weight:500;font-size:32px;line-height:40px;margin-top:var(--space-5)}
@@ -207,38 +222,41 @@ function Crime(props){
       h(P.Button,{variant:shown?"secondary":"primary",onClick:function(){setShown(!shown)}},shown?"Hide the answer":"Show the crime")));
 }
 
-/* ---------- The weeks ahead ----------
-   Dates and sessions from the Course Elements database in Notion (GUIs HT26). Card: [title, text, fill]. */
-var WEEKS=[
-  {id:"46",label:"Week 46",topic:"Colour",cards:[
-    ["Thu 12 Nov · design","Course introduction, then Colour. Exercise: colour in Figma.","teal"],
-    ["Fri 13 Nov · HTML and CSS","Introduction to HTML and CSS, colour in CSS. Exercise: colour in HTML and CSS.","plum"]]},
-  {id:"47",label:"Week 47",topic:"Type, sketching and design process",cards:[
-    ["Thu 19 Nov · design","Type, then sketching and the design process. Exercise: type and sketching in Figma.","teal"],
-    ["Fri 20 Nov · HTML and CSS","HTML document structure and CSS typography. Exercise: type in HTML and CSS.","plum"]]},
-  {id:"48",label:"Week 48",topic:"Content and UX writing, icons",cards:[
-    ["Thu 26 Nov · design","Content and UX writing, then icons and symbols. Exercise: content and icons in Figma.","teal"],
-    ["Fri 27 Nov · HTML and CSS","Semantic HTML, forms and SVG icons. Exercise: semantic HTML, forms and icons.","plum"]]},
-  {id:"49",label:"Week 49",topic:"Design systems, composition and layout",cards:[
-    ["Thu 3 Dec · design","Consistency and design systems, then composition and layout. Exercise in Figma.","teal"],
-    ["Fri 4 Dec · HTML and CSS","CSS custom properties, components and Flexbox. Exercise: components and layout.","plum"]]},
-  {id:"50",label:"Week 50",topic:"Group work on your A2 project",cards:[
-    ["Thu 10 Dec","A full day of group work sessions on your A2 design activity, with us there to help.","pink"],
-    ["Fri 11 Dec","Another day of group work sessions. A2 is due at the end of the day.","pink"]]},
-  {id:"51",label:"Week 51",topic:"A2 oral exam",cards:[
-    ["Fri 18 Dec","You present and discuss your A2 design as a group. Groups are split between morning and afternoon.","pink"]]},
-  {id:"52",label:"Week 52",topic:"Work on your A1 critique",cards:[
-    ["No teaching","Time to write your A1 critical analysis of an interface. A1 is due on Wednesday 30 Dec.","teal"]]},
-  {id:"1",label:"Week 1",topic:"Designing for intuition, animation and motion",cards:[
-    ["Thu 7 Jan · design","Designing for intuition, then animation, motion and space. Exercise in Figma.","teal"],
-    ["Fri 8 Jan · HTML and CSS","CSS states, transitions and animation. Exercise: interaction and motion in HTML and CSS.","plum"]]},
-  {id:"2",label:"Week 2",topic:"Portfolio",cards:[
-    ["Wed 13 Jan","Portfolio coaching.","plum"],
-    ["Thu 14 – Fri 15 Jan","Portfolio work sessions. A3 is due on Friday 15 Jan.","plum"]]}
+/* ---------- Course calendar ----------
+   One row per ISO week, from the Course Elements database in Notion (GUIs HT26).
+   Cells: [text, kind]; kind is design | code | a2 | off | empty. A span of 2 covers Thursday and Friday.
+   mon: the Monday of the week, used to mark the current week. */
+var CAL=[
+  {wk:"46",dates:"9–13 Nov",mon:"2026-11-09",thu:["Intro, Colour","design"],fri:["HTML and CSS, colour","code"]},
+  {wk:"47",dates:"16–20 Nov",mon:"2026-11-16",thu:["Type, sketching","design"],fri:["Structure, typography","code"]},
+  {wk:"48",dates:"23–27 Nov",mon:"2026-11-23",thu:["Content, icons","design"],fri:["Semantic HTML, forms","code"]},
+  {wk:"49",dates:"30 Nov–4 Dec",mon:"2026-11-30",thu:["Design systems, layout","design"],fri:["Components, Flexbox","code"]},
+  {wk:"50",dates:"7–11 Dec",mon:"2026-12-07",span:["A2 group work, both days","a2"],due:"A2 due Fri 11"},
+  {wk:"51",dates:"14–18 Dec",mon:"2026-12-14",thu:["","empty"],fri:["A2 oral exam","a2"],due:"A2 exam Fri 18"},
+  {wk:"52",dates:"21–27 Dec",mon:"2026-12-21",span:["No teaching: write your A1 critique","off"]},
+  {wk:"53",dates:"28 Dec–3 Jan",mon:"2026-12-28",span:["No teaching","off"],due:"A1 due Wed 30"},
+  {wk:"1",dates:"4–8 Jan",mon:"2027-01-04",thu:["Intuition, motion","design"],fri:["Transitions, animation","code"]},
+  {wk:"2",dates:"11–15 Jan",mon:"2027-01-11",span:["Coaching Wed 13, then portfolio work","code"],due:"A3 due Fri 15"}
 ];
-var weekTabs=WEEKS.map(function(w){return {id:w.id,label:w.label,content:h("div",null,
-  h("h3",{className:"h3"},w.topic),
-  h("div",{className:"grid2"},w.cards.map(function(c){return h(P.Card,{key:c[0],title:c[0],className:"fill-"+c[2]},p(c[1]))})))}});
+function isThisWeek(mon){
+  var start=new Date(mon+"T00:00:00"),end=new Date(start.getTime()+7*864e5),now=new Date();
+  return now>=start&&now<end;
+}
+function Calendar(){
+  return h("table",{className:"cal"},
+    h("caption",{className:"pn-sr"},"Course calendar, week by week, with Thursday and Friday sessions and deadlines"),
+    h("colgroup",null,h("col",{className:"c-week"}),h("col",{className:"c-day"}),h("col",{className:"c-day"}),h("col",{className:"c-due"})),
+    h("thead",null,h("tr",null,
+      h("th",{scope:"col"},"Week"),h("th",{scope:"col"},"Thursday · design"),h("th",{scope:"col"},"Friday · HTML and CSS"),h("th",{scope:"col"},"Deadlines and exams"))),
+    h("tbody",null,CAL.map(function(w){
+      var now=isThisWeek(w.mon);
+      return h("tr",{key:w.wk,className:now?"now":null},
+        h("th",{scope:"row"},h("b",null,w.wk),h("span",null,w.dates),now?h("span",null,"· this week"):null),
+        w.span?h("td",{colSpan:2,className:w.span[1]},w.span[0])
+              :[h("td",{key:"t",className:w.thu[1]},w.thu[0]),h("td",{key:"f",className:w.fri[1]},w.fri[0])],
+        h("td",{className:w.due?"due":"empty"},w.due||""));
+    })));
+}
 
 var CANVAS_URL="https://mau.instructure.com/courses/22861/";
 var LINKS=[
@@ -345,10 +363,10 @@ Deck.start([
       h("dt",null,"Morning"),h("dd",null,"David lectures on HTML and CSS."),
       h("dt",null,"Afternoon"),h("dd",null,"Implementation exercises, with the TAs.")))))}},
 
-{id:"weeks",sec:"Structure",title:"The weeks ahead",demo:"Weeks",
- notes:"Click a week (or use the arrow keys once a tab has focus). Week 50 is group work on A2, week 51 the A2 oral exam (no times on the slide; groups get theirs separately), week 52 is time for the A1 critique, due Wed 30 Dec.",
- render:function(n){return h(P.ContentSlide,{title:"The weeks ahead",number:n,footer:FOOT},
-  h("div",{className:"wide"},h(P.Tabs,{tabs:weekTabs,label:"Weeks"})))}},
+{id:"weeks",sec:"Structure",title:"Course calendar",
+ notes:"The whole course on one screen. Thursdays (teal) are design, Fridays (plum) HTML and CSS; pink is the A2 project. Week 50 is A2 group work, week 51 the A2 oral exam (no times on the slide; groups get theirs separately). Weeks 52 and 53 have no teaching: week 52 is for writing the A1 critique, due Wed 30 Dec. Week 2: portfolio coaching on Wed 13 Jan, then work sessions; A3 is due Fri 15 Jan. The current week is highlighted automatically.",
+ render:function(n){return h(P.ContentSlide,{title:"Course calendar",number:n,footer:FOOT},
+  h("div",{className:"wide"},h(Calendar)))}},
 
 {id:"ways",sec:"Structure",title:"Ways of working",
  notes:"The four kinds of activity. Scrimba is for self-directed HTML and CSS practice outside class: useful if Fridays move fast, or to go further. Readings are listed per topic under Course literature on Canvas.",
