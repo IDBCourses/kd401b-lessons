@@ -53,6 +53,18 @@ body{background:var(--surface-300);color:var(--ink);overflow:hidden;font-family:
 .pn-slide .pn-btn{font-size:36px;line-height:44px;padding:var(--space-4) var(--space-6)}
 .pn-slide .pn-link{text-decoration-thickness:3px}
 
+/* Solid-fill cards: bolder than Pane's tinted Card tones. Built only from Pane's fill tokens and their
+   paired on-* text colours, so contrast holds in light, dark and high contrast (on-plum 5.3:1 or more,
+   on-teal 6.9:1 or more, on-pink 5.9:1 or more; see shared/pane/docs/accessibility.md).
+   Use: h(P.Card,{title:"…",className:"fill-teal"}, …). Links, muted text and list markers take the
+   card's text colour, because link and ink-muted are never used on a fill. */
+.pn-slide .pn-card[class*="fill-"]{border-color:var(--ink);box-shadow:var(--shadow-pane-md)}
+.pn-slide .pn-card.fill-plum{background:var(--plum);color:var(--on-plum)}
+.pn-slide .pn-card.fill-teal{background:var(--teal);color:var(--on-teal)}
+.pn-slide .pn-card.fill-pink{background:var(--pink);color:var(--on-pink)}
+.pn-slide .pn-card[class*="fill-"] :is(.muted,.pn-link){color:inherit}
+.pn-slide .pn-card[class*="fill-"] li::marker{color:inherit}
+
 /* Content wider than the 1040px reading column (grids of cards, tabs). */
 .pn-slide .pn-content__text:has(> .wide){max-width:none}
 .pn-slide .wide{width:100%}
