@@ -64,7 +64,7 @@
 .mock-cookie .page i{display:block;height:28px;background:var(--surface-300)}
 .mock-cookie .banner{position:relative;background:var(--surface-100);border-top:2px solid var(--ink);padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-5)}
 .mock-cookie .accept{align-self:stretch;font:700 40px/1 system-ui,sans-serif;padding:var(--space-6);background:var(--plum);color:var(--on-plum);border:0;border-radius:var(--radius-md)}
-.mock-cookie .manage{align-self:center;font-size:28px;color:var(--ink);opacity:.45;text-decoration:underline}
+.mock-cookie .manage{align-self:flex-start;font-size:28px;color:var(--ink);opacity:.45;text-decoration:underline}
 .mock-shame{display:grid;place-items:center;background:var(--surface-300)}
 .mock-shame .modal{width:80%;background:var(--surface-200);border:2px solid var(--ink);padding:var(--space-7);display:flex;flex-direction:column;gap:var(--space-5);text-align:center}
 .mock-shame .modal h4{font-size:44px}
@@ -77,7 +77,23 @@
 .mock-form .box{border:1px solid var(--border);padding:var(--space-3) var(--space-4)}
 .mock-form button{align-self:flex-start;font:600 28px/1 system-ui,sans-serif;padding:var(--space-3) var(--space-6);background:var(--surface-300);color:var(--ink);border:1px solid var(--border);cursor:pointer}
 .crime-text{display:flex;flex-direction:column;gap:var(--space-5);align-items:flex-start}
-.crime-text .answer{font-size:36px;line-height:54px}
+.crime-text .answer{font-size:36px;line-height:54px;margin:0}
+.crime-text ol{margin:0;padding-left:1.3em;font-size:36px;line-height:48px}
+.crime-text li{margin-bottom:var(--space-3)}
+.crime-text li::marker{font-family:var(--font-display);font-weight:700}
+/* annotations: a pink outline around the crime and a numbered label, shown with "Show the crime" */
+.mark{position:relative;display:inline-block;align-self:flex-start}
+.mark.block{display:block;align-self:stretch}
+.mark.on{outline:4px solid var(--pink);outline-offset:6px}
+.note{position:absolute;z-index:2;display:flex;gap:var(--space-2);align-items:center;white-space:nowrap;font:700 28px/1.2 var(--font-display);background:var(--pink);color:var(--on-pink);border:2px solid var(--ink);padding:var(--space-1) var(--space-3) var(--space-1) var(--space-1);box-shadow:var(--shadow-pane-sm);animation:note-in .2s ease-out}
+.note b{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:var(--radius-full);background:var(--ink);color:var(--surface-100)}
+.note-right{left:calc(100% + 20px);top:50%;margin-top:-23px}
+.note-corner{right:12px;top:-30px}
+.note-below{left:0;top:calc(100% + 14px)}
+@keyframes note-in{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.note{animation:none}}
+/* the interlude: its own colour so it reads as a break from the course details */
+.interlude .pn-caption a{color:inherit;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.2em}
 
 /* canvas links: the whole card is clickable through its one link */
 .linkcard{position:relative}
@@ -105,47 +121,61 @@ function card(title,body,tone){return h(P.Card,{title:title,tone:tone||"paper"},
 function solid(title,body,fill){return h(P.Card,{title:title,className:"fill-"+fill},body)}
 function p(t,cls){return h("p",cls?{className:cls}:null,t)}
 
-/* ---------- Spot the GUI crime ----------
-   Each mock-up is a reconstruction, drawn in the light theme so it reads like an ordinary web page. */
-var ALERT_ITEMS=["BMD False Alarm","Amber Alert (CAE) - Kauai County Only","Amber Alert DEMO TEST","High Surf Warning North Shores","PACOM (CDW) - STATE ONLY","TSUNAMI WARNING (CEM) - STATE ONLY","DRILL - PACOM (CDW) - STATE ONLY","Landslide - Hanalei Road Closure","Amber Alert (CAE) Statewide","1. TEST Message","PACOM (DEMO) - STATE ONLY"];
-function MockAlert(){
-  return h("div",{className:"mock mock-alert","data-theme":"light"},
-    h("h4",null,"Select an alert to send"),
-    h("ul",null,ALERT_ITEMS.map(function(t){return h("li",{key:t},h("a",{href:"#",onClick:function(e){e.preventDefault()},tabIndex:-1},t))})));
+/* ---------- Spot the GUI crime (interlude) ----------
+   Each mock-up is a reconstruction, drawn in the light theme so it reads like an ordinary web page.
+   Mark wraps the part of the interface that is the crime; with on=true it gets a pink outline
+   and a numbered label (where: right | corner | below). The numbers match the list in the answer. */
+function Mark(props){
+  return h(props.block?"div":"span",{className:"mark"+(props.block?" block":"")+(props.on?" on":"")},
+    props.children,
+    props.on&&h("span",{className:"note note-"+(props.where||"right")},h("b",null,props.n),props.label));
 }
-function MockCookie(){
+var ALERT_ITEMS=["BMD False Alarm","Amber Alert (CAE) - Kauai County Only","Amber Alert DEMO TEST","High Surf Warning North Shores","PACOM (CDW) - STATE ONLY","TSUNAMI WARNING (CEM) - STATE ONLY","DRILL - PACOM (CDW) - STATE ONLY","Landslide - Hanalei Road Closure","Amber Alert (CAE) Statewide","1. TEST Message","PACOM (DEMO) - STATE ONLY"];
+var ALERT_MARKS={"PACOM (CDW) - STATE ONLY":[1,"Real missile alert"],"DRILL - PACOM (CDW) - STATE ONLY":[2,"Drill: same name"]};
+function MockAlert(props){
+  return h("div",{className:"mock mock-alert","data-theme":"light"},
+    h(Mark,{on:props.on,n:3,label:"Tests and real alerts in one list"},h("h4",null,"Select an alert to send")),
+    h("ul",null,ALERT_ITEMS.map(function(t){
+      var link=h("a",{href:"#",onClick:function(e){e.preventDefault()},tabIndex:-1},t),m=ALERT_MARKS[t];
+      return h("li",{key:t},m?h(Mark,{on:props.on,n:m[0],label:m[1]},link):link);
+    })));
+}
+function MockCookie(props){
   return h("div",{className:"mock mock-cookie","data-theme":"light"},
     h("div",{className:"page","aria-hidden":true},h("i",null),h("i",null),h("i",{style:{width:"70%"}})),
     h("div",{className:"banner"},
       h("p",{style:{margin:0}},"We value your privacy. We use cookies to improve your experience and for marketing."),
-      h("button",{type:"button",className:"accept",tabIndex:-1},"Accept all"),
-      h("span",{className:"manage"},"Manage settings")));
+      h(Mark,{on:props.on,block:true,n:1,label:"Big, bright, one click",where:"corner"},
+        h("button",{type:"button",className:"accept",tabIndex:-1,style:{width:"100%"}},"Accept all")),
+      h(Mark,{on:props.on,n:2,label:"Small, grey, more clicks"},h("span",{className:"manage"},"Manage settings"))));
 }
-function MockShame(){
+function MockShame(props){
   return h("div",{className:"mock mock-shame","data-theme":"light"},
     h("div",{className:"modal"},
       h("h4",null,"Get 10% off your first order"),
       h("div",{className:"field"},"Your email address"),
-      h("button",{type:"button",className:"yes",tabIndex:-1},"Yes, give me 10% off"),
-      h("span",{className:"no"},"No thanks, I don't like saving money")));
+      h(Mark,{on:props.on,block:true,n:2,label:"Only yes gets a button",where:"corner"},
+        h("button",{type:"button",className:"yes",tabIndex:-1,style:{width:"100%"}},"Yes, give me 10% off")),
+      h(Mark,{on:props.on,n:1,label:"Guilt as pressure",where:"below"},h("span",{className:"no"},"No thanks, I don't like saving money"))));
 }
-function MockForm(){
+function MockForm(props){
   var s=useState(false),sent=s[0],setSent=s[1];
   return h("div",{className:"mock mock-form","data-theme":"light"},
     h("h4",null,"Create an account"),
-    sent&&h("div",{className:"err",role:"status"},"Error: invalid input."),
-    h("div",{className:"box faint"},"Email"),
+    (sent||props.on)&&h(Mark,{on:props.on,block:true,n:3,label:"Which field? How to fix it?",where:"corner"},
+      h("div",{className:"err",role:"status"},"Error: invalid input.")),
+    h(Mark,{on:props.on,block:true,n:2,label:"Label vanishes when you type",where:"corner"},h("div",{className:"box faint"},"Email")),
     h("div",{className:"box faint"},"Password"),
-    h("p",{className:"faint",style:{margin:0}},"Password must meet the requirements."),
+    h(Mark,{on:props.on,n:1,label:"Too faint to read"},h("p",{className:"faint",style:{margin:0}},"Password must meet the requirements.")),
     h("button",{type:"button",onClick:function(){setSent(true)}},"Submit"));
 }
 function Crime(props){
   var s=useState(false),shown=s[0],setShown=s[1];
-  return h(P.FigureSlide,{title:"Spot the GUI crime: "+props.k+" of 4",number:props.n,footer:FOOT+" · Johannes",
-      figure:h(props.mock),caption:props.caption},
+  return h(P.FigureSlide,{title:"Spot the GUI crime: "+props.k+" of 4",tone:"teal",className:"interlude",number:props.n,footer:"Interlude · Spot the GUI crime",
+      figure:h(props.mock,{on:shown}),caption:props.caption},
     h("div",{className:"crime-text"},
-      shown?p(props.answer,"answer"):p(props.prompt||"What's wrong here, and who does it hurt?","answer"),
-      h(P.Button,{variant:shown?"secondary":"primary",onClick:function(){setShown(!shown)}},shown?"Hide the answer":"Show the crime")));
+      shown?h("ol",null,props.points.map(function(t){return h("li",{key:t},t)})):p(props.prompt||"What's wrong here, and who does it hurt?","answer"),
+      h(P.Button,{variant:shown?"secondary":"primary",onClick:function(){setShown(!shown)}},shown?"Hide the crime":"Show the crime")));
 }
 
 /* ---------- Course calendar ----------
@@ -200,6 +230,13 @@ Deck.start([
  notes:"Welcome. David leads this session; Johannes takes the parts about his Thursdays and A1/A2. Colour, with Johannes, follows straight after.",
  render:function(){return h(P.TitleSlide,{title:["Interaction","Design: Graphical","User Interfaces"],subtitle:"Course introduction",meta:"David and Johannes · KD401B HT26"})}},
 
+{id:"programming-feedback",sec:"Programming feedback",title:"Programming course feedback",
+ notes:"Not running it today. Ask when would suit them for a short feedback session on the Programming course, and agree a time or a way to decide (for example, a poll on Canvas).",
+ render:function(n){return h(P.ContentSlide,{title:"Programming course feedback",tone:"teal",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    p("David would like to hear how the Programming course went for you.","lead"),
+    solid("When should we meet?",p("A short feedback session, not today. When would suit you?"),"plum")))}},
+
 {id:"who",sec:"Welcome",title:"Who we are",
  notes:"Johannes first: he teaches Thursdays, which come first each week. A sentence or two each about background. David is course coordinator: questions about the course as a whole (registration, NAIS adjustments, re-exams) go to him. Photos are from our MAU staff pages.",
  render:function(n){return h(P.ContentSlide,{title:"Who we are",tone:"plum",number:n,footer:FOOT},
@@ -211,7 +248,8 @@ Deck.start([
 
 {id:"icebreaker",sec:"Welcome",title:"Icebreaker",
  notes:"Keep it short. Pairs first, then take two or three answers from the room. Push for the specific thing: a button that was hard to find, text too small, an error that didn't say what was wrong. Those are the things this course gives words for.",
- render:function(){return h(P.SectionSlide,{title:["Name an interface you","used today that","annoyed you."],tone:"pink",footer:"Icebreaker · Tell the person next to you what got in the way."})}},
+ render:function(){return h(P.SectionSlide,{title:["Name an interface you","used today that","annoyed you."],tone:"teal",footer:"Icebreaker · Tell the person next to you what got in the way."})}},
+
 
 /* ===== What is a GUI? ===== */
 {id:"what-is-a-gui",sec:"What is a GUI?",title:"What is a GUI?",
@@ -235,6 +273,7 @@ Deck.start([
     card("Voice and sound",p("You speak and listen; there may be no screen at all.")),
     solid("Graphical",p("You see and point: windows, icons, menus and a pointer. This course."),"plum")))}},
 
+
 /* ===== The course ===== */
 {id:"about",sec:"The course",title:"What this course is about",
  notes:"Two tracks that meet every week: design and building. The topics run from colour and type through layout and interaction to accessibility.",
@@ -242,7 +281,7 @@ Deck.start([
   h("div",{className:"wide stack"},
     h("div",{className:"grid2"},
       solid("Designing graphical user interfaces",p("Looking closely at interfaces, sketching alternatives, and making considered design decisions."),"teal"),
-      solid("Building them for the screen",p("Turning those designs into real pages in HTML and CSS."),"pink")),
+      solid("Building them for the screen",p("Turning those designs into real pages in HTML, CSS and JavaScript."),"pink")),
     h("ul",{className:"tags","aria-label":"Topics, in order"},["Colour","Type","Layout","Interaction","Accessibility"].map(function(t){return h("li",{key:t},t)}))))}},
 
 {id:"outcomes",sec:"The course",title:"Learning outcomes",
@@ -254,6 +293,7 @@ Deck.start([
     card("3. Design",p("for screens using appropriate design principles.")),
     card("4. Build",p("W3C-validated, semantically correct HTML markup and CSS."))))}},
 
+
 /* ===== Structure and ways of working ===== */
 {id:"three-parts",sec:"Structure",title:"Theory, design, implementation",
  notes:"The course has three strands, and each week touches all of them. Theory gives the words and the reasons; design is where you explore and decide; implementation is where it becomes real on a screen. Thursdays carry theory and design, Fridays carry implementation.",
@@ -261,7 +301,7 @@ Deck.start([
   h("div",{className:"wide grid3"},
     solid("Theory",p("Why interfaces work the way they do: colour, type, layout, perception."),"teal"),
     solid("Design",p("Exploring and deciding: sketching and Figma."),"plum"),
-    solid("Implementation",p("Building it for the screen: HTML and CSS."),"pink")))}},
+    solid("Implementation",p("Building it for the screen: HTML, CSS and JavaScript."),"pink")))}},
 
 {id:"week",sec:"Structure",title:"How a week works",
  notes:"Same shape both days: a lecture in the morning, exercises in the afternoon. Thursdays (teal) are theory and design, Fridays (plum) implementation, the same colours as the calendar. Johannes: a couple of minutes on Thursdays and how Figma runs through the exercises (there's no separate Figma workshop). David: Fridays take the same topic into code, and the Friday exercises feed the portfolio. The TAs run the afternoons: that's the place to ask questions while you work.",
@@ -274,10 +314,10 @@ Deck.start([
     h("tbody",null,
       h("tr",null,h("th",{scope:"row"},"Morning"),
         h("td",{className:"design"},h("b",null,"Lecture"),h("span",null,"Johannes, on design and theory")),
-        h("td",{className:"code"},h("b",null,"Lecture"),h("span",null,"David, on HTML and CSS"))),
+        h("td",{className:"code"},h("b",null,"Lecture"),h("span",null,"David, on HTML, CSS and JavaScript"))),
       h("tr",null,h("th",{scope:"row"},"Afternoon"),
         h("td",{className:"design"},h("b",null,"Exercises"),h("span",null,"Figma and sketching, with the TAs")),
-        h("td",{className:"code"},h("b",null,"Exercises"),h("span",null,"HTML and CSS, with the TAs")))))))}},
+        h("td",{className:"code"},h("b",null,"Exercises"),h("span",null,"HTML, CSS and JavaScript, with the TAs")))))))}},
 
 {id:"weeks",sec:"Structure",title:"Course calendar",
  notes:"The whole course on one screen. Thursdays (teal) are design, Fridays (plum) HTML and CSS; pink is the A2 project. Week 50 is A2 group work, week 51 the A2 oral exam (no times on the slide; groups get theirs separately). Weeks 52 and 53 have no teaching: week 52 is for writing the A1 critique, due Wed 30 Dec. Week 2: portfolio coaching on Wed 13 Jan, then work sessions; A3 is due Fri 15 Jan. The current week is highlighted automatically.",
@@ -295,58 +335,58 @@ Deck.start([
     card("Oral critique and presentation",p("Presenting your work and discussing it.")),
     card("Coaching",p("Feedback from us on your projects."))))}},
 
+
+/* ===== Interlude: Spot the GUI crime ===== */
+{id:"interlude",sec:"Interlude",title:"Interlude: Spot the GUI crime",
+ notes:"A short, playful break from the course details, as a lead-in to the critical-analysis mindset of A1. Johannes runs it. Four interfaces, one per slide: pairs get a few seconds to call out what's wrong and who it hurts, then press Show the crime to annotate the interface and list the crimes.",
+ render:function(){return h(P.SectionSlide,{title:["Interlude:","Spot the GUI crime"],tone:"pink",footer:"A break from the course details. Four interfaces, four crimes: in pairs, call out what's wrong."})}},
+
+{id:"crime-1",sec:"Interlude",title:"Crime 1",ex:"Spot the GUI crime",
+ notes:"Hawaii, 13 January 2018: an employee sent a real ballistic missile alert to every phone in the state. The image published afterwards (reconstructed here) shows test and live alerts as near-identical links in one plain list; officials later said it was a mock-up of the real screen, not a screenshot. The correction took 38 minutes. The caption links to the TechCrunch article.",
+ render:function(n){return h(Crime,{n:n,k:1,mock:MockAlert,
+   caption:["Figure 1. Reconstruction of the alert menu published after Hawaii's false missile alert, January 2018. ",h("a",{key:"tc",href:"https://techcrunch.com/2018/01/16/hawaiis-emergency-alert-interface-looks-straight-out-of-the-90s/",target:"_blank",rel:"noopener"},"TechCrunch: the story")],
+   points:["One click sent a real missile alert to every phone in the state.","The drill had almost the same name.","Tests and real alerts sit together in one plain list. The correction took 38 minutes."]})}},
+
+{id:"crime-2",sec:"Interlude",title:"Crime 2",ex:"Spot the GUI crime",
+ notes:"A common pattern rather than one site. Who it hurts: anyone who wanted to say no and clicked the big button to get rid of the banner.",
+ render:function(n){return h(Crime,{n:n,k:2,mock:MockCookie,
+   caption:"Figure 2. Reconstruction of a typical cookie banner.",
+   points:["Accepting is a big, bright button: one click.","Refusing is a small grey link, and more clicks. A dark pattern."]})}},
+
+{id:"crime-3",sec:"Interlude",title:"Crime 3",ex:"Spot the GUI crime",
+ notes:"Known as confirmshaming. The layout can look tidy; the crime is in the words.",
+ render:function(n){return h(Crime,{n:n,k:3,mock:MockShame,
+   caption:"Figure 3. Reconstruction of a typical sign-up pop-up.",
+   points:["To say no, you have to insult yourself: confirmshaming.","Only yes gets a real button."]})}},
+
+{id:"crime-4",sec:"Interlude",title:"Crime 4",ex:"Spot the GUI crime",
+ notes:"Press Submit in the mock-up to show the error. Who it hurts: people with low vision, anyone on a bright screen outdoors, everyone who has to guess what went wrong.",
+ render:function(n){return h(Crime,{n:n,k:4,mock:MockForm,
+   caption:"Figure 4. Reconstruction of a typical sign-up form. Press Submit.",
+   prompt:"What's wrong here, and who does it hurt? Try pressing Submit.",
+   points:["Light grey text is too faint to read.","The labels are placeholders that vanish when you type.","The error says neither which field is wrong nor how to fix it."]})}},
+
+
 /* ===== Assessment ===== */
 {id:"assessment",sec:"Assessment",title:"Assessment overview",
  notes:"Overview, in the order they happen: A2 in December, A1 over the break, A3 in January. 7.5 hp in total. Johannes grades A1 and A2, David grades A3.",
  render:function(n){return h(P.ContentSlide,{title:"Assessment overview",tone:"plum",number:n,footer:FOOT},
   h("div",{className:"wide grid3"},
-    h(P.Card,{title:"A2 Design activity",className:"fill-pink"},p("Design a coffee machine interface."),p("Pairs · 3 hp · LO2–3","facts")),
+    h(P.Card,{title:"A2 Design activity",className:"fill-pink"},p("Design a coffee machine interface."),p("Groups · 3 hp · LO2–3","facts")),
     h(P.Card,{title:"A1 Critical analysis",className:"fill-teal"},p("Analyse an interface using the course theory."),p("Individual · 1 hp · LO1","facts")),
-    h(P.Card,{title:"A3 Portfolio"},p("A site you build in HTML and CSS."),p("Individual · 3.5 hp · LO4","facts"))))}},
+    h(P.Card,{title:"A3 Portfolio"},p("A site you build in HTML, CSS and JavaScript."),p("Individual · 3.5 hp · LO4","facts"))))}},
 
 {id:"a2",sec:"Assessment",title:"A2 Design activity",
  notes:"Johannes presents. Keep it short: the brief is a coffee machine touch interface, and the full brief, dates and grading criteria are on Canvas under Assignments. If asked: the flow covers choosing and customising a coffee, waiting, paying and cancelling; the work goes from sketches to wireframes to a high-fidelity prototype in Figma.",
- render:function(n){return h(P.ContentSlide,{title:"A2 Design activity",number:n,footer:FOOT+" · Johannes"},
+ render:function(n){return h(P.ContentSlide,{title:"A2 Design activity",number:n,footer:FOOT},
   h("div",{className:"wide grid2"},
     h("div",{className:"stack"},
       p("Design the touch interface of a coffee machine.","lead")),
-    solid("Pairs · 3 hp · LO2–3",h("ul",null,h("li",null,"Group work: Thu 10 and Fri 11 Dec"),h("li",null,"Due: Fri 11 Dec"),h("li",null,"Oral exam: Fri 18 Dec")),"pink")))}},
-
-{id:"crime",sec:"Assessment",title:"Spot the GUI crime",ex:"Spot the GUI crime",
- notes:"Johannes runs this, as a lead-in to A1. Four flawed interfaces, one per slide. Pairs get a few seconds each to call out what's wrong and who it hurts; then press Show the crime. This is the critical-analysis mindset A1 asks for, in miniature.",
- render:function(n){return h(P.ContentSlide,{title:"Spot the GUI crime",tone:"teal",number:n,footer:FOOT+" · Johannes"},
-  h("div",{className:"wide grid2"},
-    h("div",{className:"stack"},p("Four real interfaces, each with something wrong.","lead"),p("In pairs: say what's wrong, and who it hurts.")),
-    solid("How it works",h("ul",null,h("li",null,"Look at the interface"),h("li",null,"Call out the crime"),h("li",null,"Then we show the answer")),"plum")))}},
-
-{id:"crime-1",sec:"Assessment",title:"Crime 1: the alert menu",ex:"Spot the GUI crime",
- notes:"Hawaii, 13 January 2018: an employee sent a real ballistic missile alert to every phone in the state. The image published afterwards (reconstructed here) shows test and live alerts as near-identical links in one plain list; officials later said it was a mock-up of the real screen, not a screenshot. The correction took 38 minutes. Who it hurts: everyone who believed it.",
- render:function(n){return h(Crime,{n:n,k:1,mock:MockAlert,
-   caption:"Figure 1. Reconstruction of the alert menu published after Hawaii's false missile alert, January 2018.",
-   answer:"Test and live alerts sit in one list of look-alike links. A real missile alert to the whole state was one click and a generic “are you sure?” away. The correction took 38 minutes."})}},
-
-{id:"crime-2",sec:"Assessment",title:"Crime 2: the cookie banner",ex:"Spot the GUI crime",
- notes:"A common pattern rather than one site. Who it hurts: anyone who wanted to say no and clicked the big button to get rid of the banner.",
- render:function(n){return h(Crime,{n:n,k:2,mock:MockCookie,
-   caption:"Figure 2. Reconstruction of a typical cookie banner.",
-   answer:"The two choices aren't equal. “Accept all” is a big bright button; refusing is a small grey link that leads to more clicks. The visual hierarchy pushes you one way: a dark pattern."})}},
-
-{id:"crime-3",sec:"Assessment",title:"Crime 3: the pop-up",ex:"Spot the GUI crime",
- notes:"Known as confirmshaming. The design itself can look tidy; the crime is in the words.",
- render:function(n){return h(Crime,{n:n,k:3,mock:MockShame,
-   caption:"Figure 3. Reconstruction of a typical sign-up pop-up.",
-   answer:"To say no, you have to insult yourself. The copy uses guilt as pressure: this is called confirmshaming."})}},
-
-{id:"crime-4",sec:"Assessment",title:"Crime 4: the form",ex:"Spot the GUI crime",
- notes:"Press Submit in the mock-up to show the error. Who it hurts: people with low vision, anyone on a bright screen outdoors, everyone who has to guess what went wrong.",
- render:function(n){return h(Crime,{n:n,k:4,mock:MockForm,
-   caption:"Figure 4. Reconstruction of a typical sign-up form. Press Submit.",
-   prompt:"What's wrong here, and who does it hurt? Try pressing Submit.",
-   answer:"Light grey text is hard to read, the labels are only placeholders, and the error appears only after you submit, without saying which field is wrong or how to fix it."})}},
+    solid("Groups · 3 hp · LO2–3",h("ul",null,h("li",null,"Group work: Thu 10 and Fri 11 Dec"),h("li",null,"Due: Fri 11 Dec"),h("li",null,"Oral exam: Fri 18 Dec")),"pink")))}},
 
 {id:"a1",sec:"Assessment",title:"A1 Critical analysis",
- notes:"Johannes presents. What you just did with the crimes, done properly and in writing, using the theory from the course. Brief and grading criteria are on Canvas under Assignments.",
- render:function(n){return h(P.ContentSlide,{title:"A1 Critical analysis",number:n,footer:FOOT+" · Johannes"},
+ notes:"Johannes presents. Like the GUI crimes in the interlude, but done properly and in writing, using the theory from the course. Brief and grading criteria are on Canvas under Assignments.",
+ render:function(n){return h(P.ContentSlide,{title:"A1 Critical analysis",number:n,footer:FOOT},
   h("div",{className:"wide grid2"},
     h("div",{className:"stack"},
       p("An individual analysis of an interface design, using the theory introduced in the course.","lead"),
@@ -355,7 +395,7 @@ Deck.start([
 
 {id:"a3",sec:"Assessment",title:"A3 Portfolio",
  notes:"Invitations come by email from GitHub. If one expires we have to send a new one, which slows everyone down. Anyone who already made their own copy from the template: tell David and stop working in it.",
- render:function(n){return h(P.ContentSlide,{title:"A3 Portfolio",number:n,footer:FOOT+" · David"},
+ render:function(n){return h(P.ContentSlide,{title:"A3 Portfolio",number:n,footer:FOOT},
   h("div",{className:"wide grid2"},
     h("div",{className:"stack"},
       p("Built up every Friday, in a personal GitHub repository that we create for you."),
@@ -365,13 +405,6 @@ Deck.start([
       h(P.Alert,{tone:"warning",title:"Accept the GitHub invitation the same day you get it."},"Invitations expire. If yours has, tell David."),
       h(P.Alert,{tone:"info",title:"Don't create your own repository from the template."},"Use the one we create for you."))))}},
 
-/* ===== Programming course feedback ===== */
-{id:"programming-feedback",sec:"Programming feedback",title:"Programming course feedback",
- notes:"Not running it today. Ask when would suit them for a short feedback session on the Programming course, and agree a time or a way to decide (for example, a poll on Canvas).",
- render:function(n){return h(P.ContentSlide,{title:"Programming course feedback",tone:"teal",number:n,footer:FOOT+" · David"},
-  h("div",{className:"wide grid2"},
-    p("David would like to hear how the Programming course went for you.","lead"),
-    solid("When should we meet?",p("A short feedback session, not today. When would suit you?"),"plum")))}},
 
 /* ===== Practical ===== */
 {id:"canvas",sec:"Practical",title:"Where to find things",

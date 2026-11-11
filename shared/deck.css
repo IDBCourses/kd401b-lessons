@@ -65,6 +65,10 @@ body{background:var(--surface-300);color:var(--ink);overflow:hidden;font-family:
 .pn-slide .pn-card[class*="fill-"] :is(.muted,.pn-link){color:inherit}
 .pn-slide .pn-card[class*="fill-"] li::marker{color:inherit}
 
+/* Title slides: Pane's TitleSlide draws its own "Pane" logo; the course site doesn't show it.
+   visibility keeps the layout (and hides it from screen readers too). */
+.pn-title > .pn-logo{visibility:hidden}
+
 /* Content wider than the 1040px reading column (grids of cards, tabs). */
 .pn-slide .pn-content__text:has(> .wide){max-width:none}
 .pn-slide .wide{width:100%}
