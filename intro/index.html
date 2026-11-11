@@ -24,22 +24,6 @@
 .def{font-style:italic}
 .src{font-family:var(--font-display);font-weight:500;font-size:28px;line-height:38px;margin-top:var(--space-4)}
 
-/* guess the year: five cards in a row that can be reordered */
-.years{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:var(--space-5)}
-.years li{display:flex;flex-direction:column;gap:var(--space-2);background:var(--surface-200);color:var(--ink);border:2px solid var(--ink);border-radius:var(--radius-lg);padding:var(--space-4);cursor:grab}
-.years li.dragging{opacity:.5}
-.years li.over{box-shadow:var(--shadow-pane-md);transform:translate(-4px,-4px)}
-.years img{display:block;width:100%;height:160px;object-fit:contain;background:var(--surface-300);border:2px solid var(--ink)}
-.years .name{font-family:var(--font-display);font-weight:600;font-size:36px;line-height:42px;margin:0}
-.years .move{display:flex;gap:var(--space-2);margin-top:auto}
-.years .move button{flex:1;min-height:var(--target-min);font:600 28px/1 var(--font-display);background:var(--surface-300);color:var(--ink);border:2px solid var(--ink);border-radius:var(--radius-md);cursor:pointer}
-.years .move button:disabled{opacity:.4;cursor:not-allowed}
-.years .year{font-family:var(--font-display);font-weight:700;font-size:56px;line-height:56px;margin:0}
-.years .fact,.years .verdict{font-family:var(--font-display);font-weight:500;font-size:28px;line-height:36px;margin:0}
-.yearbar{display:flex;gap:var(--space-5);align-items:center;margin-top:var(--space-5)}
-.yearbar p{font-family:var(--font-display);font-weight:500;font-size:32px;line-height:40px;margin:0}
-@media (prefers-reduced-motion:reduce){.years li.over{transform:none}}
-
 /* how a week works: morning and afternoon as a definition list inside each day's card */
 .day{margin:0;display:grid;grid-template-columns:auto 1fr;gap:var(--space-4) var(--space-6);align-items:baseline}
 .day dt{font-family:var(--font-display);font-weight:600;font-size:32px;line-height:40px}
@@ -100,9 +84,6 @@
 .linkcard a::after{content:"";position:absolute;inset:0}
 .linkcard p{margin-top:var(--space-2)}
 
-/* image credits */
-.credits{margin:0;padding-left:1.1em;font-size:32px;line-height:46px}
-.credits li{margin-bottom:var(--space-2)}
 </style>
 </head>
 <body data-lecture="intro" data-home="../">
@@ -122,62 +103,6 @@ function card(title,body,tone){return h(P.Card,{title:title,tone:tone||"paper"},
 /* solid-colour card (see "Solid-fill cards" in shared/deck.css): fill is plum | teal | pink */
 function solid(title,body,fill){return h(P.Card,{title:title,className:"fill-"+fill},body)}
 function p(t,cls){return h("p",cls?{className:cls}:null,t)}
-
-/* ---------- Guess the year ----------
-   Photos from Wikimedia Commons; licences and authors are on the "Image credits" slide. */
-var INTERFACES=[
-  {id:"alto",name:"Xerox Alto",year:1973,img:"img/year-alto.jpg",alt:"The Xerox Alto: a tall portrait-format screen, keyboard and mouse",
-   fact:"A research computer at Xerox PARC with windows, a mouse and a bitmap screen."},
-  {id:"mac",name:"Apple Macintosh",year:1984,img:"img/year-mac.jpg",alt:"The original Apple Macintosh: a beige all-in-one computer with a small screen",
-   fact:"Brought the mouse and the desktop to a mass-market computer."},
-  {id:"win95",name:"Windows 95",year:1995,img:"img/year-win95.jpg",alt:"A laptop and monitor showing the Windows 95 Setup screen, next to a stack of floppy disks",
-   fact:"Introduced the Start button and the taskbar."},
-  {id:"iphone",name:"iPhone",year:2007,img:"img/year-iphone.jpg",alt:"The first iPhone: a phone that is almost all touchscreen",
-   fact:"A multi-touch screen in place of a keyboard and stylus."},
-  {id:"echo",name:"Amazon Echo",year:2014,img:"img/year-echo.jpg",alt:"The Amazon Echo: a black cylindrical speaker",
-   fact:"A voice assistant with no screen at all."}
-];
-var START=["iphone","alto","echo","win95","mac"];
-var BY_ID={};INTERFACES.forEach(function(x){BY_ID[x.id]=x});
-var CORRECT=INTERFACES.map(function(x){return x.id});
-var ORD=["1st","2nd","3rd","4th","5th"];
-
-function GuessYear(){
-  var st=useState(START),order=st[0],setOrder=st[1];
-  var rv=useState(false),revealed=rv[0],setRevealed=rv[1];
-  var dg=useState(null),drag=dg[0],setDrag=dg[1];
-  var ov=useState(null),over=ov[0],setOver=ov[1];
-  function move(from,to){
-    if(to<0||to>=order.length||from===to)return;
-    var o=order.slice(),x=o.splice(from,1)[0];o.splice(to,0,x);setOrder(o);
-  }
-  var right=order.filter(function(id,i){return CORRECT[i]===id}).length;
-  return h("div",null,
-    h("ol",{className:"years","aria-label":"Interfaces, from earliest to latest"},order.map(function(id,i){
-      var x=BY_ID[id];
-      return h("li",{key:id,draggable:true,"data-noswipe":true,
-          className:(drag===i?"dragging":"")+(over===i&&drag!==i?" over":""),
-          onDragStart:function(e){setDrag(i);try{e.dataTransfer.setData("text/plain",id)}catch(_){}},
-          onDragOver:function(e){e.preventDefault();if(over!==i)setOver(i)},
-          onDragLeave:function(){if(over===i)setOver(null)},
-          onDrop:function(e){e.preventDefault();if(drag!=null)move(drag,i);setDrag(null);setOver(null)},
-          onDragEnd:function(){setDrag(null);setOver(null)}},
-        h("img",{src:x.img,alt:x.alt,draggable:false}),
-        h("p",{className:"name"},x.name),
-        revealed&&h("p",{className:"year"},x.year),
-        revealed&&h("p",{className:"fact"},x.fact),
-        revealed&&h("p",{className:"verdict"},CORRECT[i]===id?"✓ Right place":"✗ Belongs "+ORD[CORRECT.indexOf(id)]),
-        !revealed&&h("div",{className:"move"},
-          h("button",{type:"button",onClick:function(){move(i,i-1)},disabled:i===0,"aria-label":"Move "+x.name+" earlier"},"←"),
-          h("button",{type:"button",onClick:function(){move(i,i+1)},disabled:i===order.length-1,"aria-label":"Move "+x.name+" later"},"→")));
-    })),
-    h("div",{className:"yearbar"},
-      revealed
-        ? [h(P.Button,{key:"again",variant:"secondary",onClick:function(){setOrder(START);setRevealed(false)}},"Start again"),
-           h("p",{key:"score",role:"status"},right+" of 5 in the right place.")]
-        : [h(P.Button,{key:"reveal",onClick:function(){setRevealed(true)}},"Reveal the years"),
-           h("p",{key:"hint"},"Drag the cards, or use the arrows, to put them in order: earliest first.")]));
-}
 
 /* ---------- Spot the GUI crime ----------
    Each mock-up is a reconstruction, drawn in the light theme so it reads like an ordinary web page. */
@@ -268,16 +193,6 @@ var LINKS=[
   ["Syllabus","https://utbildningsinfo.mau.se/kurs/kursplan/en/cc3ff7f4-d4ec-11f0-b415-d312a71c4fd5/20262","The official course syllabus, Autumn 2026"]
 ];
 
-/* Image credits for the "Guess the year" photos (Wikimedia Commons). */
-var COMMONS="https://commons.wikimedia.org/wiki/File:";
-var CREDITS=[
-  ["Xerox Alto","Bc4040","CC BY 4.0","Xero_Alto_Computer.jpg"],
-  ["Apple Macintosh","Sailko","CC BY 3.0","Computer_macintosh_128k,_1984_(all_about_Apple_onlus).jpg"],
-  ["Windows 95 (setup on a Toshiba T1850)","Hanul from Germany","CC BY 2.0","Toshiba_T1850_-_Windows_95_Setup_(5171002135).jpg"],
-  ["iPhone","Carl Berkeley","CC BY-SA 2.0","IPhone_First_Generation_8GB_(3677961514).jpg"],
-  ["Amazon Echo","Frmorrison","CC BY-SA 3.0","Amazon_Echo.jpg"]
-];
-
 Deck.start([
 /* ===== Welcome ===== */
 {id:"cover",sec:"Welcome",title:"Interaction Design: Graphical User Interfaces",
@@ -318,11 +233,6 @@ Deck.start([
     card("Tangible",p("You handle physical objects that stand for digital things.")),
     card("Voice and sound",p("You speak and listen; there may be no screen at all.")),
     solid("Graphical",p("You see and point: windows, icons, menus and a pointer. This course."),"plum")))}},
-
-{id:"guess-the-year",sec:"What is a GUI?",title:"Guess the year",ex:"Guess the year",
- notes:"Students open the same link on their laptops and put the five interfaces in order, earliest first; drag the cards or use the arrow buttons. Give them a minute, then reveal on the projector and ask who got all five. Years: Xerox Alto 1973, Macintosh 1984, Windows 95 1995, iPhone 2007, Amazon Echo 2014. The point: graphical interfaces are about 50 years old, and the newest one here has no screen at all.",
- render:function(n){return h(P.ContentSlide,{title:"Guess the year",number:n,footer:FOOT+" · Photos: Wikimedia Commons, credits at the end"},
-  h("div",{className:"wide"},h(GuessYear)))}},
 
 /* ===== The course ===== */
 {id:"about",sec:"The course",title:"What this course is about",
@@ -482,14 +392,7 @@ Deck.start([
 
 {id:"next",sec:"Up next",title:"Up next: Colour",
  notes:"Hand over to Johannes. Friday continues the topic: colour in HTML and CSS.",
- render:function(){return h(P.SectionSlide,{title:["Up next: Colour,","with Johannes"],tone:"plum",footer:FOOT})}},
-
-{id:"credits",sec:"Credits",title:"Image credits",
- notes:"Not presented. Attribution for the photos on the Guess the year slide, as their licences require (all via Wikimedia Commons; photos resized). Who we are uses our MAU staff photos.",
- render:function(n){return h(P.ContentSlide,{title:"Image credits",number:n,footer:FOOT},
-  h("div",{className:"wide"},
-    p("Guess the year: photos from Wikimedia Commons.","lead"),
-    h("ul",{className:"credits"},CREDITS.map(function(c){return h("li",{key:c[0]},c[0]+": ",h("a",{className:"pn-link",href:COMMONS+c[3],target:"_blank",rel:"noopener"},c[1]),", "+c[2])}))))}}
+ render:function(){return h(P.SectionSlide,{title:["Up next: Colour,","with Johannes"],tone:"plum",footer:FOOT})}}
 ]);
 })();
 </script>
