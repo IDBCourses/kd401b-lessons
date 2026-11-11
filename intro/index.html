@@ -285,13 +285,15 @@ Deck.start([
   h("div",{className:"wide"},h(Calendar)))}},
 
 {id:"ways",sec:"Structure",title:"Ways of working",
- notes:"The four kinds of activity. Supplemental materials are optional: web links, video tutorials and other extra resources. Useful if a topic moves fast, or to go further. Readings are listed per topic under Course literature on Canvas.",
+ notes:"The six kinds of activity. Supplemental materials are optional: web links, video tutorials and other extra resources; useful if a topic moves fast, or to go further. Readings are listed per topic under Course literature on Canvas. Oral critique and presentation: you present your work and discuss it, most visibly in the A2 oral exam on Fri 18 Dec. Coaching: feedback from us on your projects, for A2 before the group work days and for the portfolio in January.",
  render:function(n){return h(P.ContentSlide,{title:"Ways of working",tone:"plum",number:n,footer:FOOT},
-  h("div",{className:"wide grid2"},
+  h("div",{className:"wide grid3"},
     card("Lectures",p("Thursday and Friday mornings.")),
-    card("Exercises",p("The afternoons, with the TAs: Figma on Thursdays, HTML and CSS on Fridays.")),
-    card("Supplemental materials",p("Web links, video tutorials and extra resources, to use at your own pace.")),
-    card("Readings",p("Articles and chapters for each topic, under Course literature on Canvas."))))}},
+    card("Exercises",p("The afternoons, with the TAs.")),
+    card("Readings",p("Articles and chapters for each topic, on Canvas.")),
+    card("Supplemental materials",p("Web links, video tutorials and extra resources.")),
+    card("Oral critique and presentation",p("Presenting your work and discussing it.")),
+    card("Coaching",p("Feedback from us on your projects."))))}},
 
 /* ===== Assessment ===== */
 {id:"assessment",sec:"Assessment",title:"Assessment overview",
