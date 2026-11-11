@@ -24,11 +24,6 @@
 .def{font-style:italic}
 .src{font-family:var(--font-display);font-weight:500;font-size:28px;line-height:38px;margin-top:var(--space-4)}
 
-/* how a week works: morning and afternoon as a definition list inside each day's card */
-.day{margin:0;display:grid;grid-template-columns:auto 1fr;gap:var(--space-4) var(--space-6);align-items:baseline}
-.day dt{font-family:var(--font-display);font-weight:600;font-size:32px;line-height:40px}
-.day dd{margin:0}
-
 /* the weeks ahead: nine week tabs need less side padding to fit on one row */
 /* course calendar: one row per week; cells tinted by kind of day */
 .cal{width:100%;border-collapse:separate;border-spacing:var(--space-2);margin:calc(-1 * var(--space-2));table-layout:fixed;font-family:var(--font-display)}
@@ -46,6 +41,12 @@
 .cal .due{background:var(--pink);color:var(--on-pink);font-weight:700}
 .cal tr.now th{background:var(--teal);color:var(--on-teal)}
 .cal col.c-week{width:23%}.cal col.c-day{width:27%}.cal col.c-due{width:23%}
+/* how a week works: the same table style, larger, two rows */
+.cal-week th,.cal-week td{font-size:36px;line-height:46px;padding:var(--space-5) var(--space-6)}
+.cal-week thead th{font-size:36px;padding-bottom:var(--space-2)}
+.cal-week td b{display:block;font-weight:700}
+.cal-week td span{font-family:var(--font-text);font-weight:400}
+.cal-week col.c-part{width:20%}.cal-week col.c-wday{width:40%}
 
 /* assessment facts under a card */
 .facts{font-family:var(--font-display);font-weight:500;font-size:32px;line-height:40px;margin-top:var(--space-5)}
@@ -263,15 +264,20 @@ Deck.start([
     solid("Implementation",p("Building it for the screen: HTML and CSS."),"pink")))}},
 
 {id:"week",sec:"Structure",title:"How a week works",
- notes:"Same shape both days: a lecture in the morning, exercises in the afternoon. Johannes: a couple of minutes on Thursdays and how Figma runs through the exercises (there's no separate Figma workshop). David: Fridays take the same topic into code, and the Friday exercises feed the portfolio. The TAs run the afternoons: that's the place to ask questions while you work.",
+ notes:"Same shape both days: a lecture in the morning, exercises in the afternoon. Thursdays (teal) are theory and design, Fridays (plum) implementation, the same colours as the calendar. Johannes: a couple of minutes on Thursdays and how Figma runs through the exercises (there's no separate Figma workshop). David: Fridays take the same topic into code, and the Friday exercises feed the portfolio. The TAs run the afternoons: that's the place to ask questions while you work.",
  render:function(n){return h(P.ContentSlide,{title:"How a week works",number:n,footer:FOOT},
-  h("div",{className:"wide grid2"},
-    h(P.Card,{title:"Thursdays · theory and design",className:"fill-teal"},h("dl",{className:"day"},
-      h("dt",null,"Morning"),h("dd",null,"Johannes lectures on design and theory."),
-      h("dt",null,"Afternoon"),h("dd",null,"Figma and sketching exercises, with the TAs."))),
-    h(P.Card,{title:"Fridays · implementation",className:"fill-plum"},h("dl",{className:"day"},
-      h("dt",null,"Morning"),h("dd",null,"David lectures on HTML and CSS."),
-      h("dt",null,"Afternoon"),h("dd",null,"Implementation exercises, with the TAs.")))))}},
+  h("div",{className:"wide"},h("table",{className:"cal cal-week"},
+    h("caption",{className:"pn-sr"},"A typical week: Thursday and Friday, morning and afternoon"),
+    h("colgroup",null,h("col",{className:"c-part"}),h("col",{className:"c-wday"}),h("col",{className:"c-wday"})),
+    h("thead",null,h("tr",null,h("td",{className:"empty"}),
+      h("th",{scope:"col"},"Thursday · theory and design"),h("th",{scope:"col"},"Friday · implementation"))),
+    h("tbody",null,
+      h("tr",null,h("th",{scope:"row"},"Morning"),
+        h("td",{className:"design"},h("b",null,"Lecture"),h("span",null,"Johannes, on design and theory")),
+        h("td",{className:"code"},h("b",null,"Lecture"),h("span",null,"David, on HTML and CSS"))),
+      h("tr",null,h("th",{scope:"row"},"Afternoon"),
+        h("td",{className:"design"},h("b",null,"Exercises"),h("span",null,"Figma and sketching, with the TAs")),
+        h("td",{className:"code"},h("b",null,"Exercises"),h("span",null,"HTML and CSS, with the TAs")))))))}},
 
 {id:"weeks",sec:"Structure",title:"Course calendar",
  notes:"The whole course on one screen. Thursdays (teal) are design, Fridays (plum) HTML and CSS; pink is the A2 project. Week 50 is A2 group work, week 51 the A2 oral exam (no times on the slide; groups get theirs separately). Weeks 52 and 53 have no teaching: week 52 is for writing the A1 critique, due Wed 30 Dec. Week 2: portfolio coaching on Wed 13 Jan, then work sessions; A3 is due Fri 15 Jan. The current week is highlighted automatically.",
