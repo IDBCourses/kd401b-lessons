@@ -171,7 +171,7 @@ function start(list){
     else if(a==="ex")nextEx();else if(a==="fs")toggleFS();
   })});
   var tx=null;
-  stageEl.addEventListener("touchstart",function(e){if(e.target.closest("button,input,textarea,a,label,[role=tab]"))return;tx=e.touches[0].clientX},{passive:true});
+  stageEl.addEventListener("touchstart",function(e){if(e.target.closest("button,input,textarea,a,label,[role=tab],[data-noswipe]"))return;tx=e.touches[0].clientX},{passive:true});
   stageEl.addEventListener("touchend",function(e){if(tx===null)return;var dx=e.changedTouches[0].clientX-tx;tx=null;if(Math.abs(dx)>60)go(cur+(dx<0?1:-1))},{passive:true});
 
   window.addEventListener("resize",setBarH);

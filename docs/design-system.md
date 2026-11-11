@@ -41,6 +41,7 @@ them use `Card`, `Tabs`, `Alert`, `CodeBlock` (`size:"slide"`) and `Button`. See
 - **Solid-fill cards**: `className:"fill-plum" | "fill-teal" | "fill-pink"` on a `Card` gives a solid
   Pane fill with its `on-*` text colour, an ink border and a hard shadow. Bolder than Pane's tinted
   `tone`s; use them for the main callouts, and plain cards for supporting content.
+- **No Pane logo on title slides**: `TitleSlide` draws a "Pane" logo; `deck.css` hides it (the space is kept).
 - **Dark by default**: decks and the home page start in Pane's `dark` theme (`data-theme="dark"` on `<html>`).
 - **Theme switch**: `T` or the Theme button cycles light, dark and high contrast. The choice is remembered
   per viewer (`kd401b:theme`) and also used by the home page.

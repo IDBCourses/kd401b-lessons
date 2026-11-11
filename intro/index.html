@@ -11,7 +11,7 @@
 /* styles used only by this lecture */
 
 /* who we are: photos from the MAU staff pages, in a Pane-style frame (square, ink border, hard shadow) */
-.person{display:flex;gap:var(--space-7);align-items:center}
+.person{display:flex;gap:var(--space-7);align-items:flex-start}
 .photo{flex:none;display:block;width:240px;height:240px;object-fit:cover;border:2px solid var(--ink);box-shadow:var(--shadow-pane-md);background:var(--surface-300)}
 .role{font-family:var(--font-display);font-weight:500;font-size:28px;line-height:38px;color:var(--ink-muted);margin:0 0 var(--space-2)}
 
@@ -20,23 +20,87 @@
 #cover .pn-title{width:1200px}
 #cover .pn-frame{font-size:104px!important}
 
-/* the weeks ahead: nine week tabs need less side padding to fit on one row */
-#weeks .pn-tab{padding-left:var(--space-4);padding-right:var(--space-4)}
-.when{font-family:var(--font-display);font-weight:500;font-size:32px;line-height:40px;margin-top:var(--space-4)}
+/* definitions: the quoted text, and a small source line */
+.def{font-style:italic}
+.src{font-family:var(--font-display);font-weight:500;font-size:28px;line-height:38px;margin-top:var(--space-4)}
 
-/* how a week works: morning and afternoon as a definition list inside each day's card */
-.day{margin:0;display:grid;grid-template-columns:auto 1fr;gap:var(--space-4) var(--space-6);align-items:baseline}
-.day dt{font-family:var(--font-display);font-weight:600;font-size:32px;line-height:40px}
-.day dd{margin:0}
+/* the weeks ahead: nine week tabs need less side padding to fit on one row */
+/* course calendar: one row per week; cells tinted by kind of day */
+.cal{width:100%;border-collapse:separate;border-spacing:var(--space-2);margin:calc(-1 * var(--space-2));table-layout:fixed;font-family:var(--font-display)}
+.cal th,.cal td{font-size:28px;line-height:34px;padding:var(--space-2) var(--space-4);text-align:left;vertical-align:middle;border-radius:var(--radius-sm)}
+.cal thead th{font-weight:600;padding-top:0;padding-bottom:0}
+.cal tbody th{font-weight:600;background:var(--surface-200);color:var(--ink);white-space:nowrap}
+.cal tbody th b{font-weight:700}
+.cal tbody th span{font-weight:500;margin-left:var(--space-3)}
+.cal td{font-weight:500;color:var(--ink)}
+.cal .design{background:var(--teal-tint)}
+.cal .code{background:var(--plum-tint)}
+.cal .a2{background:var(--pink-tint)}
+.cal .off{background:var(--surface-300)}
+.cal .empty{background:transparent}
+.cal .due{background:var(--pink);color:var(--on-pink);font-weight:700}
+.cal tr.now th{background:var(--teal);color:var(--on-teal)}
+.cal col.c-week{width:23%}.cal col.c-day{width:27%}.cal col.c-due{width:23%}
+/* how a week works: the same table style, larger, two rows */
+.cal-week th,.cal-week td{font-size:36px;line-height:46px;padding:var(--space-5) var(--space-6)}
+.cal-week thead th{font-size:36px;padding-bottom:var(--space-2)}
+.cal-week td b{display:block;font-weight:700}
+.cal-week td span{font-family:var(--font-text);font-weight:400}
+.cal-week col.c-part{width:20%}.cal-week col.c-wday{width:40%}
 
 /* assessment facts under a card */
 .facts{font-family:var(--font-display);font-weight:500;font-size:32px;line-height:40px;margin-top:var(--space-5)}
+
+/* spot the GUI crime: reconstructions of real interfaces, always drawn in the light theme
+   (data-theme="light" on the mock-up) so they read as screenshots of ordinary web pages */
+.mock{background:var(--surface-200);color:var(--ink);font-family:system-ui,sans-serif;font-size:28px;line-height:1.35;min-height:500px;position:relative}
+.mock h4{margin:0;font-size:32px;font-weight:700}
+.mock-alert{padding:var(--space-5) var(--space-6)}
+.mock-alert ul{margin:var(--space-4) 0 0;padding:0;list-style:none}
+.mock-alert li{margin:0}
+.mock-alert a{color:var(--link);text-decoration:underline;font-family:"Times New Roman",serif}
+.mock-cookie{display:flex;flex-direction:column;justify-content:flex-end}
+.mock-cookie .page{position:absolute;inset:var(--space-6);display:flex;flex-direction:column;gap:var(--space-4)}
+.mock-cookie .page i{display:block;height:28px;background:var(--surface-300)}
+.mock-cookie .banner{position:relative;background:var(--surface-100);border-top:2px solid var(--ink);padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-5)}
+.mock-cookie .accept{align-self:stretch;font:700 40px/1 system-ui,sans-serif;padding:var(--space-6);background:var(--plum);color:var(--on-plum);border:0;border-radius:var(--radius-md)}
+.mock-cookie .manage{align-self:flex-start;font-size:28px;color:var(--ink);opacity:.45;text-decoration:underline}
+.mock-shame{display:grid;place-items:center;background:var(--surface-300)}
+.mock-shame .modal{width:80%;background:var(--surface-200);border:2px solid var(--ink);padding:var(--space-7);display:flex;flex-direction:column;gap:var(--space-5);text-align:center}
+.mock-shame .modal h4{font-size:44px}
+.mock-shame .field{border:2px solid var(--border-control);padding:var(--space-3);text-align:left;color:var(--ink-muted)}
+.mock-shame .yes{font:700 32px/1 system-ui,sans-serif;padding:var(--space-5);background:var(--pink);color:var(--on-pink);border:0}
+.mock-shame .no{font-size:28px;text-decoration:underline}
+.mock-form{padding:var(--space-7);display:flex;flex-direction:column;gap:var(--space-5)}
+.mock-form .err{background:var(--danger-bg);color:var(--danger);padding:var(--space-3) var(--space-4);font-weight:600}
+.mock-form .faint{opacity:.35}
+.mock-form .box{border:1px solid var(--border);padding:var(--space-3) var(--space-4)}
+.mock-form button{align-self:flex-start;font:600 28px/1 system-ui,sans-serif;padding:var(--space-3) var(--space-6);background:var(--surface-300);color:var(--ink);border:1px solid var(--border);cursor:pointer}
+.crime-text{display:flex;flex-direction:column;gap:var(--space-5);align-items:flex-start}
+.crime-text .answer{font-size:36px;line-height:54px;margin:0}
+.crime-text ol{margin:0;padding-left:1.3em;font-size:36px;line-height:48px}
+.crime-text li{margin-bottom:var(--space-3)}
+.crime-text li::marker{font-family:var(--font-display);font-weight:700}
+/* annotations: a pink outline around the crime and a numbered label, shown with "Show the crime" */
+.mark{position:relative;display:inline-block;align-self:flex-start}
+.mark.block{display:block;align-self:stretch}
+.mark.on{outline:4px solid var(--pink);outline-offset:6px}
+.note{position:absolute;z-index:2;display:flex;gap:var(--space-2);align-items:center;white-space:nowrap;font:700 28px/1.2 var(--font-display);background:var(--pink);color:var(--on-pink);border:2px solid var(--ink);padding:var(--space-1) var(--space-3) var(--space-1) var(--space-1);box-shadow:var(--shadow-pane-sm);animation:note-in .2s ease-out}
+.note b{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:var(--radius-full);background:var(--ink);color:var(--surface-100)}
+.note-right{left:calc(100% + 20px);top:50%;margin-top:-23px}
+.note-corner{right:12px;top:-30px}
+.note-below{left:0;top:calc(100% + 14px)}
+@keyframes note-in{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.note{animation:none}}
+/* the interlude: its own colour so it reads as a break from the course details */
+.interlude .pn-caption a{color:inherit;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.2em}
 
 /* canvas links: the whole card is clickable through its one link */
 .linkcard{position:relative}
 .linkcard a{font-family:var(--font-display);font-weight:600;font-size:44px;line-height:52px}
 .linkcard a::after{content:"";position:absolute;inset:0}
 .linkcard p{margin-top:var(--space-2)}
+
 </style>
 </head>
 <body data-lecture="intro" data-home="../">
@@ -49,7 +113,7 @@
 <script>
 (function(){
 "use strict";
-var P=window.Pane,h=React.createElement;
+var P=window.Pane,h=React.createElement,useState=React.useState;
 var FOOT="KD401B · Course introduction";
 
 function card(title,body,tone){return h(P.Card,{title:title,tone:tone||"paper"},body)}
@@ -57,38 +121,98 @@ function card(title,body,tone){return h(P.Card,{title:title,tone:tone||"paper"},
 function solid(title,body,fill){return h(P.Card,{title:title,className:"fill-"+fill},body)}
 function p(t,cls){return h("p",cls?{className:cls}:null,t)}
 
-/* The weeks ahead: one tab per week. Dates and sessions from the Course Elements database in Notion
-   (GUIs HT26). Each card: [title, text, tone]. */
-var WEEKS=[
-  {id:"46",label:"Week 46",topic:"Colour",cards:[
-    ["Thu 12 Nov · design","Course introduction, then Colour. Exercise: colour in Figma.","teal"],
-    ["Fri 13 Nov · HTML and CSS","Introduction to HTML and CSS, colour in CSS. Exercise: colour in HTML and CSS.","plum"]]},
-  {id:"47",label:"Week 47",topic:"Type, sketching and design process",cards:[
-    ["Thu 19 Nov · design","Type, then sketching and the design process. Exercise: type and sketching in Figma.","teal"],
-    ["Fri 20 Nov · HTML and CSS","HTML document structure and CSS typography. Exercise: type in HTML and CSS.","plum"]]},
-  {id:"48",label:"Week 48",topic:"Content and UX writing, icons",cards:[
-    ["Thu 26 Nov · design","Content and UX writing, then icons and symbols. Exercise: content and icons in Figma.","teal"],
-    ["Fri 27 Nov · HTML and CSS","Semantic HTML, forms and SVG icons. Exercise: semantic HTML, forms and icons.","plum"]]},
-  {id:"49",label:"Week 49",topic:"Design systems, composition and layout",cards:[
-    ["Thu 3 Dec · design","Consistency and design systems, then composition and layout. Exercise in Figma.","teal"],
-    ["Fri 4 Dec · HTML and CSS","CSS custom properties, components and Flexbox. Exercise: components and layout.","plum"]]},
-  {id:"50",label:"Week 50",topic:"Group work on your A2 project",cards:[
-    ["Thu 10 Dec","A full day of group work sessions on your A2 design activity, with us there to help.","pink"],
-    ["Fri 11 Dec","Another day of group work sessions. A2 is due at the end of the day.","pink"]]},
-  {id:"51",label:"Week 51",topic:"A2 oral exam",cards:[
-    ["Fri 18 Dec","You present and discuss your A2 design as a group. Groups are split between morning and afternoon.","pink"]]},
-  {id:"52",label:"Week 52",topic:"Work on your A1 critique",cards:[
-    ["No teaching","Time to write your A1 critical analysis of an interface. A1 is due on Wednesday 30 Dec.","teal"]]},
-  {id:"1",label:"Week 1",topic:"Designing for intuition, animation and motion",cards:[
-    ["Thu 7 Jan · design","Designing for intuition, then animation, motion and space. Exercise in Figma.","teal"],
-    ["Fri 8 Jan · HTML and CSS","CSS states, transitions and animation. Exercise: interaction and motion in HTML and CSS.","plum"]]},
-  {id:"2",label:"Week 2",topic:"Portfolio",cards:[
-    ["Wed 13 Jan","Portfolio coaching.","plum"],
-    ["Thu 14 – Fri 15 Jan","Portfolio work sessions. A3 is due on Friday 15 Jan.","plum"]]}
+/* ---------- Spot the GUI crime (interlude) ----------
+   Each mock-up is a reconstruction, drawn in the light theme so it reads like an ordinary web page.
+   Mark wraps the part of the interface that is the crime; with on=true it gets a pink outline
+   and a numbered label (where: right | corner | below). The numbers match the list in the answer. */
+function Mark(props){
+  return h(props.block?"div":"span",{className:"mark"+(props.block?" block":"")+(props.on?" on":"")},
+    props.children,
+    props.on&&h("span",{className:"note note-"+(props.where||"right")},h("b",null,props.n),props.label));
+}
+var ALERT_ITEMS=["BMD False Alarm","Amber Alert (CAE) - Kauai County Only","Amber Alert DEMO TEST","High Surf Warning North Shores","PACOM (CDW) - STATE ONLY","TSUNAMI WARNING (CEM) - STATE ONLY","DRILL - PACOM (CDW) - STATE ONLY","Landslide - Hanalei Road Closure","Amber Alert (CAE) Statewide","1. TEST Message","PACOM (DEMO) - STATE ONLY"];
+var ALERT_MARKS={"PACOM (CDW) - STATE ONLY":[1,"Real missile alert"],"DRILL - PACOM (CDW) - STATE ONLY":[2,"Drill: same name"]};
+function MockAlert(props){
+  return h("div",{className:"mock mock-alert","data-theme":"light"},
+    h(Mark,{on:props.on,n:3,label:"Tests and real alerts in one list"},h("h4",null,"Select an alert to send")),
+    h("ul",null,ALERT_ITEMS.map(function(t){
+      var link=h("a",{href:"#",onClick:function(e){e.preventDefault()},tabIndex:-1},t),m=ALERT_MARKS[t];
+      return h("li",{key:t},m?h(Mark,{on:props.on,n:m[0],label:m[1]},link):link);
+    })));
+}
+function MockCookie(props){
+  return h("div",{className:"mock mock-cookie","data-theme":"light"},
+    h("div",{className:"page","aria-hidden":true},h("i",null),h("i",null),h("i",{style:{width:"70%"}})),
+    h("div",{className:"banner"},
+      h("p",{style:{margin:0}},"We value your privacy. We use cookies to improve your experience and for marketing."),
+      h(Mark,{on:props.on,block:true,n:1,label:"Big, bright, one click",where:"corner"},
+        h("button",{type:"button",className:"accept",tabIndex:-1,style:{width:"100%"}},"Accept all")),
+      h(Mark,{on:props.on,n:2,label:"Small, grey, more clicks"},h("span",{className:"manage"},"Manage settings"))));
+}
+function MockShame(props){
+  return h("div",{className:"mock mock-shame","data-theme":"light"},
+    h("div",{className:"modal"},
+      h("h4",null,"Get 10% off your first order"),
+      h("div",{className:"field"},"Your email address"),
+      h(Mark,{on:props.on,block:true,n:2,label:"Only yes gets a button",where:"corner"},
+        h("button",{type:"button",className:"yes",tabIndex:-1,style:{width:"100%"}},"Yes, give me 10% off")),
+      h(Mark,{on:props.on,n:1,label:"Guilt as pressure",where:"below"},h("span",{className:"no"},"No thanks, I don't like saving money"))));
+}
+function MockForm(props){
+  var s=useState(false),sent=s[0],setSent=s[1];
+  return h("div",{className:"mock mock-form","data-theme":"light"},
+    h("h4",null,"Create an account"),
+    (sent||props.on)&&h(Mark,{on:props.on,block:true,n:3,label:"Which field? How to fix it?",where:"corner"},
+      h("div",{className:"err",role:"status"},"Error: invalid input.")),
+    h(Mark,{on:props.on,block:true,n:2,label:"Label vanishes when you type",where:"corner"},h("div",{className:"box faint"},"Email")),
+    h("div",{className:"box faint"},"Password"),
+    h(Mark,{on:props.on,n:1,label:"Too faint to read"},h("p",{className:"faint",style:{margin:0}},"Password must meet the requirements.")),
+    h("button",{type:"button",onClick:function(){setSent(true)}},"Submit"));
+}
+function Crime(props){
+  var s=useState(false),shown=s[0],setShown=s[1];
+  return h(P.FigureSlide,{title:"Spot the GUI crime: "+props.k+" of 4",tone:"teal",className:"interlude",number:props.n,footer:"Interlude · Spot the GUI crime",
+      figure:h(props.mock,{on:shown}),caption:props.caption},
+    h("div",{className:"crime-text"},
+      shown?h("ol",null,props.points.map(function(t){return h("li",{key:t},t)})):p(props.prompt||"What's wrong here, and who does it hurt?","answer"),
+      h(P.Button,{variant:shown?"secondary":"primary",onClick:function(){setShown(!shown)}},shown?"Hide the crime":"Show the crime")));
+}
+
+/* ---------- Course calendar ----------
+   One row per ISO week, from the Course Elements database in Notion (GUIs HT26).
+   Cells: [text, kind]; kind is design | code | a2 | off | empty. A span of 2 covers Thursday and Friday.
+   mon: the Monday of the week, used to mark the current week. */
+var CAL=[
+  {wk:"46",dates:"9–13 Nov",mon:"2026-11-09",thu:["Intro, Colour","design"],fri:["HTML and CSS, colour","code"]},
+  {wk:"47",dates:"16–20 Nov",mon:"2026-11-16",thu:["Type, sketching","design"],fri:["Structure, typography","code"]},
+  {wk:"48",dates:"23–27 Nov",mon:"2026-11-23",thu:["Content, icons","design"],fri:["Semantic HTML, forms","code"]},
+  {wk:"49",dates:"30 Nov–4 Dec",mon:"2026-11-30",thu:["Design systems, layout","design"],fri:["Components, Flexbox","code"]},
+  {wk:"50",dates:"7–11 Dec",mon:"2026-12-07",span:["A2 group work, both days","a2"],due:"A2 due Fri 11"},
+  {wk:"51",dates:"14–18 Dec",mon:"2026-12-14",thu:["","empty"],fri:["A2 oral exam","a2"],due:"A2 exam Fri 18"},
+  {wk:"52",dates:"21–27 Dec",mon:"2026-12-21",span:["No teaching: write your A1 critique","off"]},
+  {wk:"53",dates:"28 Dec–3 Jan",mon:"2026-12-28",span:["No teaching","off"],due:"A1 due Wed 30"},
+  {wk:"1",dates:"4–8 Jan",mon:"2027-01-04",thu:["Intuition, motion","design"],fri:["Transitions, animation","code"]},
+  {wk:"2",dates:"11–15 Jan",mon:"2027-01-11",span:["Coaching Wed 13, then portfolio work","code"],due:"A3 due Fri 15"}
 ];
-var weekTabs=WEEKS.map(function(w){return {id:w.id,label:w.label,content:h("div",null,
-  h("h3",{className:"h3"},w.topic),
-  h("div",{className:"grid2"},w.cards.map(function(c){return h(P.Card,{key:c[0],title:c[0],className:"fill-"+c[2]},p(c[1]))})))}});
+function isThisWeek(mon){
+  var start=new Date(mon+"T00:00:00"),end=new Date(start.getTime()+7*864e5),now=new Date();
+  return now>=start&&now<end;
+}
+function Calendar(){
+  return h("table",{className:"cal"},
+    h("caption",{className:"pn-sr"},"Course calendar, week by week, with Thursday and Friday sessions and deadlines"),
+    h("colgroup",null,h("col",{className:"c-week"}),h("col",{className:"c-day"}),h("col",{className:"c-day"}),h("col",{className:"c-due"})),
+    h("thead",null,h("tr",null,
+      h("th",{scope:"col"},"Week"),h("th",{scope:"col"},"Thursday · design"),h("th",{scope:"col"},"Friday · HTML and CSS"),h("th",{scope:"col"},"Deadlines and exams"))),
+    h("tbody",null,CAL.map(function(w){
+      var now=isThisWeek(w.mon);
+      return h("tr",{key:w.wk,className:now?"now":null},
+        h("th",{scope:"row"},h("b",null,w.wk),h("span",null,w.dates),now?h("span",null,"· this week"):null),
+        w.span?h("td",{colSpan:2,className:w.span[1]},w.span[0])
+              :[h("td",{key:"t",className:w.thu[1]},w.thu[0]),h("td",{key:"f",className:w.fri[1]},w.fri[0])],
+        h("td",{className:w.due?"due":"empty"},w.due||""));
+    })));
+}
 
 var CANVAS_URL="https://mau.instructure.com/courses/22861/";
 var LINKS=[
@@ -101,9 +225,17 @@ var LINKS=[
 ];
 
 Deck.start([
+/* ===== Welcome ===== */
 {id:"cover",sec:"Welcome",title:"Interaction Design: Graphical User Interfaces",
  notes:"Welcome. David leads this session; Johannes takes the parts about his Thursdays and A1/A2. Colour, with Johannes, follows straight after.",
  render:function(){return h(P.TitleSlide,{title:["Interaction","Design: Graphical","User Interfaces"],subtitle:"Course introduction",meta:"David and Johannes · KD401B HT26"})}},
+
+{id:"programming-feedback",sec:"Programming feedback",title:"Programming course feedback",
+ notes:"Not running it today. Ask when would suit them for a short feedback session on the Programming course, and agree a time or a way to decide (for example, a poll on Canvas).",
+ render:function(n){return h(P.ContentSlide,{title:"Programming course feedback",tone:"teal",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    p("David would like to hear how the Programming course went for you.","lead"),
+    solid("When should we meet?",p("A short feedback session, not today. When would suit you?"),"plum")))}},
 
 {id:"who",sec:"Welcome",title:"Who we are",
  notes:"Johannes first: he teaches Thursdays, which come first each week. A sentence or two each about background. David is course coordinator: questions about the course as a whole (registration, NAIS adjustments, re-exams) go to him. Photos are from our MAU staff pages.",
@@ -115,20 +247,45 @@ Deck.start([
       h("div",null,p("Fridays · HTML and CSS","role"),h("h3",{className:"h3",style:{marginBottom:8}},"David"),p("Course coordinator. HTML and CSS lectures and exercises. Grades the portfolio."))))))}},
 
 {id:"icebreaker",sec:"Welcome",title:"Icebreaker",
- notes:"Pairs first, then take three or four answers from the room. Push for the specific thing: a button that was hard to find, text too small, an error that didn't say what was wrong. Those are the things this course gives words for: colour, type, layout, input, accessibility.",
- render:function(){return h(P.SectionSlide,{title:["Name an interface you","used today that","annoyed you."],tone:"pink",footer:"Icebreaker · Tell the person next to you what got in the way."})}},
+ notes:"Keep it short. Pairs first, then take two or three answers from the room. Push for the specific thing: a button that was hard to find, text too small, an error that didn't say what was wrong. Those are the things this course gives words for.",
+ render:function(){return h(P.SectionSlide,{title:["Name an interface you","used today that","annoyed you."],tone:"teal",footer:"Icebreaker · Tell the person next to you what got in the way."})}},
 
+
+/* ===== What is a GUI? ===== */
+{id:"what-is-a-gui",sec:"What is a GUI?",title:"What is a GUI?",
+ notes:"Before the course itself: what we mean by an interface, and where graphical interfaces sit among the other kinds.",
+ render:function(){return h(P.SectionSlide,{title:["What is a GUI?"],tone:"ink",footer:FOOT})}},
+
+{id:"interface",sec:"What is a GUI?",title:"What is an interface?",
+ notes:"Read the three side by side. The dictionaries describe a meeting point between two things. Hookway's book (Interface, MIT Press, 2014) shifts the focus: the interface is how we relate to technology, not a thing in itself. That is the sense this course works with: designing the relation between people and what's on the screen. The Hookway line is a paraphrase of his opening argument; it isn't a direct quote.",
+ render:function(n){return h(P.ContentSlide,{title:"What is an interface?",number:n,footer:FOOT},
+  h("div",{className:"wide grid3"},
+    h(P.Card,{title:"Wiktionary"},p("“The point of interconnection or contact between entities.”","def")),
+    h(P.Card,{title:"Merriam-Webster"},p("“The place at which independent and often unrelated systems meet and act on or communicate with each other.”","def")),
+    h(P.Card,{title:"Branden Hookway",className:"fill-teal"},p("An interface is a relation with technology, rather than a technology in itself."),p("Interface (2014), paraphrased","src"))))}},
+
+{id:"kinds",sec:"What is a GUI?",title:"Kinds of interface",
+ notes:"Locate graphical interfaces among the others. Ask the room for an example of each: a terminal, a tangible toy or museum installation, a smart speaker or a phone menu, and almost everything on their laptop. Many real products mix several.",
+ render:function(n){return h(P.ContentSlide,{title:"Kinds of interface",tone:"teal",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    card("Command line",p("You type commands as text and read text back.")),
+    card("Tangible",p("You handle physical objects that stand for digital things.")),
+    card("Voice and sound",p("You speak and listen; there may be no screen at all.")),
+    solid("Graphical",p("You see and point: windows, icons, menus and a pointer. This course."),"plum")))}},
+
+
+/* ===== The course ===== */
 {id:"about",sec:"The course",title:"What this course is about",
- notes:"Two tracks that meet every week: design (Thursdays) and building (Fridays). The topics run from colour and type through layout and interaction to accessibility. Each Thursday topic gets a matching Friday in code.",
- render:function(n){return h(P.ContentSlide,{title:"What this course is about",number:n,footer:FOOT},
+ notes:"Two tracks that meet every week: design and building. The topics run from colour and type through layout and interaction to accessibility.",
+ render:function(n){return h(P.ContentSlide,{title:"What this course is about",tone:"plum",number:n,footer:FOOT},
   h("div",{className:"wide stack"},
     h("div",{className:"grid2"},
       solid("Designing graphical user interfaces",p("Looking closely at interfaces, sketching alternatives, and making considered design decisions."),"teal"),
-      solid("Building them for the screen",p("Turning those designs into real pages in HTML and CSS."),"plum")),
+      solid("Building them for the screen",p("Turning those designs into real pages in HTML, CSS and JavaScript."),"pink")),
     h("ul",{className:"tags","aria-label":"Topics, in order"},["Colour","Type","Layout","Interaction","Accessibility"].map(function(t){return h("li",{key:t},t)}))))}},
 
 {id:"outcomes",sec:"The course",title:"Learning outcomes",
- notes:"Walk through the four. 1–3 are mostly Thursdays; 4 is Fridays. Each maps to an assessment, coming up shortly. \"W3C-validated\" means it passes validator.w3.org; we use it from the first Friday.",
+ notes:"Quickly through the four. 1–3 are mostly Thursdays; 4 is Fridays. Each maps to an assessment. \"W3C-validated\" means it passes validator.w3.org; we use it from the first Friday.",
  render:function(n){return h(P.ContentSlide,{title:"Learning outcomes",tone:"teal",number:n,footer:FOOT},
   h("div",{className:"wide grid2"},
     card("1. Analyse",p("interface designs using the theory introduced in the course.")),
@@ -136,57 +293,123 @@ Deck.start([
     card("3. Design",p("for screens using appropriate design principles.")),
     card("4. Build",p("W3C-validated, semantically correct HTML markup and CSS."))))}},
 
+
+/* ===== Structure and ways of working ===== */
+{id:"three-parts",sec:"Structure",title:"Theory, design, implementation",
+ notes:"The course has three strands, and each week touches all of them. Theory gives the words and the reasons; design is where you explore and decide; implementation is where it becomes real on a screen. Thursdays carry theory and design, Fridays carry implementation.",
+ render:function(n){return h(P.ContentSlide,{title:"Theory, design, implementation",number:n,footer:FOOT},
+  h("div",{className:"wide grid3"},
+    solid("Theory",p("Why interfaces work the way they do: colour, type, layout, perception."),"teal"),
+    solid("Design",p("Exploring and deciding: sketching and Figma."),"plum"),
+    solid("Implementation",p("Building it for the screen: HTML, CSS and JavaScript."),"pink")))}},
+
 {id:"week",sec:"Structure",title:"How a week works",
- notes:"Same shape both days: a lecture in the morning, exercises in the afternoon. Johannes: a couple of minutes on Thursdays and how Figma runs through the exercises (there's no separate Figma workshop). David: Fridays take the same topic into code, and the Friday exercises feed the portfolio. The TAs run the afternoons: that's the place to ask questions while you work.",
+ notes:"Same shape both days: a lecture in the morning, exercises in the afternoon. Thursdays (teal) are theory and design, Fridays (plum) implementation, the same colours as the calendar. Johannes: a couple of minutes on Thursdays and how Figma runs through the exercises (there's no separate Figma workshop). David: Fridays take the same topic into code, and the Friday exercises feed the portfolio. The TAs run the afternoons: that's the place to ask questions while you work.",
  render:function(n){return h(P.ContentSlide,{title:"How a week works",number:n,footer:FOOT},
-  h("div",{className:"wide grid2"},
-    h(P.Card,{title:"Thursdays · design",className:"fill-teal"},h("dl",{className:"day"},
-      h("dt",null,"Morning"),h("dd",null,"Johannes lectures on design and theory."),
-      h("dt",null,"Afternoon"),h("dd",null,"Figma and sketching exercises, with the TAs."))),
-    h(P.Card,{title:"Fridays · HTML and CSS",className:"fill-plum"},h("dl",{className:"day"},
-      h("dt",null,"Morning"),h("dd",null,"David lectures on HTML and CSS."),
-      h("dt",null,"Afternoon"),h("dd",null,"Implementation exercises, with the TAs.")))))}},
+  h("div",{className:"wide"},h("table",{className:"cal cal-week"},
+    h("caption",{className:"pn-sr"},"A typical week: Thursday and Friday, morning and afternoon"),
+    h("colgroup",null,h("col",{className:"c-part"}),h("col",{className:"c-wday"}),h("col",{className:"c-wday"})),
+    h("thead",null,h("tr",null,h("td",{className:"empty"}),
+      h("th",{scope:"col"},"Thursday · theory and design"),h("th",{scope:"col"},"Friday · implementation"))),
+    h("tbody",null,
+      h("tr",null,h("th",{scope:"row"},"Morning"),
+        h("td",{className:"design"},h("b",null,"Lecture"),h("span",null,"Johannes, on design and theory")),
+        h("td",{className:"code"},h("b",null,"Lecture"),h("span",null,"David, on HTML, CSS and JavaScript"))),
+      h("tr",null,h("th",{scope:"row"},"Afternoon"),
+        h("td",{className:"design"},h("b",null,"Exercises"),h("span",null,"Figma and sketching, with the TAs")),
+        h("td",{className:"code"},h("b",null,"Exercises"),h("span",null,"HTML, CSS and JavaScript, with the TAs")))))))}},
 
-{id:"weeks",sec:"Structure",title:"The weeks ahead",demo:"Weeks",
- notes:"Click a week (or use the arrow keys once a tab has focus). Week 50 is group work on A2, week 51 the A2 oral exam (no times on the slide; groups get theirs separately), week 52 is time for the A1 critique, due Wed 30 Dec.",
- render:function(n){return h(P.ContentSlide,{title:"The weeks ahead",number:n,footer:FOOT},
-  h("div",{className:"wide"},h(P.Tabs,{tabs:weekTabs,label:"Weeks"})))}},
+{id:"weeks",sec:"Structure",title:"Course calendar",
+ notes:"The whole course on one screen. Thursdays (teal) are design, Fridays (plum) HTML and CSS; pink is the A2 project. Week 50 is A2 group work, week 51 the A2 oral exam (no times on the slide; groups get theirs separately). Weeks 52 and 53 have no teaching: week 52 is for writing the A1 critique, due Wed 30 Dec. Week 2: portfolio coaching on Wed 13 Jan, then work sessions; A3 is due Fri 15 Jan. The current week is highlighted automatically.",
+ render:function(n){return h(P.ContentSlide,{title:"Course calendar",number:n,footer:FOOT},
+  h("div",{className:"wide"},h(Calendar)))}},
 
+{id:"ways",sec:"Structure",title:"Ways of working",
+ notes:"The six kinds of activity. Supplemental materials are optional: web links, video tutorials and other extra resources; useful if a topic moves fast, or to go further. Readings are listed per topic under Course literature on Canvas. Oral critique and presentation: you present your work and discuss it, most visibly in the A2 oral exam on Fri 18 Dec. Coaching: feedback from us on your projects, for A2 before the group work days and for the portfolio in January.",
+ render:function(n){return h(P.ContentSlide,{title:"Ways of working",tone:"plum",number:n,footer:FOOT},
+  h("div",{className:"wide grid3"},
+    card("Lectures",p("Thursday and Friday mornings.")),
+    card("Exercises",p("The afternoons, with the TAs.")),
+    card("Readings",p("Articles and chapters for each topic, on Canvas.")),
+    card("Supplemental materials",p("Web links, video tutorials and extra resources.")),
+    card("Oral critique and presentation",p("Presenting your work and discussing it.")),
+    card("Coaching",p("Feedback from us on your projects."))))}},
+
+
+/* ===== Interlude: Spot the GUI crime ===== */
+{id:"interlude",sec:"Interlude",title:"Interlude: Spot the GUI crime",
+ notes:"A short, playful break from the course details, as a lead-in to the critical-analysis mindset of A1. Johannes runs it. Four interfaces, one per slide: groups get a few seconds to call out what's wrong and who it hurts, then press Show the crime to annotate the interface and list the crimes.",
+ render:function(){return h(P.SectionSlide,{title:["Interlude:","Spot the GUI crime"],tone:"pink",footer:"A break from the course details. Four interfaces, four crimes: in groups, call out what's wrong."})}},
+
+{id:"crime-1",sec:"Interlude",title:"Crime 1",ex:"Spot the GUI crime",
+ notes:"Hawaii, 13 January 2018: an employee sent a real ballistic missile alert to every phone in the state. The image published afterwards (reconstructed here) shows test and live alerts as near-identical links in one plain list; officials later said it was a mock-up of the real screen, not a screenshot. The correction took 38 minutes. The caption links to the TechCrunch article.",
+ render:function(n){return h(Crime,{n:n,k:1,mock:MockAlert,
+   caption:["Figure 1. Reconstruction of the alert menu published after Hawaii's false missile alert, January 2018. ",h("a",{key:"tc",href:"https://techcrunch.com/2018/01/16/hawaiis-emergency-alert-interface-looks-straight-out-of-the-90s/",target:"_blank",rel:"noopener"},"TechCrunch: the story")],
+   points:["One click sent a real missile alert to every phone in the state.","The drill had almost the same name.","Tests and real alerts sit together in one plain list. The correction took 38 minutes."]})}},
+
+{id:"crime-2",sec:"Interlude",title:"Crime 2",ex:"Spot the GUI crime",
+ notes:"A common pattern rather than one site. Who it hurts: anyone who wanted to say no and clicked the big button to get rid of the banner.",
+ render:function(n){return h(Crime,{n:n,k:2,mock:MockCookie,
+   caption:"Figure 2. Reconstruction of a typical cookie banner.",
+   points:["Accepting is a big, bright button: one click.","Refusing is a small grey link, and more clicks. A dark pattern."]})}},
+
+{id:"crime-3",sec:"Interlude",title:"Crime 3",ex:"Spot the GUI crime",
+ notes:"Known as confirmshaming. The layout can look tidy; the crime is in the words.",
+ render:function(n){return h(Crime,{n:n,k:3,mock:MockShame,
+   caption:"Figure 3. Reconstruction of a typical sign-up pop-up.",
+   points:["To say no, you have to insult yourself: confirmshaming.","Only yes gets a real button."]})}},
+
+{id:"crime-4",sec:"Interlude",title:"Crime 4",ex:"Spot the GUI crime",
+ notes:"Press Submit in the mock-up to show the error. Who it hurts: people with low vision, anyone on a bright screen outdoors, everyone who has to guess what went wrong.",
+ render:function(n){return h(Crime,{n:n,k:4,mock:MockForm,
+   caption:"Figure 4. Reconstruction of a typical sign-up form. Press Submit.",
+   prompt:"What's wrong here, and who does it hurt? Try pressing Submit.",
+   points:["Light grey text is too faint to read.","The labels are placeholders that vanish when you type.","The error says neither which field is wrong nor how to fix it."]})}},
+
+
+/* ===== Assessment ===== */
 {id:"assessment",sec:"Assessment",title:"Assessment overview",
- notes:"Overview only; details on the next two slides. In the order they happen: A2 in December, A1 over the break, A3 in January. 7.5 hp in total. Johannes grades A1 and A2, David grades A3.",
+ notes:"Overview, in the order they happen: A2 in December, A1 over the break, A3 in January. 7.5 hp in total. Johannes grades A1 and A2, David grades A3.",
  render:function(n){return h(P.ContentSlide,{title:"Assessment overview",tone:"plum",number:n,footer:FOOT},
   h("div",{className:"wide grid3"},
-    h(P.Card,{title:"A2 Design activity",className:"fill-pink"},p("Sketch and design an interface together."),p("Pairs · 3 hp · LO2–3","facts")),
+    h(P.Card,{title:"A2 Design activity",className:"fill-pink"},p("Design a coffee machine interface."),p("Groups · 3 hp · LO2–3","facts")),
     h(P.Card,{title:"A1 Critical analysis",className:"fill-teal"},p("Analyse an interface using the course theory."),p("Individual · 1 hp · LO1","facts")),
-    h(P.Card,{title:"A3 Portfolio"},p("A site you build in HTML and CSS."),p("Individual · 3.5 hp · LO4","facts"))))}},
+    h(P.Card,{title:"A3 Portfolio"},p("A site you build in HTML, CSS and JavaScript."),p("Individual · 3.5 hp · LO4","facts"))))}},
 
-{id:"a2-a1",sec:"Assessment",title:"A2 and A1",
- notes:"Johannes presents. A2 first, since it comes first. Click the tabs to switch. Briefs, dates and grading criteria are on Canvas under Assignments. Johannes: add anything about the A2 brief to announce today (the plan mentions kiosk and ordering interfaces as possible briefs; not on the slide until confirmed).",
- render:function(n){return h(P.ContentSlide,{title:"A2 and A1",number:n,footer:"KD401B · Course introduction · Johannes"},
-  h("div",{className:"wide"},h(P.Tabs,{label:"Assessments",tabs:[
-    {id:"a2",label:"A2 Design activity",content:h("div",{className:"stack"},
-      p("In pairs, you take a design problem from sketches to a screen design in Figma. The Thursday sketching and Figma exercises lead into it.","lead"),
-      p("Pairs · 3 hp · LO2–3 · Due Fri 11 Dec · Oral exam Fri 18 Dec","facts"))},
-    {id:"a1",label:"A1 Critical analysis",content:h("div",{className:"stack"},
-      p("An individual analysis of an interface design, using the theory introduced in the course. Short, and deep rather than broad.","lead"),
-      p("Individual · 1 hp · LO1 · Due Wed 30 Dec","facts"))}
-  ]})))}},
+{id:"a2",sec:"Assessment",title:"A2 Design activity",
+ notes:"Johannes presents. Keep it short: the brief is a coffee machine touch interface, and the full brief, dates and grading criteria are on Canvas under Assignments. If asked: the flow covers choosing and customising a coffee, waiting, paying and cancelling; the work goes from sketches to wireframes to a high-fidelity prototype in Figma.",
+ render:function(n){return h(P.ContentSlide,{title:"A2 Design activity",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h("div",{className:"stack"},
+      p("Design the touch interface of a coffee machine.","lead")),
+    solid("Groups · 3 hp · LO2–3",h("ul",null,h("li",null,"Group work: Thu 10 and Fri 11 Dec"),h("li",null,"Due: Fri 11 Dec"),h("li",null,"Oral exam: Fri 18 Dec")),"pink")))}},
+
+{id:"a1",sec:"Assessment",title:"A1 Critical analysis",
+ notes:"Johannes presents. Like the GUI crimes in the interlude, but done properly and in writing, using the theory from the course. Brief and grading criteria are on Canvas under Assignments.",
+ render:function(n){return h(P.ContentSlide,{title:"A1 Critical analysis",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h("div",{className:"stack"},
+      p("An individual analysis of an interface design, using the theory introduced in the course.","lead"),
+      p("Short, and deep rather than broad.")),
+    solid("Individual · 1 hp · LO1",h("ul",null,h("li",null,"Written in week 52"),h("li",null,"Due: Wed 30 Dec")),"teal")))}},
 
 {id:"a3",sec:"Assessment",title:"A3 Portfolio",
  notes:"Invitations come by email from GitHub. If one expires we have to send a new one, which slows everyone down. Anyone who already made their own copy from the template: tell David and stop working in it.",
- render:function(n){return h(P.ContentSlide,{title:"A3 Portfolio",number:n,footer:"KD401B · Course introduction · David"},
+ render:function(n){return h(P.ContentSlide,{title:"A3 Portfolio",number:n,footer:FOOT},
   h("div",{className:"wide grid2"},
     h("div",{className:"stack"},
       p("Built up every Friday, in a personal GitHub repository that we create for you."),
       p("Each Friday's exercises add to it, so by the end of the course most of it is already there."),
-      p("Individual · 3.5 hp · LO4","facts")),
+      p("Individual · 3.5 hp · LO4 · Due Fri 15 Jan","facts")),
     h("div",{className:"stack"},
       h(P.Alert,{tone:"warning",title:"Accept the GitHub invitation the same day you get it."},"Invitations expire. If yours has, tell David."),
       h(P.Alert,{tone:"info",title:"Don't create your own repository from the template."},"Use the one we create for you."))))}},
 
+
+/* ===== Practical ===== */
 {id:"canvas",sec:"Practical",title:"Where to find things",
  notes:"Click through one or two live. Modules is week by week; Assignments has the A1–A3 briefs and deadlines. The syllabus is the official description of the course: learning outcomes and the three examinations.",
- render:function(n){return h(P.ContentSlide,{title:"Where to find things",tone:"teal",number:n,footer:FOOT},
+ render:function(n){return h(P.ContentSlide,{title:"Where to find things",tone:"plum",number:n,footer:FOOT},
   h("div",{className:"wide grid3"},LINKS.map(function(c){
     return h(P.Card,{key:c[0],interactive:true,className:"linkcard"},
       h("a",{className:"pn-link",href:c[1],target:"_blank",rel:"noopener"},c[0]),
@@ -195,12 +418,12 @@ Deck.start([
 
 {id:"help",sec:"Practical",title:"Getting help",
  notes:"Introduce the TAs by name if they're in the room. Contact: Canvas Inbox reaches both of us; change this if you'd rather point to email. NAIS: say it plainly and move on; students can write to us privately.",
- render:function(n){return h(P.ContentSlide,{title:"Getting help",tone:"plum",number:n,footer:FOOT},
+ render:function(n){return h(P.ContentSlide,{title:"Getting help",number:n,footer:FOOT},
   h("div",{className:"wide stack"},
     h("div",{className:"grid3"},
-      card("Exercise sessions",p("The afternoons after each lecture. The best place to ask.")),
-      card("TAs",p("In the exercise sessions, for Figma, HTML and CSS.")),
-      card("David and Johannes",p("Ask in class, or message us in Canvas Inbox."))),
+      solid("Exercise sessions",p("The afternoons after each lecture. The best place to ask."),"teal"),
+      solid("TAs",p("In the exercise sessions, for Figma, HTML and CSS."),"plum"),
+      solid("David and Johannes",p("Ask in class, or message us in Canvas Inbox."),"pink")),
     h(P.Alert,{tone:"info",title:"Have a NAIS certificate? Let us know early."},"Then adjustments for the assessments can be arranged in good time.")))}},
 
 {id:"questions",sec:"Questions",title:"Questions",
