@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 150" width="240" height="150">
+  <title>Green hills under a pale sky with a yellow sun</title>
+  <rect width="240" height="150" fill="lightskyblue"/>
+  <circle cx="186" cy="40" r="20" fill="gold"/>
+  <path d="M0 110 Q60 60 130 105 T240 95 V150 H0 Z" fill="mediumseagreen"/>
+  <path d="M0 130 Q80 100 160 128 T240 120 V150 H0 Z" fill="seagreen"/>
+</svg>

@@ -141,7 +141,7 @@
 .venn{display:block;width:100%;height:auto;border:2px solid var(--ink);box-shadow:var(--shadow-pane-md)}
 .venn g{isolation:isolate}
 .venn circle{mix-blend-mode:screen}
-.notation{font:400 56px/72px var(--font-mono);margin:0}
+.notation{font:400 48px/64px var(--font-mono);margin:0;white-space:nowrap}
 .hexpairs{display:flex;gap:var(--space-4);margin:var(--space-3) 0 var(--space-5)}
 .hexpairs span{display:flex;flex-direction:column;align-items:center;font:400 44px/56px var(--font-mono);border:2px solid var(--ink);border-radius:var(--radius-sm);padding:var(--space-2) var(--space-4);background:var(--surface-200);color:var(--ink)}
 .hexpairs small{font:500 28px/38px var(--font-display);color:var(--ink-muted)}
@@ -156,7 +156,7 @@
 .slider input::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:48px;margin-top:-8px;box-sizing:border-box;border:3px solid var(--ink);border-radius:var(--radius-sm);background:var(--surface-100);box-shadow:0 0 0 2px var(--surface-100)}
 .slider input::-moz-range-thumb{width:16px;height:42px;border:3px solid var(--ink);border-radius:var(--radius-sm);background:var(--surface-100);box-shadow:0 0 0 2px var(--surface-100)}
 .slider input:focus-visible{outline:var(--focus-width) solid var(--focus);outline-offset:var(--focus-offset)}
-.hsl-demo{display:grid;grid-template-columns:1fr 1.25fr;gap:var(--space-8);align-items:start}
+.hsl-demo{display:grid;grid-template-columns:1fr 1.15fr;gap:var(--space-7);align-items:start}
 .swrow{display:flex;gap:var(--space-5);align-items:center;flex-wrap:wrap}
 .hsl-btn{font:600 36px/44px var(--font-display);color:var(--on-plum);background:var(--bg);border:2px solid var(--ink);border-radius:var(--radius-md);padding:var(--space-4) var(--space-6);min-height:var(--target-min);cursor:pointer}
 .hsl-btn:hover,.hsl-btn.is-hover{background:var(--bg-hover)}
@@ -171,6 +171,45 @@
 /* JavaScript toggle */
 .js-demo{display:grid;grid-template-columns:1.6fr 1fr;gap:var(--space-7);align-items:start}
 .js-demo .site{font-size:28px}
+
+/* the parts of a page: code split into regions, and where each one shows up in a browser */
+.parts{display:grid;grid-template-columns:1fr 500px;gap:var(--space-8);align-items:start}
+.regions{display:grid;grid-template-columns:auto 1fr;gap:0 var(--space-5);align-items:stretch;background:var(--surface-300);border:2px solid var(--ink);border-radius:var(--radius-sm);padding:var(--space-4) 0}
+.regions pre{margin:0;padding:var(--space-2) var(--space-5);font:400 34px/46px var(--font-mono);color:var(--ink);border-left:8px solid transparent}
+.regions .lab{padding:var(--space-2) var(--space-5) var(--space-2) 0;font:500 30px/40px var(--font-display);display:flex;flex-direction:column;justify-content:center}
+.regions .lab b{font-weight:700}
+.regions .r-head{background:var(--teal-tint);border-left-color:var(--ink)}
+.regions .r-body{background:var(--plum-tint);border-left-color:var(--ink)}
+.regions .lab.r-head,.regions .lab.r-body{border-left:0}
+.browser{border:2px solid var(--ink);box-shadow:var(--shadow-pane-md);background:var(--surface-300)}
+.browser-tab{display:inline-block;margin:var(--space-3) 0 0 var(--space-3);padding:var(--space-2) var(--space-5);background:var(--teal-tint);color:var(--ink);border:2px solid var(--ink);border-bottom:0;border-radius:var(--radius-md) var(--radius-md) 0 0;font:500 28px/38px var(--font-display)}
+.browser-view{background:var(--plum-tint);color:var(--ink);border-top:2px solid var(--ink);min-height:320px;padding:var(--space-5)}
+.browser-view .h1like{font:700 56px/64px var(--font-text);margin:0}
+.browser-key{display:flex;flex-direction:column;gap:var(--space-2);margin-top:var(--space-5)}
+.browser-key span{font:500 32px/44px var(--font-display)}
+
+/* default (browser) styles: everything reverted to the browser's own stylesheet, at slide scale */
+.defaults{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-5)}
+.defaults .pn-card{padding:var(--space-5)}
+.defaults .pn-card__title{margin-bottom:var(--space-2)}
+.uabox{background:var(--surface-200);color:var(--ink);border:2px dashed var(--border-control);padding:0 var(--space-4);min-height:150px;display:flex;align-items:center}
+.uabox .ua,.uabox .ua *{all:revert}
+.uabox .ua{display:block;font-size:28px;line-height:1.3;width:100%}
+.uabox .ua button{font-size:28px}
+.uabox .ua li::marker{color:inherit}
+.uabox .ua img{display:block;width:180px;height:auto;margin:var(--space-3) 0}
+.defaults .desc{margin:var(--space-3) 0 0;font-size:28px;line-height:38px}
+
+/* cascade answer key */
+.key{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-5)}
+.ladder{display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;font:400 32px/44px var(--font-mono);margin:var(--space-2) 0 0}
+
+/* HSL: the colour and its hover state as two groups */
+fieldset.group{margin:0;border:2px solid var(--ink);border-radius:var(--radius-lg);padding:var(--space-3) var(--space-5) var(--space-5);display:flex;flex-direction:column;gap:var(--space-3);min-width:0}
+fieldset.group legend{font:600 32px/40px var(--font-display);padding:0 var(--space-2)}
+.seg-choice{display:flex;gap:var(--space-3);flex-wrap:wrap}
+.seg-choice .pn-btn{font-size:28px;line-height:36px;padding:var(--space-2) var(--space-5)}
+.seg-choice .pn-btn[aria-pressed="true"]{background:var(--ink);color:var(--surface-100)}
 
 /* steps lists */
 .steps{margin:0;padding-left:1.2em;font-size:36px;line-height:52px}
@@ -366,6 +405,18 @@ var PUZZLES=[
   {id:"p3",label:"Puzzle 3",code:'<p id="intro" class="note">Hello</p>\n\n#intro { color: purple; }\n.note { color: teal; }',
    answer:"Purple. An id beats a class. That's why we style with classes: rules on ids are hard to override."}
 ];
+function AnswerKey(){
+  return h("div",{className:"key"},
+    h(P.Card,{title:"1. Order"},
+      p("When two rules are equally specific, the later one wins."),
+      p("Puzzle 1","muted")),
+    h(P.Card,{title:"2. Specificity"},
+      p("A more specific selector wins, wherever it is in the file."),
+      h("p",{className:"ladder"},"#id",h("span",{"aria-label":"beats"}," > "),".class",h("span",{"aria-label":"beats"}," > "),"p"),
+      p("Puzzles 2 and 3","muted")),
+    h(P.Card,{title:"3. Check it",className:"fill-teal"},
+      p("In DevTools, the rule that lost is crossed out in the Styles panel.")));
+}
 function Puzzle(props){
   var s=useState(false),shown=s[0];
   return h("div",{className:"puzzle"},
@@ -417,27 +468,38 @@ function RgbMixer(){
 }
 
 /* ---------- HSL: nudge the lightness ---------- */
-var HSL0={h:270,s:52,l:34,d:10};
+var HSL0={h:270,s:52,l:34,mode:"l",amt:-10};
+function clamp(v){return Math.max(0,Math.min(100,v))}
 function HslDemo(){
-  var H=useState(HSL0.h),S=useState(HSL0.s),L=useState(HSL0.l),D=useState(HSL0.d);
-  var hu=H[0],sa=S[0],li=L[0],hl=Math.max(0,li-D[0]);
-  var base=hsl(hu,sa,li),hover=hsl(hu,sa,hl);
+  var H=useState(HSL0.h),S=useState(HSL0.s),L=useState(HSL0.l),M=useState(HSL0.mode),A=useState(HSL0.amt);
+  var hu=H[0],sa=S[0],li=L[0],mode=M[0],amt=A[0];
+  function hov(a){return mode==="l"?hsl(hu,sa,clamp(li+a)):hsl(hu,clamp(sa+a),li)}
+  var hs=mode==="l"?sa:clamp(sa+amt),hl=mode==="l"?clamp(li+amt):li;
+  var base=hsl(hu,sa,li),hover=hsl(hu,hs,hl);
   var hues=[];for(var a=0;a<=360;a+=30)hues.push(hsl(a,sa,li));
+  var words=mode==="l"?["darker","lighter"]:["duller","more vivid"];
+  var signed=(amt>0?"+":amt<0?"−":"")+Math.abs(amt)+(amt===0?"":" ("+(amt<0?words[0]:words[1])+")");
   return h("div",{className:"wide hsl-demo"},
-    h("div",{className:"sliders"},
-      h(Slider,{id:"h",label:"Hue",value:hu,set:H[1],max:360,unit:"°",track:grad(hues)}),
-      h(Slider,{id:"s",label:"Saturation",value:sa,set:S[1],max:100,unit:"%",track:grad([hsl(hu,0,li),hsl(hu,100,li)])}),
-      h(Slider,{id:"l",label:"Lightness",value:li,set:L[1],max:100,unit:"%",track:grad([hsl(hu,sa,0),hsl(hu,sa,50),hsl(hu,sa,100)])}),
-      h(Slider,{id:"d",label:"Hover: darker by",value:D[0],set:D[1],max:40,unit:" points",track:grad([base,hsl(hu,sa,Math.max(0,li-40))])}),
-      h("div",null,h(P.Button,{variant:"secondary",onClick:function(){H[1](HSL0.h);S[1](HSL0.s);L[1](HSL0.l);D[1](HSL0.d)}},"Reset"))),
+    h("div",{className:"stack",style:{gap:"var(--space-5)"}},
+      h("fieldset",{className:"group"},h("legend",null,"The colour"),
+        h(Slider,{id:"h",label:"Hue",value:hu,set:H[1],max:360,unit:"°",track:grad(hues)}),
+        h(Slider,{id:"s",label:"Saturation",value:sa,set:S[1],max:100,unit:"%",track:grad([hsl(hu,0,li),hsl(hu,100,li)])}),
+        h(Slider,{id:"l",label:"Lightness",value:li,set:L[1],max:100,unit:"%",track:grad([hsl(hu,sa,0),hsl(hu,sa,50),hsl(hu,sa,100)])})),
+      h("fieldset",{className:"group"},h("legend",null,"Its hover state"),
+        h("div",{className:"seg-choice",role:"group","aria-label":"What the hover state changes"},
+          [["l","Change lightness"],["s","Change saturation"]].map(function(o){
+            return h("button",{key:o[0],type:"button",className:"pn-btn pn-btn--secondary","aria-pressed":mode===o[0]?"true":"false",onClick:function(){M[1](o[0])}},o[1]);
+          })),
+        h(Slider,{id:"d",label:"By",value:amt,set:A[1],min:-30,max:30,show:signed,track:grad([hov(-30),hov(0),hov(30)])}))),
     h("div",{className:"stack"},
       code("style.css",".button {\n  background-color: "+base+";\n}\n.button:hover {\n  background-color: "+hover+";\n}"),
       h("div",{className:"swrow",style:{"--bg":base,"--bg-hover":hover}},
         h("button",{type:"button",className:"hsl-btn"},"Hover me"),
-        h("span",{className:"hsl-btn is-hover","aria-hidden":"true"},"Hover")),
+        h("span",{className:"hsl-btn is-hover","aria-hidden":"true"},"Hover"),
+        h("span",{style:{marginLeft:"auto"}},h(P.Button,{variant:"secondary",onClick:function(){H[1](HSL0.h);S[1](HSL0.s);L[1](HSL0.l);M[1](HSL0.mode);A[1](HSL0.amt)}},"Reset"))),
       h("div",null,
         h(Ratio,{label:"White text, normal",ratio:whiteOn(hu,sa,li)}),
-        h(Ratio,{label:"White text, hover",ratio:whiteOn(hu,sa,hl)}))));
+        h(Ratio,{label:"White text, hover",ratio:whiteOn(hu,hs,hl)}))));
 }
 
 /* ---------- Custom properties: change the palette in one place ---------- */
@@ -547,22 +609,38 @@ Deck.start([
           h("li",null,h("a",{className:"pn-link",href:"https://developer.mozilla.org/en-US/docs/Web/SVG",target:"_blank",rel:"noopener"},"MDN: SVG")),
           h("li",null,h("a",{className:"pn-link",href:"https://developer.mozilla.org/en-US/docs/Web/XML",target:"_blank",rel:"noopener"},"MDN: XML")))))))}},
 
-{id:"skeleton",sec:"First HTML page",title:"The skeleton of a page",
- notes:"Live-code this in VS Code and open it in the browser. The doctype says this is modern HTML. Everything sits in html. The head holds information about the page (the title in the tab, the character set); the body holds what you see. Set lang from the very first page: screen readers use it to choose a voice and pronunciation, and browsers use it to offer translation. The portfolio's accessibility check flags a missing lang.",
- render:function(n){return h(P.ContentSlide,{title:"The skeleton of a page",number:n,footer:FOOT,asideTitle:"Always set lang",
-   aside:"Screen readers use it to pick the right voice and pronunciation. Browsers use it to offer translation."},
-  code("index.html",'<!DOCTYPE html>\n<html lang="en">\n  <head>\n    <meta charset="utf-8">\n    <title>My portfolio</title>\n  </head>\n  <body>\n    <h1>Hello</h1>\n  </body>\n</html>'))}},
+{id:"skeleton",sec:"First HTML page",title:"The parts of a page",
+ notes:"Live-code this in VS Code and open it in the browser. The doctype says this is modern HTML. Everything sits inside html. The page splits in two. The head is about the page: its title (shown in the tab), the character set, and later the link to the stylesheet; nothing in the head appears in the window. The body is everything you see. Set lang from the very first page: screen readers use it to choose a voice and pronunciation, and browsers use it to offer translation. The portfolio's accessibility check flags a missing lang.",
+ render:function(n){return h(P.ContentSlide,{title:"The parts of a page",number:n,footer:FOOT},
+  h("div",{className:"wide parts"},
+    h("div",{className:"regions",role:"img","aria-label":"index.html split into doctype, html, head and body, with what each is for"},
+      h("pre",null,"<!DOCTYPE html>"),h("div",{className:"lab"},h("b",null,"Doctype"),"This is modern HTML"),
+      h("pre",null,'<html lang="en">'),h("div",{className:"lab"},h("b",null,"html"),"Wraps everything. lang: its language"),
+      h("pre",{className:"r-head"},'  <head>\n    <meta charset="utf-8">\n    <title>My portfolio</title>\n  </head>'),
+      h("div",{className:"lab r-head"},h("b",null,"head"),"About the page. Not shown in the window"),
+      h("pre",{className:"r-body"},"  <body>\n    <h1>Hello</h1>\n  </body>"),
+      h("div",{className:"lab r-body"},h("b",null,"body"),"What you see"),
+      h("pre",null,"</html>"),h("div",{className:"lab"})),
+    h("div",null,
+      h("div",{className:"browser","aria-label":"The same page in a browser",role:"img"},
+        h("span",{className:"browser-tab"},"My portfolio"),
+        h("div",{className:"browser-view"},h("p",{className:"h1like"},"Hello"))),
+      h("div",{className:"browser-key"},
+        h("span",null,"Tab: the title, from the head"),
+        h("span",null,"Window: the body")))))}},
 
-{id:"elements",sec:"First HTML page",title:"A few elements to start with",
- notes:"Add these to the live page one at a time and reload each time. Headings go in order: one h1, then h2, then h3; don't pick a heading for its size. A link needs href to say where it goes; an image needs src and alt; list items go in li elements inside the ul. The portfolio template also uses header, nav, main, article, aside and footer: those are week 48.",
- render:function(n){return h(P.ContentSlide,{title:"A few elements to start with",tone:"plum",number:n,footer:FOOT},
-  h("div",{className:"wide grid3"},
-    card("<h1>",p("The main heading. Smaller headings go below it, in order.")),
-    card("<p>",p("A paragraph of text.")),
-    card("<a>",p("A link to another page.")),
-    card("<ul>",p("A list of items.")),
-    card("<img>",p("An image, with a text description.")),
-    card("<button>",p("Something you press to make a thing happen."))))}},
+{id:"elements",sec:"First HTML page",title:"Six elements, as the browser shows them",
+ notes:"Each box shows the element with no CSS at all: the browser's own default styles (scaled up to be readable on the slide). Headings are big and bold with space around them; links are blue and underlined; lists get bullets and an indent; a button looks like the operating system's. Images show at their own size. These defaults are what you start from, and what CSS changes. Headings go in order: one h1, then h2, then h3; don't pick a heading for its size. The portfolio template also uses header, nav, main, article, aside and footer: those are week 48.",
+ render:function(n){
+  function demo(title,desc,sample){return h(P.Card,{title:title},h("div",{className:"uabox","data-theme":"light","aria-hidden":"true"},h("div",{className:"ua"},sample)),p(desc,"desc"))}
+  return h(P.ContentSlide,{title:"Six elements, as the browser shows them",tone:"plum",number:n,footer:FOOT},
+  h("div",{className:"wide defaults"},
+    demo("<h1>","The main heading",h("h1",null,"Hello")),
+    demo("<p>","A paragraph",h("p",null,"A paragraph of text.")),
+    demo("<a>","A link",h("a",{href:"#",tabIndex:-1,onClick:stop},"About me")),
+    demo("<ul> and <li>","A list and its items",h("ul",null,h("li",null,"Colour"),h("li",null,"Type"))),
+    demo("<img>","An image",h("img",{src:"img/hills.svg",alt:""})),
+    demo("<button>","Something to press",h("button",{type:"button",tabIndex:-1},"Press me"))))}},
 
 {id:"validate",sec:"First HTML page",title:"Check it with the validator",
  notes:"Run the live page through validator.w3.org (Validate by direct input, paste the code). Fix errors from the top: one mistake early on often causes several messages further down. Learning outcome 4 is what A3 is assessed on: W3C-validated, semantically correct HTML and CSS. Your portfolio repository runs the same validator automatically every time you push to main; the badge in the README shows whether it passes.",
@@ -616,19 +694,20 @@ Deck.start([
   ].map(function(r){return h("div",{key:r[0]},h("dt",null,r[0]),h("dd",null,r[1]))})))}},
 
 {id:"cascade",sec:"CSS basics",title:"Which rule wins?",demo:"Which rule wins?",
- notes:"The cascade in one minute. Two rules: later rules win, and more specific selectors win. Ask the room to vote before pressing Show the answer. Then show it in DevTools: right-click, Inspect, and in the Styles panel the losing declaration is crossed out.",
+ notes:"The cascade in one minute. Two rules: later rules win, and more specific selectors win. Ask the room to vote before pressing Show the answer. The Answer key tab names the two rules: order and specificity. Then show it in DevTools: right-click, Inspect, and in the Styles panel the losing declaration is crossed out.",
  render:function(n){return h(P.ContentSlide,{title:"Which rule wins?",number:n,footer:FOOT},
   h("div",{className:"wide"},h(P.Tabs,{label:"Cascade puzzles",tabs:PUZZLES.map(function(z){
     return {id:z.id,label:z.label,content:h(Puzzle,{code:z.code,answer:z.answer})};
-  })})))}},
+  }).concat([{id:"key",label:"Answer key",content:h(AnswerKey)}])})))}},
 
-{id:"css-turn",sec:"CSS basics",title:"Your turn: style one element",ex:"Style one element",
- notes:"TODO for David: say which page students use here (the page from the live-coding, or their portfolio template if they have accepted the invitation). Walk round. Common problems: the stylesheet isn't linked (check the href and the file name), a missing dot before the class name in the CSS, and colour instead of color.",
- render:function(n){return h(P.ContentSlide,{title:"Your turn: style one element",tone:"teal",number:n,footer:FOOT},
+{id:"css-turn",sec:"CSS basics",title:"Your turn: style your portfolio page",ex:"Style your portfolio page",
+ notes:"Students work in their own portfolio repository. If someone hasn't accepted the GitHub invitation yet, they do that first (it's in their email); don't make a new repository from the template. The template's index.html already links style.css, and style.css starts empty. Walk round. Common problems: the file isn't saved, a missing dot before the class name in the CSS, and colour instead of color.",
+ render:function(n){return h(P.ContentSlide,{title:"Your turn: style your portfolio page",tone:"teal",number:n,footer:FOOT},
   h("ol",{className:"steps"},
-    h("li",null,"In your HTML, add ",c('class="intro"')," to one element."),
-    h("li",null,"In your CSS, write a ",c(".intro")," rule with two or three properties."),
-    h("li",null,"Reload. Right-click the element, choose Inspect, and find your rule.")))}},
+    h("li",null,"Clone your portfolio repository from GitHub and open it in VS Code."),
+    h("li",null,"In index.html, add ",c('class="intro"')," to one element."),
+    h("li",null,"In style.css, write an ",c(".intro")," rule with two or three properties."),
+    h("li",null,"Open index.html in the browser. Right-click the element, choose Inspect, and find your rule.")))}},
 
 
 /* ===== Colour in CSS ===== */
@@ -650,7 +729,7 @@ Deck.start([
  render:function(n){return h(P.ContentSlide,{title:"Hex and RGB: mixing light",number:n,footer:FOOT},h(RgbMixer))}},
 
 {id:"hsl",sec:"Colour in CSS",title:"HSL: nudge the lightness",demo:"HSL hover shade",
- notes:"HSL came up in Johannes's colour lecture: hue (around the colour wheel), saturation (grey to vivid) and lightness (black to white). The code version means you can make a darker hover shade by changing only one number. Live: lower the lightness and watch the hover colour and its contrast. Each slider's track shows what you'd get at every position, given the other values. Reset goes back to plum. Hover the real button to see it. Ask: what happens to contrast if the lightness goes up to 60? Students can try it on their laptops.",
+ notes:"HSL came up in Johannes's colour lecture: hue (around the colour wheel), saturation (grey to vivid) and lightness (black to white). The top group is the colour itself; the bottom group is its hover state, worked out from it. Usually that's a lightness change: darker on a light page, often lighter on a dark one. A saturation change is subtler; making it duller can read as disabled, so be careful with that one. Live: lower the lightness and watch the hover colour and its contrast. Each slider's track shows what you'd get at every position, given the other values. Reset goes back to plum. Hover the real button to see it. Ask: what happens to contrast if the lightness goes up to 60? Students can try it on their laptops.",
  render:function(n){return h(P.ContentSlide,{title:"HSL: nudge the lightness",number:n,footer:FOOT},h(HslDemo))}},
 
 {id:"vars",sec:"Colour in CSS",title:"Define the palette once",demo:"Custom properties",
