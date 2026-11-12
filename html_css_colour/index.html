@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HTML, CSS and colour · KD401B Interaction Design: Graphical User Interfaces</title>
+<link rel="stylesheet" href="../shared/pane/tokens/tokens.css">
+<link rel="stylesheet" href="../shared/pane/components/bundle.css">
+<link rel="stylesheet" href="../shared/deck.css">
+<style>
+/* styles used only by this lecture: layout only, colours and sizes from Pane tokens.
+   Exception: the colour demos (named colours, HSL, the SVG circle) show literal CSS colour values,
+   because those values are what the slide teaches. */
+
+/* ---------- The example site: the A3 portfolio template's blog page, drawn in Pane colours ----------
+   --accent can be set on .site (custom properties demo); it defaults to plum. */
+.site{background:var(--surface-100);color:var(--ink);border:2px solid var(--ink);box-shadow:var(--shadow-pane-md);font-family:var(--font-text);font-size:28px;line-height:38px;overflow:hidden;text-align:left}
+.site-head{background:var(--accent,var(--plum));color:var(--on-plum);padding:var(--space-5) var(--space-6);display:flex;justify-content:space-between;align-items:center;gap:var(--space-5);flex-wrap:wrap}
+.site-title{font:700 36px/44px var(--font-display);margin:0}
+.site-head ul{display:flex;gap:var(--space-5);list-style:none;margin:0;padding:0}
+.site-head a{color:inherit;font-family:var(--font-display);font-weight:500}
+.site-main{padding:var(--space-6)}
+.site-card{background:var(--surface-200);border:2px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-5) var(--space-6)}
+.site-h2{font:700 36px/44px var(--font-display);margin:0 0 var(--space-2)}
+.site-meta{color:var(--ink-muted);margin:0 0 var(--space-3);font-family:var(--font-display);font-weight:500}
+.site-card p{margin:0 0 var(--space-3)}
+.site-card > :last-child{margin-bottom:0}
+.site-foot{padding:var(--space-4) var(--space-6);border-top:2px solid var(--border);color:var(--ink-muted);font-family:var(--font-display);font-weight:500}
+.site-btn{font:600 28px/36px var(--font-display);background:var(--accent,var(--plum));color:var(--on-plum);border:2px solid var(--ink);border-radius:var(--radius-md);padding:var(--space-2) var(--space-5);min-height:var(--target-min);cursor:pointer}
+.site.compact .site-meta,.site.compact .site-foot{display:none}
+.mock-label{font:500 28px/38px var(--font-display);margin:0 0 var(--space-3)}
+
+/* peel the layers: "CSS off" drops every style back to the browser's defaults */
+.peel-frame{background:var(--surface-200);color:var(--ink);border:2px solid var(--ink);box-shadow:var(--shadow-pane-md)}
+.peel-frame .site{box-shadow:none;border:0}
+.site.bare,.site.bare *{all:revert}
+.site.bare{display:block;font-size:28px;line-height:1.3;padding:var(--space-4) var(--space-5)}
+.site.bare .site-title{font-size:2em;font-weight:700;margin:.4em 0}
+.site.bare .site-h2{font-size:1.5em;font-weight:700;margin:.6em 0 .3em}
+.site.bare button{font-size:28px}
+.toggles{display:flex;flex-direction:column;gap:var(--space-4)}
+
+/* native checkboxes at slide size */
+.check{display:flex;align-items:center;gap:var(--space-4);font:500 36px/44px var(--font-display);cursor:pointer;min-height:var(--target-min)}
+.check input{width:40px;height:40px;margin:0;accent-color:var(--plum);flex:none}
+
+/* real button vs fake button */
+.twobtn{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-7)}
+.twobtn .pn-card{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-5)}
+.twobtn .site-btn{font-size:36px;line-height:44px;padding:var(--space-4) var(--space-6);display:inline-block}
+.count{font:500 32px/40px var(--font-display);margin:0}
+.btn-fake{user-select:none}
+
+/* anatomy of an element: an annotated line of code */
+.anat{display:inline-flex;flex-direction:column;gap:var(--space-5);align-items:flex-start}
+.anat-row{display:flex;align-items:flex-start;gap:var(--space-3)}
+.seg{display:flex;flex-direction:column;align-items:center;gap:var(--space-3)}
+.seg code{font:400 64px/96px var(--font-mono);padding:0 var(--space-3);border:2px solid var(--ink);border-radius:var(--radius-sm);white-space:pre;color:var(--ink)}
+.seg-tag code{background:var(--plum-tint)}
+.seg-text code{background:var(--pink-tint)}
+.seg code .attr{background:var(--teal-tint);outline:2px dashed var(--ink);outline-offset:-2px;padding:0 4px}
+.seg-label{font:600 36px/44px var(--font-display);text-align:center}
+.seg-label small{display:block;font-weight:500;font-size:28px;line-height:38px;color:var(--ink-muted)}
+.anat-whole{font:600 36px/44px var(--font-display);border-top:4px solid var(--ink);padding-top:var(--space-2);align-self:stretch;text-align:center}
+
+/* SVG fun fact */
+.svgdemo{display:grid;grid-template-columns:1.3fr 1fr;gap:var(--space-7);align-items:center}
+.svgdemo svg{width:100%;max-width:420px;height:auto;display:block;margin:0 auto;background:var(--surface-200);border:2px solid var(--ink)}
+
+/* anatomy of a CSS rule: code lines with labels beside them */
+.rule{display:grid;grid-template-columns:auto 1fr;gap:var(--space-3) var(--space-6);align-items:center;background:var(--surface-300);border:2px solid var(--ink);border-radius:var(--radius-sm);padding:var(--space-5) var(--space-6)}
+.rule code{font:400 40px/56px var(--font-mono);white-space:pre;color:var(--ink)}
+.rule span{font:500 28px/38px var(--font-display);color:var(--ink-muted);white-space:nowrap}
+.rule span::before{content:"← "}
+
+.rulegrid{display:grid;grid-template-columns:auto 1fr;gap:var(--space-8);align-items:start}
+/* core properties */
+.props{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5) var(--space-8);margin:0}
+.props div{margin:0}
+.props dt{font:400 32px/44px var(--font-mono)}
+.props dd{margin:0;font-size:32px;line-height:44px;color:var(--ink-muted)}
+
+/* selector playground */
+.play{display:grid;grid-template-columns:1fr 1.25fr;gap:var(--space-7);align-items:start}
+.selbtns{display:flex;flex-wrap:wrap;gap:var(--space-3);margin:0 0 var(--space-5)}
+.selbtns .pn-btn{font-family:var(--font-mono);font-weight:400;font-size:32px;line-height:40px;padding:var(--space-3) var(--space-5)}
+.selbtns .pn-btn[aria-pressed="true"]{background:var(--ink);color:var(--surface-100)}
+.codelines{margin:0;padding:var(--space-4) 0;background:var(--surface-300);border:2px solid var(--ink);border-radius:var(--radius-sm);font:400 28px/40px var(--font-mono);color:var(--ink)}
+.codelines div{white-space:pre;padding:0 var(--space-5);border-left:8px solid transparent}
+.codelines div.hit{background:var(--plum-tint);border-left-color:var(--ink);font-weight:700}
+.selnote{font-size:32px;line-height:46px;margin:0}
+
+/* cascade puzzles */
+.puzzle{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-7);align-items:start}
+.puzzle .stack{gap:var(--space-5)}
+.puzzle p{margin:0}
+
+/* named colours */
+.swatches{display:grid;grid-template-columns:repeat(6,1fr);gap:var(--space-5);margin:0;padding:0;list-style:none}
+.swatches li{display:flex;flex-direction:column;gap:var(--space-3)}
+.sw{display:block;height:160px;border:2px solid var(--ink)}
+.swatches code{font:400 28px/38px var(--font-mono)}
+
+/* hex and rgb */
+.hexdemo{display:grid;grid-template-columns:420px 1fr;gap:var(--space-8);align-items:center}
+.bigsw{height:380px;background:var(--plum);border:2px solid var(--ink);box-shadow:var(--shadow-pane-md)}
+.notation{font:400 56px/72px var(--font-mono);margin:0}
+.hexpairs{display:flex;gap:var(--space-4);margin:var(--space-3) 0 var(--space-6)}
+.hexpairs span{display:flex;flex-direction:column;align-items:center;font:400 44px/56px var(--font-mono);border:2px solid var(--ink);border-radius:var(--radius-sm);padding:var(--space-2) var(--space-4);background:var(--surface-200);color:var(--ink)}
+.hexpairs small{font:500 28px/38px var(--font-display);color:var(--ink-muted)}
+
+/* sliders (HSL and custom properties) */
+.sliders{display:flex;flex-direction:column;gap:var(--space-5)}
+.slider label{display:flex;justify-content:space-between;font:500 32px/40px var(--font-display)}
+.slider output{font-family:var(--font-mono);font-weight:400}
+.slider input{width:100%;height:var(--target-min);margin:0;accent-color:var(--plum)}
+.hsl-demo{display:grid;grid-template-columns:1fr 1.25fr;gap:var(--space-8);align-items:start}
+.swrow{display:flex;gap:var(--space-5);align-items:center;flex-wrap:wrap}
+.hsl-btn{font:600 36px/44px var(--font-display);color:var(--on-plum);background:var(--bg);border:2px solid var(--ink);border-radius:var(--radius-md);padding:var(--space-4) var(--space-6);min-height:var(--target-min);cursor:pointer}
+.hsl-btn:hover,.hsl-btn.is-hover{background:var(--bg-hover)}
+.ratio{font:500 32px/44px var(--font-display);margin:0}
+.ratio b{font-variant-numeric:tabular-nums}
+.ratio .ok{color:var(--success)}
+.ratio .bad{color:var(--danger)}
+
+/* custom properties */
+.vars-demo{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-7);align-items:start}
+
+/* JavaScript toggle */
+.js-demo{display:grid;grid-template-columns:1.6fr 1fr;gap:var(--space-7);align-items:start}
+.js-demo .site{font-size:28px}
+
+/* steps lists */
+.steps{margin:0;padding-left:1.2em;font-size:36px;line-height:52px}
+.steps li{margin-bottom:var(--space-3)}
+.steps li::marker{font-family:var(--font-display);font-weight:700}
+.steps code{font-family:var(--font-mono);font-size:32px}
+
+/* canvas link card */
+.linkcard{position:relative}
+.linkcard a{font-family:var(--font-display);font-weight:600;font-size:44px;line-height:52px}
+.linkcard a::after{content:"";position:absolute;inset:0}
+.linkcard p{margin-top:var(--space-2)}
+
+/* inline code in body text and cards */
+.pn-slide p code,.pn-slide li code,.pn-card__title code{font-family:var(--font-mono);font-size:.9em}
+</style>
+</head>
+<body data-lecture="html_css_colour" data-home="../">
+<main id="stage"><div id="deck"></div></main>
+
+<script src="../shared/pane/vendor/react.production.min.js"></script>
+<script src="../shared/pane/vendor/react-dom.production.min.js"></script>
+<script src="../shared/pane/components/bundle.js"></script>
+<script src="../shared/deck.js"></script>
+<script>
+(function(){
+"use strict";
+var P=window.Pane,h=React.createElement,useState=React.useState;
+var FOOT="KD401B · HTML, CSS and colour";
+var CANVAS_EX="https://mau.instructure.com/courses/22861/pages/exercise-colour-in-html-+-css";
+
+function card(title,body,tone){return h(P.Card,{title:title,tone:tone||"paper"},body)}
+/* solid-colour card (see "Solid-fill cards" in shared/deck.css): fill is plum | teal | pink */
+function solid(title,body,fill){return h(P.Card,{title:title,className:"fill-"+fill},body)}
+function p(t,cls){return h("p",cls?{className:cls}:null,t)}
+function c(t){return h("code",null,t)}
+function code(label,text){return h(P.CodeBlock,{size:"slide",label:label},text)}
+function stop(e){e.preventDefault()}
+
+/* ---------- Colour maths for the contrast readouts (WCAG 2 relative luminance) ---------- */
+function hslToRgb(hu,s,l){
+  s/=100;l/=100;
+  var a=s*Math.min(l,1-l);
+  function f(n){var k=(n+hu/30)%12;return l-a*Math.max(-1,Math.min(k-3,9-k,1))}
+  return [f(0)*255,f(8)*255,f(4)*255];
+}
+function lum(rgb){
+  return rgb.map(function(v){v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4)})
+            .reduce(function(t,v,i){return t+v*[0.2126,0.7152,0.0722][i]},0);
+}
+/* contrast of white text on an HSL colour */
+function whiteOn(hu,s,l){return 1.05/(lum(hslToRgb(hu,s,l))+0.05)}
+/* "White text on …: 7.2:1, passes" — never colour alone: a symbol and a word as well */
+function Ratio(props){
+  var r=props.ratio,ok=r>=4.5;
+  return h("p",{className:"ratio"},props.label+": ",h("b",null,r.toFixed(1)+":1")," ",
+    h("span",{className:ok?"ok":"bad"},ok?"✓ passes 4.5:1":"✗ below 4.5:1"));
+}
+function hsl(hu,s,l){return "hsl("+hu+" "+s+"% "+l+"%)"}
+
+/* ---------- The example site ----------
+   The A3 portfolio template's blog page (header, nav, article, footer), styled with Pane's colours.
+   props: theme (light | dark, optional), cls, style, extra (more content in the article) */
+function Site(props){
+  return h("div",{className:"site"+(props.cls?" "+props.cls:""),"data-theme":props.theme||null,style:props.style},
+    h("div",{className:"site-head"},
+      h("p",{className:"site-title"},"Blog Site Title"),
+      h("nav",{"aria-label":"Example site"},h("ul",null,["Home","About","Contact"].map(function(t){
+        return h("li",{key:t},h("a",{href:"#",tabIndex:-1,onClick:stop},t))})))),
+    h("div",{className:"site-main"},
+      h("div",{className:"site-card"},
+        h("p",{className:"site-h2"},"Title of the First Blog Post"),
+        h("p",{className:"site-meta"},"November 11, 2025 by Author Name"),
+        p("This is the introduction of the first blog post."),
+        props.extra)),
+    h("div",{className:"site-foot"},"© 2025 Blog Site. All rights reserved."));
+}
+
+/* ---------- Real button vs fake button ---------- */
+function TwoButtons(){
+  var a=useState(0),b=useState(0);
+  return h("div",{className:"twobtn"},
+    h(P.Card,{title:"A real button"},
+      h(P.CodeBlock,{size:"slide"},"<button>Save</button>"),
+      h("button",{type:"button",className:"site-btn",onClick:function(){a[1](a[0]+1)}},"Save"),
+      h("p",{className:"count","aria-live":"polite"},"Pressed "+a[0]+(a[0]===1?" time":" times"))),
+    h(P.Card,{title:"A div dressed as one"},
+      h(P.CodeBlock,{size:"slide"},'<div class="btn">Save</div>'),
+      h("div",{className:"site-btn btn-fake",onClick:function(){b[1](b[0]+1)}},"Save"),
+      h("p",{className:"count","aria-live":"polite"},"Pressed "+b[0]+(b[0]===1?" time":" times"))));
+}
+
+/* ---------- Peel the layers: switch CSS and JavaScript off ---------- */
+function Peel(){
+  var cs=useState(true),js=useState(true),likes=useState(0);
+  var like=h("button",{type:"button",className:"site-btn",onClick:function(){if(js[0])likes[1](likes[0]+1)}},
+    "Like ("+likes[0]+")");
+  return h("div",{className:"wide grid2"},
+    h("div",{className:"stack"},
+      h("div",{className:"toggles"},
+        h("label",{className:"check"},h("input",{type:"checkbox",checked:cs[0],onChange:function(e){cs[1](e.target.checked)}}),"CSS: how it looks"),
+        h("label",{className:"check"},h("input",{type:"checkbox",checked:js[0],onChange:function(e){js[1](e.target.checked)}}),"JavaScript: what it does")),
+      p(!cs[0]?"Without CSS: the browser's default look. Every word is still there, in order."
+        :!js[0]?"Without JavaScript: it looks the same, but the Like button no longer does anything."
+        :"Switch each layer off and see what's left. Then press Like.")),
+    h("div",{className:"peel-frame","data-theme":"light"},
+      h(Site,{cls:cs[0]?null:"bare",extra:like})));
+}
+
+/* ---------- Selector playground ---------- */
+var LINES=[
+  '<nav>',
+  '  <a href="/">Home</a>',
+  '  <a href="/about">About</a>',
+  '</nav>',
+  '<main id="main">',
+  '  <h2>Projects</h2>',
+  '  <p>Things I have made.</p>',
+  '  <article class="card">',
+  '    <h3>Colour study</h3>',
+  '    <p>Two palettes, one page.</p>',
+  '    <a href="/colour">Read more</a>',
+  '  </article>',
+  '</main>'
+];
+var SELECTORS=[
+  {sel:"p",hits:[6,9],note:"An element selector: every <p> on the page."},
+  {sel:".card",hits:[7,8,9,10,11],note:"A class selector: every element with class=\"card\", and what's inside it."},
+  {sel:"#main",hits:[4,5,6,7,8,9,10,11,12],note:"An id selector: the one element with id=\"main\". Ids are unique, so use them sparingly."},
+  {sel:"a",hits:[1,2,10],note:"Every link, wherever it is."},
+  {sel:"nav a",hits:[1,2],note:"A descendant selector: only links inside a <nav>."}
+];
+function Playground(){
+  var s=useState(0),cur=SELECTORS[s[0]];
+  return h("div",{className:"wide play"},
+    h("div",null,
+      h("div",{className:"selbtns",role:"group","aria-label":"Selectors"},SELECTORS.map(function(x,i){
+        return h("button",{key:x.sel,type:"button",className:"pn-btn pn-btn--secondary","aria-pressed":i===s[0]?"true":"false",onClick:function(){s[1](i)}},x.sel+" { }");
+      })),
+      p(cur.note,"selnote")),
+    h("div",{className:"codelines",role:"img","aria-label":"index.html, with the lines that "+cur.sel+" selects highlighted"},
+      LINES.map(function(t,i){return h("div",{key:i,className:cur.hits.indexOf(i)>=0?"hit":null},t)})));
+}
+
+/* ---------- Which rule wins? ---------- */
+var PUZZLES=[
+  {id:"p1",label:"Puzzle 1",code:'<p>Hello</p>\n\np { color: purple; }\np { color: teal; }',
+   answer:"Teal. Both rules have the same selector, so the later one wins."},
+  {id:"p2",label:"Puzzle 2",code:'<p class="note">Hello</p>\n\n.note { color: teal; }\np { color: purple; }',
+   answer:"Teal. A class is more specific than an element, so it wins even though it comes first."},
+  {id:"p3",label:"Puzzle 3",code:'<p id="intro" class="note">Hello</p>\n\n#intro { color: purple; }\n.note { color: teal; }',
+   answer:"Purple. An id beats a class. That's why we style with classes: rules on ids are hard to override."}
+];
+function Puzzle(props){
+  var s=useState(false),shown=s[0];
+  return h("div",{className:"puzzle"},
+    code("index.html and style.css",props.code),
+    h("div",{className:"stack"},
+      p("What colour is the text?","lead"),
+      shown?h(P.Alert,{tone:"info",title:"Answer"},props.answer):null,
+      h("div",null,h(P.Button,{variant:shown?"secondary":"primary",onClick:function(){s[1](!shown)}},shown?"Hide the answer":"Show the answer"))));
+}
+
+/* ---------- HSL: nudge the lightness ---------- */
+function Slider(props){
+  var id="sl-"+props.id;
+  return h("div",{className:"slider"},
+    h("label",{htmlFor:id},h("span",null,props.label),h("output",{htmlFor:id},props.value+props.unit)),
+    h("input",{id:id,type:"range",min:props.min||0,max:props.max,value:props.value,onChange:function(e){props.set(+e.target.value)}}));
+}
+function HslDemo(){
+  var H=useState(270),S=useState(52),L=useState(34),D=useState(10);
+  var hl=Math.max(0,L[0]-D[0]);
+  var base=hsl(H[0],S[0],L[0]),hover=hsl(H[0],S[0],hl);
+  return h("div",{className:"wide hsl-demo"},
+    h("div",{className:"sliders"},
+      h(Slider,{id:"h",label:"Hue",value:H[0],set:H[1],max:360,unit:"°"}),
+      h(Slider,{id:"s",label:"Saturation",value:S[0],set:S[1],max:100,unit:"%"}),
+      h(Slider,{id:"l",label:"Lightness",value:L[0],set:L[1],max:100,unit:"%"}),
+      h(Slider,{id:"d",label:"Hover: darker by",value:D[0],set:D[1],max:40,unit:" points"})),
+    h("div",{className:"stack"},
+      code("style.css",".button {\n  background-color: "+base+";\n}\n.button:hover {\n  background-color: "+hover+";\n}"),
+      h("div",{className:"swrow",style:{"--bg":base,"--bg-hover":hover}},
+        h("button",{type:"button",className:"hsl-btn"},"Hover me"),
+        h("span",{className:"hsl-btn is-hover","aria-hidden":"true"},"Hover")),
+      h("div",null,
+        h(Ratio,{label:"White text, normal",ratio:whiteOn(H[0],S[0],L[0])}),
+        h(Ratio,{label:"White text, hover",ratio:whiteOn(H[0],S[0],hl)}))));
+}
+
+/* ---------- Custom properties: change the palette in one place ---------- */
+function VarsDemo(){
+  var H=useState(270);
+  var accent=hsl(H[0],55,35);
+  return h("div",{className:"wide vars-demo"},
+    h("div",{className:"stack"},
+      code("style.css",":root {\n  --accent: "+accent+";\n}\nheader, button {\n  background-color: var(--accent);\n}"),
+      h(Slider,{id:"acc",label:"Hue of --accent",value:H[0],set:H[1],max:360,unit:"°"}),
+      h(Ratio,{label:"White text on --accent",ratio:whiteOn(H[0],55,35)})),
+    h(Site,{style:{"--accent":accent},extra:h("button",{type:"button",className:"site-btn"},"Subscribe")}));
+}
+
+/* ---------- JavaScript: a button that swaps the stylesheet ----------
+   The demo swaps a data-theme attribute; the code on the slide swaps the <link>'s href.
+   Same idea: one switch, a whole palette changes. */
+function JsDemo(){
+  var d=useState(false),dark=d[0];
+  return h("div",{className:"wide js-demo"},
+    h("div",{className:"stack"},
+      code("index.html",'<link id="palette" rel="stylesheet" href="light.css">\n<button id="theme" type="button">Dark mode</button>'),
+      code("script.js",'const link = document.querySelector("#palette");\nconst button = document.querySelector("#theme");\n\nbutton.addEventListener("click", function () {\n  const dark = link.getAttribute("href") === "dark.css";\n  link.setAttribute("href", dark ? "light.css" : "dark.css");\n});')),
+    h(Site,{theme:dark?"dark":"light",cls:"compact",extra:h("button",{type:"button",className:"site-btn",onClick:function(){d[1](!dark)}},dark?"Light mode":"Dark mode")}));
+}
+
+Deck.start([
+/* ===== Opening ===== */
+{id:"cover",sec:"Opening",title:"From Figma to the browser",
+ notes:"Yesterday was colour in Figma with Johannes. Today we build: what HTML, CSS and JavaScript each do, a first HTML page, the basics of CSS, and colour in CSS. This afternoon you put your palette from yesterday into your portfolio.",
+ render:function(){return h(P.TitleSlide,{title:["From Figma","to the browser"],subtitle:"HTML, CSS, JavaScript and colour",meta:"David · KD401B HT26 · Week 46"})}},
+
+{id:"hook",sec:"Opening",title:"What would it take to build this?",
+ notes:"This is the portfolio template's page (the one in your A3 repository) with a palette in light and dark, like the ones you made in Figma yesterday. Ask: what would it take to build this? Collect answers: text and headings, colours, a nav, a button that switches between the two palettes. By the end of today we'll have touched each of them, and this afternoon you build your own version.",
+ render:function(n){return h(P.ContentSlide,{title:"What would it take to build this?",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h("div",null,p("Light","mock-label"),h(Site,{theme:"light",extra:h("button",{type:"button",className:"site-btn",tabIndex:-1},"Dark mode")})),
+    h("div",null,p("Dark","mock-label"),h(Site,{theme:"dark",extra:h("button",{type:"button",className:"site-btn",tabIndex:-1},"Light mode")}))))}},
+
+
+/* ===== Big picture ===== */
+{id:"big-picture",sec:"Big picture",title:"HTML, CSS, JavaScript",
+ notes:"Three languages, three jobs. Each one does something on its own, and they work together.",
+ render:function(){return h(P.SectionSlide,{title:["HTML, CSS,","JavaScript"],tone:"ink",footer:FOOT})}},
+
+{id:"house",sec:"Big picture",title:"A house: plan, furniture, wiring",
+ notes:"The floor plan has the walls and rooms (structure) and the labels for what goes where: chair here, table there. That's the content. It says nothing about how anything looks. CSS chooses the actual furniture. JavaScript is the wiring: flip a switch and something happens. You can change the furniture without moving a wall, and that's exactly how we'll do light and dark mode this afternoon.",
+ render:function(n){return h(P.ContentSlide,{title:"A house: plan, furniture, wiring",tone:"plum",number:n,footer:FOOT},
+  h("div",{className:"wide grid3"},
+    solid("HTML",p("The floor plan: rooms, and labels for what goes where. Chair here, table there."),"teal"),
+    h(P.Card,{title:"CSS"},p("The furniture: the oak table, the green velvet chair. How it all looks.")),
+    solid("JavaScript",p("The wiring: flip a switch and something happens."),"pink")))}},
+
+{id:"semantic",sec:"Big picture",title:"Say what it's for",
+ notes:"A good floor plan says chair, not brown thing with four legs. Semantic markup says what an element is for: its role and purpose, not its appearance. Browsers and screen readers rely on that role. Next slide: try it.",
+ render:function(n){return h(P.ContentSlide,{title:"Say what it's for",number:n,footer:FOOT},
+  h("div",{className:"wide stack"},
+    p("A good floor plan says “chair”, not “brown thing with four legs”.","lead"),
+    h("div",{className:"grid2"},
+      h(P.Card,{title:"Semantic"},h(P.CodeBlock,{size:"slide"},"<button>Save</button>"),p("Says what it is. Browsers and screen readers know what to do with it.")),
+      h(P.Card,{title:"Not semantic"},h(P.CodeBlock,{size:"slide"},'<div class="btn">Save</div>'),p("Can be made to look the same, but it isn't a button.")))))}},
+
+{id:"real-button",sec:"Big picture",title:"Real button, fake button",demo:"Real vs fake button",
+ notes:"On your laptop too. Press Tab until one of the buttons has a focus ring, then Enter or Space. Only the real one can be reached and pressed with the keyboard; the div only works with a mouse. A screen reader also announces the first as a button, and the second as plain text. Making a div behave like a button takes tabindex, a role and key handling in JavaScript, and it's easy to get wrong. Use the element that already does it.",
+ render:function(n){return h(P.ContentSlide,{title:"Real button, fake button",tone:"teal",number:n,footer:FOOT},
+  h("div",{className:"wide stack"},
+    p("Press Tab to move to a button, then Enter. Then click both."),
+    h(TwoButtons)))}},
+
+{id:"peel",sec:"Big picture",title:"Peel off the layers",demo:"Peel the layers",
+ notes:"Live demo first on a familiar site. Firefox: View → Page Style → No Style. Chrome: delete the stylesheet links in the Elements panel. JavaScript off in Chrome: DevTools, Ctrl+Shift+P (Cmd+Shift+P on a Mac), type Disable JavaScript, then reload. Keep it brief. This slide is the same idea on our example page, so students can try it on their own laptops. Point out: without CSS the content is all still there and in a sensible order. That's what a screen reader works with.",
+ render:function(n){return h(P.ContentSlide,{title:"Peel off the layers",number:n,footer:FOOT},h(Peel))}},
+
+
+/* ===== First HTML page ===== */
+{id:"first-page",sec:"First HTML page",title:"Your first HTML page",
+ notes:"Now the floor plan itself. We'll write a page from scratch, then check it with the validator.",
+ render:function(){return h(P.SectionSlide,{title:["Your first","HTML page"],tone:"teal",footer:FOOT})}},
+
+{id:"anatomy",sec:"First HTML page",title:"Tags wrap content",
+ notes:"An element is an opening tag, some content and a closing tag. The closing tag has a slash. Attributes go in the opening tag: a name, an equals sign and a value in quotes. Here href says where the link goes. Ask: what would a screen reader say for this? \"Link, About me.\"",
+ render:function(n){return h(P.ContentSlide,{title:"Tags wrap content",tone:"plum",number:n,footer:FOOT},
+  h("div",{className:"wide stack"},h(P.Card,null,
+    h("div",{className:"anat",role:"img","aria-label":"The element <a href=\"about.html\">About me</a>: opening tag with an href attribute, content, closing tag"},
+      p("Element","anat-whole"),
+      h("div",{className:"anat-row"},
+        h("div",{className:"seg seg-tag"},h("code",null,"<a ",h("span",{className:"attr"},'href="about.html"'),">"),
+          h("span",{className:"seg-label"},"Opening tag",h("small",null,"with an attribute: name=\"value\""))),
+        h("div",{className:"seg seg-text"},h("code",null,"About me"),h("span",{className:"seg-label"},"Content")),
+        h("div",{className:"seg seg-tag"},h("code",null,"</a>"),h("span",{className:"seg-label"},"Closing tag",h("small",null,"with a slash")))))),
+    p("Most elements come in pairs like this: <p>…</p>, <h1>…</h1>, <li>…</li>.")))}},
+
+{id:"nesting",sec:"First HTML page",title:"Elements nest inside elements",
+ notes:"Elements go inside other elements, like boxes in boxes. Whatever opened last closes first. Overlapping tags is the most common validator error. Some elements have no content, so they have no closing tag: img, br, meta, link. The alt text on an image is what a screen reader reads out; we come back to images in week 48.",
+ render:function(n){return h(P.ContentSlide,{title:"Elements nest inside elements",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h("div",{className:"stack"},
+      h(P.Alert,{tone:"success",title:"Close in reverse order"},h(P.CodeBlock,{size:"slide"},"<p>I <em>really</em> like it.</p>")),
+      h(P.Alert,{tone:"danger",title:"Overlapping tags"},h(P.CodeBlock,{size:"slide"},"<p>I <em>really</p> like it.</em>"))),
+    h(P.Card,{title:"Empty elements"},
+      h(P.CodeBlock,{size:"slide"},'<img src="me.jpg"\n     alt="Me, sketching">'),
+      p("No content, so no closing tag. Also: <br>, <meta>, <link>."))))}},
+
+{id:"svg",sec:"First HTML page",title:"Fun fact: SVG is the same system",
+ notes:"SVG, the format for icons and vector graphics, uses the same tags, attributes and nesting. Only the vocabulary is different: shapes instead of paragraphs. You can paste SVG straight into an HTML page, and Figma can export frames and icons as SVG. Open an exported icon in VS Code and it will look familiar. The slash before the closing bracket closes an empty element in SVG.",
+ render:function(n){return h(P.ContentSlide,{title:"Fun fact: SVG is the same system",tone:"teal",number:n,footer:FOOT},
+  h("div",{className:"wide svgdemo"},
+    h("div",{className:"stack"},
+      code("icon.svg",'<svg viewBox="0 0 100 100">\n  <rect x="10" y="10"\n        width="80" height="80"\n        fill="gold" />\n  <circle cx="50" cy="50" r="30"\n          fill="tomato" />\n</svg>'),
+      p("Tags, attributes and nesting, with shapes instead of paragraphs.")),
+    h("svg",{viewBox:"0 0 100 100",role:"img","aria-label":"A tomato-red circle on a gold square"},
+      h("rect",{x:10,y:10,width:80,height:80,fill:"gold"}),
+      h("circle",{cx:50,cy:50,r:30,fill:"tomato"}))))}},
+
+{id:"skeleton",sec:"First HTML page",title:"The skeleton of a page",
+ notes:"Live-code this in VS Code and open it in the browser. The doctype says this is modern HTML. Everything sits in html. The head holds information about the page (the title in the tab, the character set); the body holds what you see. Set lang from the very first page: screen readers use it to choose a voice and pronunciation, and browsers use it to offer translation. The portfolio's accessibility check flags a missing lang.",
+ render:function(n){return h(P.ContentSlide,{title:"The skeleton of a page",number:n,footer:FOOT,asideTitle:"Always set lang",
+   aside:"Screen readers use it to pick the right voice and pronunciation. Browsers use it to offer translation."},
+  code("index.html",'<!DOCTYPE html>\n<html lang="en">\n  <head>\n    <meta charset="utf-8">\n    <title>My portfolio</title>\n  </head>\n  <body>\n    <h1>Hello</h1>\n  </body>\n</html>'))}},
+
+{id:"elements",sec:"First HTML page",title:"A few elements to start with",
+ notes:"Add these to the live page one at a time and reload each time. Headings go in order: one h1, then h2, then h3; don't pick a heading for its size. The portfolio template also uses header, nav, main, article, aside and footer: those are week 48.",
+ render:function(n){return h(P.ContentSlide,{title:"A few elements to start with",tone:"plum",number:n,footer:FOOT},
+  h("div",{className:"wide grid3"},
+    card("<h1> to <h6>",p("Headings, in order. Not chosen for their size.")),
+    card("<p>",p("A paragraph of text.")),
+    card("<a href>",p("A link to another page.")),
+    card("<ul> and <li>",p("A list, and its items.")),
+    card("<img alt>",p("An image, with alt text describing it.")),
+    card("<button>",p("Something you press to make a thing happen."))))}},
+
+{id:"validate",sec:"First HTML page",title:"Check it with the validator",
+ notes:"Run the live page through validator.w3.org (Validate by direct input, paste the code). Fix errors from the top: one mistake early on often causes several messages further down. Learning outcome 4 is what A3 is assessed on: W3C-validated, semantically correct HTML and CSS. Your portfolio repository runs the same validator automatically every time you push to main; the badge in the README shows whether it passes.",
+ render:function(n){return h(P.ContentSlide,{title:"Check it with the validator",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h("ol",{className:"steps"},
+      h("li",null,"Open ",h("a",{className:"pn-link",href:"https://validator.w3.org/#validate_by_input",target:"_blank",rel:"noopener"},"validator.w3.org"),"."),
+      h("li",null,"Paste your HTML under Validate by direct input."),
+      h("li",null,"Fix the first error, then check again.")),
+    solid("Learning outcome 4",p("Build W3C-validated, semantically correct HTML and CSS. This is what your portfolio is assessed on."),"teal")))}},
+
+{id:"break",sec:"Break",title:"Break",
+ notes:"Break. After it: CSS.",
+ render:function(){return h(P.SectionSlide,{title:["Break"],tone:"plum",footer:"Next: CSS basics"})}},
+
+
+/* ===== CSS basics ===== */
+{id:"css",sec:"CSS basics",title:"CSS basics",
+ notes:"The furniture. How a rule is written, how to pick which elements it applies to, a handful of properties, and what happens when two rules disagree.",
+ render:function(){return h(P.SectionSlide,{title:["CSS basics"],tone:"teal",footer:FOOT})}},
+
+{id:"rule",sec:"CSS basics",title:"Anatomy of a rule",
+ notes:"A rule is a selector, then curly braces, then declarations: property, colon, value, semicolon. Common mistakes: a missing semicolon (the next line is then ignored), a missing closing brace, and American spelling: it's color, not colour. Link the stylesheet from the head with a link element. Avoid style attributes on elements: one stylesheet for the whole site is easier to change.",
+ render:function(n){return h(P.ContentSlide,{title:"Anatomy of a rule",number:n,footer:FOOT},
+  h("div",{className:"wide rulegrid"},
+    h("div",{className:"rule",role:"img","aria-label":"A CSS rule: selector p, then declarations color: purple and font-size: 20px inside curly braces"},
+      c("p {"),h("span",null,"selector"),
+      c("  color: purple;"),h("span",null,"property: value;"),
+      c("  font-size: 20px;"),h("span",null,"another declaration"),
+      c("}"),h("span",null,"braces close the rule")),
+    h("div",{className:"stack"},
+      p("Link the stylesheet in the head:"),
+      h(P.CodeBlock,{size:"slide",label:"index.html"},'<link rel="stylesheet"\n      href="style.css">'),
+      p("Not style=\"…\" on each element.","muted"))))}},
+
+{id:"selectors",sec:"CSS basics",title:"Selectors pick elements",demo:"Selector playground",
+ notes:"Click through the selectors; students can do the same on their laptops. p: every paragraph. .card: everything with class card. #main: the one element with that id. a: every link. nav a: only links inside nav (descendant selector). Rule of thumb: style with classes. Element selectors for sensible defaults, ids rarely.",
+ render:function(n){return h(P.ContentSlide,{title:"Selectors pick elements",tone:"plum",number:n,footer:FOOT},
+  h(Playground))}},
+
+{id:"properties",sec:"CSS basics",title:"Six properties to start with",
+ notes:"Enough to style a first page. Margin is space outside an element, padding is space inside it, around the content. The box model in depth comes in week 49. Font families take a list: if the first isn't available, the browser tries the next.",
+ render:function(n){return h(P.ContentSlide,{title:"Six properties to start with",number:n,footer:FOOT},
+  h("dl",{className:"wide props"},[
+    ["color: purple;","Text colour"],
+    ["background-color: gold;","Background behind the element"],
+    ["font-family: Georgia, serif;","Typeface, with fallbacks"],
+    ["font-size: 20px;","Text size"],
+    ["margin: 16px;","Space outside the element"],
+    ["padding: 16px;","Space inside, around the content"]
+  ].map(function(r){return h("div",{key:r[0]},h("dt",null,r[0]),h("dd",null,r[1]))})))}},
+
+{id:"cascade",sec:"CSS basics",title:"Which rule wins?",demo:"Which rule wins?",
+ notes:"The cascade in one minute. Two rules: later rules win, and more specific selectors win. Ask the room to vote before pressing Show the answer. Then show it in DevTools: right-click, Inspect, and in the Styles panel the losing declaration is crossed out.",
+ render:function(n){return h(P.ContentSlide,{title:"Which rule wins?",number:n,footer:FOOT},
+  h("div",{className:"wide"},h(P.Tabs,{label:"Cascade puzzles",tabs:PUZZLES.map(function(z){
+    return {id:z.id,label:z.label,content:h(Puzzle,{code:z.code,answer:z.answer})};
+  })})))}},
+
+{id:"css-turn",sec:"CSS basics",title:"Your turn: style one element",ex:"Style one element",
+ notes:"TODO for David: say which page students use here (the page from the live-coding, or their portfolio template if they have accepted the invitation). Walk round. Common problems: the stylesheet isn't linked (check the href and the file name), a missing dot before the class name in the CSS, and colour instead of color.",
+ render:function(n){return h(P.ContentSlide,{title:"Your turn: style one element",tone:"teal",number:n,footer:FOOT},
+  h("ol",{className:"steps"},
+    h("li",null,"In your HTML, add ",c('class="intro"')," to one element."),
+    h("li",null,"In your CSS, write a ",c(".intro")," rule with two or three properties."),
+    h("li",null,"Reload. Right-click the element, choose Inspect, and find your rule.")))}},
+
+
+/* ===== Colour in CSS ===== */
+{id:"colour",sec:"Colour in CSS",title:"Colour in CSS",
+ notes:"From the simplest way to write a colour to the most designer-friendly. Yesterday's palette ends up as code.",
+ render:function(){return h(P.SectionSlide,{title:["Colour in CSS"],tone:"pink",footer:FOOT})}},
+
+{id:"named",sec:"Colour in CSS",title:"Named colours",
+ notes:"CSS has about 150 named colours. rebeccapurple was added in memory of Rebecca Meyer, daughter of the CSS author Eric Meyer. They're fun and quick for testing, but limited: you can't ask for tomato, slightly darker. For a real palette you need numbers.",
+ render:function(n){return h(P.ContentSlide,{title:"Named colours",number:n,footer:FOOT},
+  h("div",{className:"wide stack"},
+    h("ul",{className:"swatches"},["tomato","rebeccapurple","teal","gold","hotpink","cornflowerblue"].map(function(x){
+      return h("li",{key:x},h("span",{className:"sw",style:{background:x},"aria-hidden":"true"}),c(x));
+    })),
+    p("Quick and fun, but you can't ask for “tomato, a bit darker”.")))}},
+
+{id:"hex",sec:"Colour in CSS",title:"Hex and RGB",
+ notes:"This is plum from this course's design system, the colour on these slides in the light theme. Hex is three pairs of digits, red, green and blue, each from 00 to FF (0 to 255). RGB writes the same three numbers in decimal. This is what Figma gives you: select a colour style and copy the value straight into your CSS.",
+ render:function(n){return h(P.ContentSlide,{title:"Hex and RGB: what Figma gives you",number:n,footer:FOOT},
+  h("div",{className:"wide hexdemo"},
+    h("div",{"data-theme":"light",className:"bigsw",role:"img","aria-label":"A plum-coloured swatch"}),
+    h("div",null,
+      h("p",{className:"notation"},"#5B2A86"),
+      h("div",{className:"hexpairs"},
+        h("span",null,"5B",h("small",null,"red")),h("span",null,"2A",h("small",null,"green")),h("span",null,"86",h("small",null,"blue"))),
+      h("p",{className:"notation"},"rgb(91 42 134)"),
+      p("The same colour, written two ways."))))}},
+
+{id:"hsl",sec:"Colour in CSS",title:"HSL: nudge the lightness",demo:"HSL hover shade",
+ notes:"HSL came up in Johannes's colour lecture: hue (around the colour wheel), saturation (grey to vivid) and lightness (black to white). The code version means you can make a darker hover shade by changing only one number. Live: lower the lightness and watch the hover colour and its contrast. Hover the real button to see it. Ask: what happens to contrast if the lightness goes up to 60? Students can try it on their laptops.",
+ render:function(n){return h(P.ContentSlide,{title:"HSL: nudge the lightness",number:n,footer:FOOT},h(HslDemo))}},
+
+{id:"vars",sec:"Colour in CSS",title:"Define the palette once",demo:"Custom properties",
+ notes:"Custom properties are like colour styles in Figma: name a colour once in :root, then use it everywhere with var(). Change it in one place and the whole page follows. Move the hue: header and button change together. Watch the contrast readout: some hues fail with white text at the same lightness (try yellow). This is how the afternoon's light and dark mode work: the second stylesheet only redefines the variables. Design systems in week 49 build on this.",
+ render:function(n){return h(P.ContentSlide,{title:"Define the palette once",number:n,footer:FOOT},h(VarsDemo))}},
+
+{id:"contrast",sec:"Colour in CSS",title:"Check contrast in DevTools",
+ notes:"Yesterday's contrast rule has a direct counterpart in code. In Chrome or Edge, click the small colour square next to color in the Styles panel: the picker shows the contrast ratio against the background, with ticks for AA and AAA. Firefox shows it in its colour picker and in the Accessibility panel. Demo it on the live page. The portfolio's accessibility check also flags low contrast when you push.",
+ render:function(n){return h(P.ContentSlide,{title:"Check contrast in DevTools",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h("ol",{className:"steps"},
+      h("li",null,"Right-click some text, choose Inspect."),
+      h("li",null,"In Styles, click the colour square next to ",c("color"),"."),
+      h("li",null,"Read the contrast ratio.")),
+    solid("Targets, from Thursday",h("ul",null,h("li",null,"4.5:1 for body text"),h("li",null,"3:1 for large text")),"plum")))}},
+
+
+/* ===== Wrap-up ===== */
+{id:"js",sec:"Wrap-up",title:"JavaScript is the wiring",demo:"Light and dark toggle",
+ notes:"Your first JavaScript, and Part 2 of this afternoon. HTML gives the button (a real button, as before), CSS makes it look right, JavaScript makes it do something. The script finds the link and the button, and when the button is clicked it swaps which stylesheet the link points to. Because the palette is in custom properties, dark.css only has to redefine the variables. Press the button on the page. (The demo on the slide swaps a theme attribute rather than a file; same idea.)",
+ render:function(n){return h(P.ContentSlide,{title:"JavaScript is the wiring",tone:"plum",number:n,footer:FOOT},h(JsDemo))}},
+
+{id:"afternoon",sec:"Wrap-up",title:"This afternoon",
+ notes:"Individual work, sitting together; the TAs are there. Step 0 is accepting the invitation to your portfolio repository; don't make your own from the template. Use the palette from yesterday's Figma exercise: no new design work today. The full brief, with hints and a done-when checklist, is on Canvas.",
+ render:function(n){return h(P.ContentSlide,{title:"This afternoon: colour in your portfolio",number:n,footer:FOOT},
+  h("div",{className:"wide grid3"},
+    h(P.Card,{title:"Part 1"},h("ul",null,
+      h("li",null,"Yesterday's palette as custom properties"),
+      h("li",null,"A hover shade made with HSL"),
+      h("li",null,"Contrast and validator pass"))),
+    h(P.Card,{title:"Part 2"},h("ul",null,
+      h("li",null,"A second stylesheet: dark or light"),
+      h("li",null,"A button that switches between them"))),
+    h(P.Card,{interactive:true,className:"linkcard fill-teal"},
+      h("a",{className:"pn-link",href:CANVAS_EX,target:"_blank",rel:"noopener"},"The brief, on Canvas"),
+      p("Steps, hints and the checklist")))) }},
+
+{id:"tag",sec:"Wrap-up",title:"End of the week: tag it",
+ notes:"At the end of the afternoon. Commit and push. If you worked on a branch, merge it into main first. Then add an annotated tag: -a makes it annotated, -m is its message. Tags aren't pushed with a normal push, so push the tag by name. Check on GitHub that v0.1 appears under Tags.",
+ render:function(n){return h(P.ContentSlide,{title:"End of the week: tag it",tone:"teal",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    code("Terminal",'git add .\ngit commit -m "Add colour palette"\ngit push\n\ngit tag -a v0.1 -m "Colour"\ngit push origin v0.1'),
+    h("div",{className:"stack"},
+      p("A tag marks a point in your history: your portfolio at the end of this week."),
+      h(P.Alert,{tone:"info",title:"Working on a branch?"},"Merge it into main before you tag."))))}}
+]);
+})();
+</script>
+</body>
+</html>
