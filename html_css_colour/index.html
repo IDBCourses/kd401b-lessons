@@ -38,18 +38,44 @@
 .site.bare .site-title{font-size:2em;font-weight:700;margin:.4em 0}
 .site.bare .site-h2{font-size:1.5em;font-weight:700;margin:.6em 0 .3em}
 .site.bare button{font-size:28px}
-.toggles{display:flex;flex-direction:column;gap:var(--space-4)}
+.toggles{display:flex;flex-direction:column;gap:var(--space-3)}
 
-/* native checkboxes at slide size */
-.check{display:flex;align-items:center;gap:var(--space-4);font:500 36px/44px var(--font-display);cursor:pointer;min-height:var(--target-min)}
-.check input{width:40px;height:40px;margin:0;accent-color:var(--plum);flex:none}
+/* on/off switches (role="switch"): position of the knob and the word On/Off, not colour alone */
+.toggle{display:flex;align-items:center;gap:var(--space-4);background:none;border:0;padding:var(--space-1) 0;color:inherit;font:500 36px/44px var(--font-display);cursor:pointer;min-height:var(--target-min);text-align:left}
+.toggle-track{flex:none;width:96px;height:52px;box-sizing:border-box;border-radius:var(--radius-full);border:var(--border-width) solid var(--border-control);background:var(--surface-300);position:relative}
+.toggle-thumb{position:absolute;top:4px;left:4px;width:40px;height:40px;border-radius:var(--radius-full);background:var(--ink-muted);transition:left .15s}
+.toggle[aria-checked="true"] .toggle-track{background:var(--plum);border-color:var(--ink)}
+.toggle[aria-checked="true"] .toggle-thumb{left:48px;background:var(--on-plum)}
+.toggle-state{font-family:var(--font-mono);font-weight:400;font-size:28px;color:var(--ink-muted);min-width:3ch}
+.toggle:disabled{cursor:not-allowed}
+.toggle:disabled .toggle-track{border-style:dashed}
+.toggle:focus-visible{outline:var(--focus-width) solid var(--focus);outline-offset:var(--focus-offset)}
+.toggle-hint{display:block;margin:0 0 0 calc(96px + var(--space-4));font:500 28px/38px var(--font-display);color:var(--ink-muted)}
+@media (prefers-reduced-motion:reduce){.toggle-thumb{transition:none}}
 
-/* real button vs fake button */
-.twobtn{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-7)}
-.twobtn .pn-card{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-5)}
-.twobtn .site-btn{font-size:36px;line-height:44px;padding:var(--space-4) var(--space-6);display:inline-block}
-.count{font:500 32px/40px var(--font-display);margin:0}
-.btn-fake{user-select:none}
+/* the house: a floor plan built up in three steps */
+.house{display:grid;grid-template-columns:1fr 1.5fr;gap:var(--space-7);align-items:start}
+.steps-btns{display:flex;flex-direction:column;gap:var(--space-3);margin:0 0 var(--space-5)}
+.steps-btns .pn-btn{justify-content:flex-start;text-align:left}
+.steps-btns .pn-btn[aria-pressed="true"]{background:var(--ink);color:var(--surface-100)}
+.house-text{margin:0 0 var(--space-5)}
+.plan{display:block;width:100%;height:auto;border:2px solid var(--ink);box-shadow:var(--shadow-pane-md);background:var(--surface-200)}
+.plan .floor{fill:var(--surface-200)}
+.plan .wall{stroke:var(--ink);stroke-width:12;fill:none}
+.plan .room{font:500 28px var(--font-display);fill:var(--ink-muted)}
+.plan .lbl{font:400 28px var(--font-mono);fill:var(--ink);text-anchor:middle;dominant-baseline:central}
+.plan .outline{fill:none;stroke:var(--ink-muted);stroke-width:3;stroke-dasharray:10 8}
+.plan .sofa{fill:var(--plum);stroke:var(--ink);stroke-width:3}
+.plan .cushion{fill:none;stroke:var(--on-plum);stroke-width:3}
+.plan .table{fill:var(--pink);stroke:var(--ink);stroke-width:3}
+.plan .chair{fill:var(--teal);stroke:var(--ink);stroke-width:3}
+.plan .lamp{fill:var(--surface-300);stroke:var(--ink);stroke-width:3}
+.plan .lamp.on{fill:var(--pink)}
+.plan .on-plum{fill:var(--on-plum)}.plan .on-pink{fill:var(--on-pink)}.plan .on-teal{fill:var(--on-teal)}
+.plan .glow{fill:var(--pink);opacity:.3}
+.plan .wire{fill:none;stroke:var(--ink);stroke-width:4;stroke-dasharray:4 10;stroke-linecap:round}
+.plan .switch{fill:var(--surface-100);stroke:var(--ink);stroke-width:3}
+.plan .knob{fill:var(--ink)}
 
 /* anatomy of an element: an annotated line of code */
 .anat{display:inline-flex;flex-direction:column;gap:var(--space-5);align-items:flex-start}
@@ -58,14 +84,23 @@
 .seg code{font:400 64px/96px var(--font-mono);padding:0 var(--space-3);border:2px solid var(--ink);border-radius:var(--radius-sm);white-space:pre;color:var(--ink)}
 .seg-tag code{background:var(--plum-tint)}
 .seg-text code{background:var(--pink-tint)}
-.seg code .attr{background:var(--teal-tint);outline:2px dashed var(--ink);outline-offset:-2px;padding:0 4px}
+.seg code .attr-name{background:var(--teal-tint)}
+.seg code .attr-val{background:var(--pink);color:var(--on-pink);font-weight:700}
+.attr-break{display:flex;flex-direction:column;gap:var(--space-4);align-items:flex-start;margin-top:var(--space-6);padding-top:var(--space-5);border-top:2px dashed var(--border-control)}
+.attr-break .h3{margin:0}
+.seg-name code{background:var(--teal-tint)}
+.seg-eq code{background:var(--surface-200)}
+.seg-val code{background:var(--pink);color:var(--on-pink);font-weight:700;border-width:4px;box-shadow:var(--shadow-pane-sm)}
 .seg-label{font:600 36px/44px var(--font-display);text-align:center}
 .seg-label small{display:block;font-weight:500;font-size:28px;line-height:38px;color:var(--ink-muted)}
 .anat-whole{font:600 36px/44px var(--font-display);border-top:4px solid var(--ink);padding-top:var(--space-2);align-self:stretch;text-align:center}
 
 /* SVG fun fact */
-.svgdemo{display:grid;grid-template-columns:1.3fr 1fr;gap:var(--space-7);align-items:center}
-.svgdemo svg{width:100%;max-width:420px;height:auto;display:block;margin:0 auto;background:var(--surface-200);border:2px solid var(--ink)}
+.svgdemo{display:grid;grid-template-columns:1.15fr 1fr;gap:var(--space-7);align-items:start}
+.svgdemo svg{width:200px;height:200px;flex:none;display:block;background:var(--surface-200);border:2px solid var(--ink)}
+.svgside{display:flex;gap:var(--space-6);align-items:flex-start}
+.svgside p{margin:0}
+.reslinks{margin:var(--space-3) 0 0;padding-left:1.1em}
 
 /* anatomy of a CSS rule: code lines with labels beside them */
 .rule{display:grid;grid-template-columns:auto 1fr;gap:var(--space-3) var(--space-6);align-items:center;background:var(--surface-300);border:2px solid var(--ink);border-radius:var(--radius-sm);padding:var(--space-5) var(--space-6)}
@@ -102,18 +137,25 @@
 .swatches code{font:400 28px/38px var(--font-mono)}
 
 /* hex and rgb */
-.hexdemo{display:grid;grid-template-columns:420px 1fr;gap:var(--space-8);align-items:center}
-.bigsw{height:380px;background:var(--plum);border:2px solid var(--ink);box-shadow:var(--shadow-pane-md)}
+.rgbdemo{display:grid;grid-template-columns:520px 1fr 1fr;gap:var(--space-7);align-items:start}
+.venn{display:block;width:100%;height:auto;border:2px solid var(--ink);box-shadow:var(--shadow-pane-md)}
+.venn g{isolation:isolate}
+.venn circle{mix-blend-mode:screen}
 .notation{font:400 56px/72px var(--font-mono);margin:0}
-.hexpairs{display:flex;gap:var(--space-4);margin:var(--space-3) 0 var(--space-6)}
+.hexpairs{display:flex;gap:var(--space-4);margin:var(--space-3) 0 var(--space-5)}
 .hexpairs span{display:flex;flex-direction:column;align-items:center;font:400 44px/56px var(--font-mono);border:2px solid var(--ink);border-radius:var(--radius-sm);padding:var(--space-2) var(--space-4);background:var(--surface-200);color:var(--ink)}
 .hexpairs small{font:500 28px/38px var(--font-display);color:var(--ink-muted)}
 
-/* sliders (HSL and custom properties) */
 .sliders{display:flex;flex-direction:column;gap:var(--space-5)}
-.slider label{display:flex;justify-content:space-between;font:500 32px/40px var(--font-display)}
+/* sliders whose track is a gradient of what each value would give (set as --track on the input) */
+.slider label{display:flex;justify-content:space-between;gap:var(--space-4);font:500 32px/40px var(--font-display);margin-bottom:var(--space-2)}
 .slider output{font-family:var(--font-mono);font-weight:400}
-.slider input{width:100%;height:var(--target-min);margin:0;accent-color:var(--plum)}
+.slider input{-webkit-appearance:none;appearance:none;display:block;width:100%;height:48px;margin:0;background:transparent;cursor:pointer}
+.slider input::-webkit-slider-runnable-track{height:36px;box-sizing:border-box;border:2px solid var(--ink);border-radius:var(--radius-sm);background:var(--track)}
+.slider input::-moz-range-track{height:32px;border:2px solid var(--ink);border-radius:var(--radius-sm);background:var(--track)}
+.slider input::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:48px;margin-top:-8px;box-sizing:border-box;border:3px solid var(--ink);border-radius:var(--radius-sm);background:var(--surface-100);box-shadow:0 0 0 2px var(--surface-100)}
+.slider input::-moz-range-thumb{width:16px;height:42px;border:3px solid var(--ink);border-radius:var(--radius-sm);background:var(--surface-100);box-shadow:0 0 0 2px var(--surface-100)}
+.slider input:focus-visible{outline:var(--focus-width) solid var(--focus);outline-offset:var(--focus-offset)}
 .hsl-demo{display:grid;grid-template-columns:1fr 1.25fr;gap:var(--space-8);align-items:start}
 .swrow{display:flex;gap:var(--space-5);align-items:center;flex-wrap:wrap}
 .hsl-btn{font:600 36px/44px var(--font-display);color:var(--on-plum);background:var(--bg);border:2px solid var(--ink);border-radius:var(--radius-md);padding:var(--space-4) var(--space-6);min-height:var(--target-min);cursor:pointer}
@@ -164,7 +206,7 @@ function card(title,body,tone){return h(P.Card,{title:title,tone:tone||"paper"},
 /* solid-colour card (see "Solid-fill cards" in shared/deck.css): fill is plum | teal | pink */
 function solid(title,body,fill){return h(P.Card,{title:title,className:"fill-"+fill},body)}
 function p(t,cls){return h("p",cls?{className:cls}:null,t)}
-function c(t){return h("code",null,t)}
+function c(t,props){return h("code",props||null,t)}
 function code(label,text){return h(P.CodeBlock,{size:"slide",label:label},text)}
 function stop(e){e.preventDefault()}
 
@@ -207,18 +249,58 @@ function Site(props){
     h("div",{className:"site-foot"},"© 2025 Blog Site. All rights reserved."));
 }
 
-/* ---------- Real button vs fake button ---------- */
-function TwoButtons(){
-  var a=useState(0),b=useState(0);
-  return h("div",{className:"twobtn"},
-    h(P.Card,{title:"A real button"},
-      h(P.CodeBlock,{size:"slide"},"<button>Save</button>"),
-      h("button",{type:"button",className:"site-btn",onClick:function(){a[1](a[0]+1)}},"Save"),
-      h("p",{className:"count","aria-live":"polite"},"Pressed "+a[0]+(a[0]===1?" time":" times"))),
-    h(P.Card,{title:"A div dressed as one"},
-      h(P.CodeBlock,{size:"slide"},'<div class="btn">Save</div>'),
-      h("div",{className:"site-btn btn-fake",onClick:function(){b[1](b[0]+1)}},"Save"),
-      h("p",{className:"count","aria-live":"polite"},"Pressed "+b[0]+(b[0]===1?" time":" times"))));
+/* ---------- The house: plan, furniture, wiring ----------
+   Step 0: the plan (HTML) only labels what goes where. Step 1 adds the furniture (CSS).
+   Step 2 adds the wiring (JavaScript): a switch that turns the lamp on. */
+var HOUSE_STEPS=[
+  {label:"1. HTML: the floor plan",text:"The rooms, and labels for what goes where. Nothing about how anything looks."},
+  {label:"2. CSS: the furniture",text:"The same plan, now furnished. Change the furniture without moving a wall."},
+  {label:"3. JavaScript: the wiring",text:"Flip the switch and something happens."}
+];
+function House(){
+  var st=useState(0),step=st[0],li=useState(false),lit=li[0];
+  var css=step>=1,js=step>=2,on=js&&lit;
+  /* a piece of furniture: a dashed outline with a label in the plan, a filled shape with CSS */
+  function piece(key,x,y,w,hh,label,cls,txt,extra){
+    return h("g",{key:key},
+      h("rect",{x:x,y:y,width:w,height:hh,rx:css?14:0,className:css?cls:"outline"}),
+      css?extra:null,
+      h("text",{x:x+w/2,y:y+hh/2,className:"lbl"+(css?" "+txt:"")},label));
+  }
+  return h("div",{className:"wide house"},
+    h("div",null,
+      h("div",{className:"steps-btns",role:"group","aria-label":"Layers of the house"},HOUSE_STEPS.map(function(x,i){
+        return h("button",{key:i,type:"button",className:"pn-btn pn-btn--secondary","aria-pressed":i===step?"true":"false",onClick:function(){st[1](i)}},x.label);
+      })),
+      p(HOUSE_STEPS[step].text,"house-text"),
+      js?h(P.Button,{variant:"primary",onClick:function(){li[1](!lit)}},lit?"Switch the light off":"Switch the light on"):null),
+    h("svg",{className:"plan",viewBox:"0 0 900 560",role:"img","aria-label":"Floor plan of a living room and a kitchen"+(css?", furnished":", with labels only")+(js?(on?"; the lamp is on":"; the lamp is off"):"")},
+      h("rect",{x:6,y:6,width:888,height:548,className:"floor"}),
+      on?h("circle",{cx:470,cy:120,r:100,className:"glow"}):null,
+      h("text",{x:44,y:66,className:"room"},"Living room"),
+      h("text",{x:600,y:66,className:"room"},"Kitchen"),
+      piece("sofa",70,404,360,110,"sofa","sofa","on-plum",
+        [h("path",{key:"back",d:"M86 492 H414",className:"cushion"}),h("path",{key:"arm1",d:"M100 424 V492 M400 424 V492",className:"cushion"})]),
+      piece("table",640,250,180,110,"table","table","on-pink"),
+      piece("chair1",680,150,100,76,"chair","chair","on-teal"),
+      piece("chair2",680,384,100,76,"chair","chair","on-teal"),
+      css?h("circle",{cx:470,cy:120,r:42,className:"lamp"+(on?" on":"")}):h("circle",{cx:470,cy:120,r:42,className:"outline"}),
+      h("text",{x:470,y:194,className:"lbl"},"lamp"),
+      js?h("path",{d:"M526 362 H512 V150",className:"wire"}):null,
+      js?h("g",null,h("rect",{x:526,y:334,width:28,height:56,rx:4,className:"switch"}),h("rect",{x:532,y:on?340:362,width:16,height:22,rx:3,className:"knob"})):null,
+      h("path",{d:"M6 6 H894 V554 H6 Z",className:"wall"}),
+      h("path",{d:"M560 6 V230 M560 330 V554",className:"wall"})));
+}
+
+/* ---------- On/off switch ---------- */
+function Toggle(props){
+  return h("div",null,
+    h("button",{type:"button",role:"switch","aria-checked":props.on?"true":"false",disabled:props.disabled,className:"toggle",
+        onClick:function(){if(!props.disabled)props.set(!props.on)}},
+      h("span",{className:"toggle-track","aria-hidden":"true"},h("span",{className:"toggle-thumb"})),
+      h("span",null,props.label),
+      h("span",{className:"toggle-state","aria-hidden":"true"},props.on?"On":"Off")),
+    props.hint?h("span",{className:"toggle-hint"},props.hint):null);
 }
 
 /* ---------- Peel the layers: switch CSS and JavaScript off ---------- */
@@ -229,8 +311,9 @@ function Peel(){
   return h("div",{className:"wide grid2"},
     h("div",{className:"stack"},
       h("div",{className:"toggles"},
-        h("label",{className:"check"},h("input",{type:"checkbox",checked:cs[0],onChange:function(e){cs[1](e.target.checked)}}),"CSS: how it looks"),
-        h("label",{className:"check"},h("input",{type:"checkbox",checked:js[0],onChange:function(e){js[1](e.target.checked)}}),"JavaScript: what it does")),
+        h(Toggle,{label:"HTML: what's there",on:true,disabled:true,hint:"Can't be switched off: without it, there is no page."}),
+        h(Toggle,{label:"CSS: how it looks",on:cs[0],set:cs[1]}),
+        h(Toggle,{label:"JavaScript: what it does",on:js[0],set:js[1]})),
       p(!cs[0]?"Without CSS: the browser's default look. Every word is still there, in order."
         :!js[0]?"Without JavaScript: it looks the same, but the Like button no longer does anything."
         :"Switch each layer off and see what's left. Then press Like.")),
@@ -245,7 +328,7 @@ var LINES=[
   '  <a href="/about">About</a>',
   '</nav>',
   '<main id="main">',
-  '  <h2>Projects</h2>',
+  '  <h2 id="projects">Projects</h2>',
   '  <p>Things I have made.</p>',
   '  <article class="card">',
   '    <h3>Colour study</h3>',
@@ -257,7 +340,8 @@ var LINES=[
 var SELECTORS=[
   {sel:"p",hits:[6,9],note:"An element selector: every <p> on the page."},
   {sel:".card",hits:[7,8,9,10,11],note:"A class selector: every element with class=\"card\", and what's inside it."},
-  {sel:"#main",hits:[4,5,6,7,8,9,10,11,12],note:"An id selector: the one element with id=\"main\". Ids are unique, so use them sparingly."},
+  {sel:"#projects",hits:[5],note:"An id selector: the one element with id=\"projects\". Each id is used only once on a page."},
+  {sel:"#main",hits:[4,5,6,7,8,9,10,11,12],note:"Also an id selector: the element with id=\"main\", and everything inside it."},
   {sel:"a",hits:[1,2,10],note:"Every link, wherever it is."},
   {sel:"nav a",hits:[1,2],note:"A descendant selector: only links inside a <nav>."}
 ];
@@ -292,43 +376,83 @@ function Puzzle(props){
       h("div",null,h(P.Button,{variant:shown?"secondary":"primary",onClick:function(){s[1](!shown)}},shown?"Hide the answer":"Show the answer"))));
 }
 
-/* ---------- HSL: nudge the lightness ---------- */
+/* ---------- Sliders with a gradient track ----------
+   track: a CSS gradient showing what each position of this slider would give, given the other values. */
 function Slider(props){
   var id="sl-"+props.id;
   return h("div",{className:"slider"},
-    h("label",{htmlFor:id},h("span",null,props.label),h("output",{htmlFor:id},props.value+props.unit)),
-    h("input",{id:id,type:"range",min:props.min||0,max:props.max,value:props.value,onChange:function(e){props.set(+e.target.value)}}));
+    h("label",{htmlFor:id},h("span",null,props.label),h("output",{htmlFor:id},props.show!=null?props.show:props.value+props.unit)),
+    h("input",{id:id,type:"range",min:props.min||0,max:props.max,value:props.value,style:{"--track":props.track},
+      onChange:function(e){props.set(+e.target.value)}}));
 }
+function grad(stops){return "linear-gradient(to right, "+stops.join(", ")+")"}
+function rgb(r,g,b){return "rgb("+r+" "+g+" "+b+")"}
+function hex2(v){return ("0"+v.toString(16).toUpperCase()).slice(-2)}
+
+/* ---------- RGB: mixing light ----------
+   Three circles of red, green and blue light on black, blended with "screen" (light adds up):
+   where all three overlap you get the mixed colour. Starts at Pane's plum, rgb(91 42 134). */
+var PLUM=[91,42,134];
+function RgbMixer(){
+  var R=useState(PLUM[0]),G=useState(PLUM[1]),B=useState(PLUM[2]);
+  var r=R[0],g=G[0],b=B[0];
+  return h("div",{className:"wide rgbdemo"},
+    h("svg",{className:"venn",viewBox:"0 0 300 290",role:"img","aria-label":"Red, green and blue light overlapping; the centre shows the mixed colour "+rgb(r,g,b)},
+      h("rect",{width:300,height:290,fill:"black"}),
+      h("g",null,
+        h("circle",{cx:108,cy:108,r:82,fill:rgb(r,0,0)}),
+        h("circle",{cx:192,cy:108,r:82,fill:rgb(0,g,0)}),
+        h("circle",{cx:150,cy:180,r:82,fill:rgb(0,0,b)}))),
+    h("div",{className:"sliders"},
+      h(Slider,{id:"r",label:"Red",value:r,set:R[1],max:255,unit:"",track:grad([rgb(0,g,b),rgb(255,g,b)])}),
+      h(Slider,{id:"g",label:"Green",value:g,set:G[1],max:255,unit:"",track:grad([rgb(r,0,b),rgb(r,255,b)])}),
+      h(Slider,{id:"b",label:"Blue",value:b,set:B[1],max:255,unit:"",track:grad([rgb(r,g,0),rgb(r,g,255)])}),
+      h("div",null,h(P.Button,{variant:"secondary",onClick:function(){R[1](PLUM[0]);G[1](PLUM[1]);B[1](PLUM[2])}},"Reset to plum"))),
+    h("div",null,
+      h("p",{className:"notation"},"#"+hex2(r)+hex2(g)+hex2(b)),
+      h("div",{className:"hexpairs"},
+        h("span",null,hex2(r),h("small",null,"red")),h("span",null,hex2(g),h("small",null,"green")),h("span",null,hex2(b),h("small",null,"blue"))),
+      h("p",{className:"notation"},"rgb("+r+" "+g+" "+b+")"),
+      p("The same colour, written two ways.")));
+}
+
+/* ---------- HSL: nudge the lightness ---------- */
+var HSL0={h:270,s:52,l:34,d:10};
 function HslDemo(){
-  var H=useState(270),S=useState(52),L=useState(34),D=useState(10);
-  var hl=Math.max(0,L[0]-D[0]);
-  var base=hsl(H[0],S[0],L[0]),hover=hsl(H[0],S[0],hl);
+  var H=useState(HSL0.h),S=useState(HSL0.s),L=useState(HSL0.l),D=useState(HSL0.d);
+  var hu=H[0],sa=S[0],li=L[0],hl=Math.max(0,li-D[0]);
+  var base=hsl(hu,sa,li),hover=hsl(hu,sa,hl);
+  var hues=[];for(var a=0;a<=360;a+=30)hues.push(hsl(a,sa,li));
   return h("div",{className:"wide hsl-demo"},
     h("div",{className:"sliders"},
-      h(Slider,{id:"h",label:"Hue",value:H[0],set:H[1],max:360,unit:"°"}),
-      h(Slider,{id:"s",label:"Saturation",value:S[0],set:S[1],max:100,unit:"%"}),
-      h(Slider,{id:"l",label:"Lightness",value:L[0],set:L[1],max:100,unit:"%"}),
-      h(Slider,{id:"d",label:"Hover: darker by",value:D[0],set:D[1],max:40,unit:" points"})),
+      h(Slider,{id:"h",label:"Hue",value:hu,set:H[1],max:360,unit:"°",track:grad(hues)}),
+      h(Slider,{id:"s",label:"Saturation",value:sa,set:S[1],max:100,unit:"%",track:grad([hsl(hu,0,li),hsl(hu,100,li)])}),
+      h(Slider,{id:"l",label:"Lightness",value:li,set:L[1],max:100,unit:"%",track:grad([hsl(hu,sa,0),hsl(hu,sa,50),hsl(hu,sa,100)])}),
+      h(Slider,{id:"d",label:"Hover: darker by",value:D[0],set:D[1],max:40,unit:" points",track:grad([base,hsl(hu,sa,Math.max(0,li-40))])}),
+      h("div",null,h(P.Button,{variant:"secondary",onClick:function(){H[1](HSL0.h);S[1](HSL0.s);L[1](HSL0.l);D[1](HSL0.d)}},"Reset"))),
     h("div",{className:"stack"},
       code("style.css",".button {\n  background-color: "+base+";\n}\n.button:hover {\n  background-color: "+hover+";\n}"),
       h("div",{className:"swrow",style:{"--bg":base,"--bg-hover":hover}},
         h("button",{type:"button",className:"hsl-btn"},"Hover me"),
         h("span",{className:"hsl-btn is-hover","aria-hidden":"true"},"Hover")),
       h("div",null,
-        h(Ratio,{label:"White text, normal",ratio:whiteOn(H[0],S[0],L[0])}),
-        h(Ratio,{label:"White text, hover",ratio:whiteOn(H[0],S[0],hl)}))));
+        h(Ratio,{label:"White text, normal",ratio:whiteOn(hu,sa,li)}),
+        h(Ratio,{label:"White text, hover",ratio:whiteOn(hu,sa,hl)}))));
 }
 
 /* ---------- Custom properties: change the palette in one place ---------- */
 function VarsDemo(){
   var H=useState(270);
-  var accent=hsl(H[0],55,35);
+  var accent=hsl(H[0],55,35),hues=[];
+  for(var a=0;a<=360;a+=30)hues.push(hsl(a,55,35));
   return h("div",{className:"wide vars-demo"},
     h("div",{className:"stack"},
       code("style.css",":root {\n  --accent: "+accent+";\n}\nheader, button {\n  background-color: var(--accent);\n}"),
-      h(Slider,{id:"acc",label:"Hue of --accent",value:H[0],set:H[1],max:360,unit:"°"}),
+      h(Slider,{id:"acc",label:"Hue of --accent",value:H[0],set:H[1],max:360,unit:"°",track:grad(hues)}),
       h(Ratio,{label:"White text on --accent",ratio:whiteOn(H[0],55,35)})),
-    h(Site,{style:{"--accent":accent},extra:h("button",{type:"button",className:"site-btn"},"Subscribe")}));
+    h("div",{className:"stack"},
+      h(Site,{style:{"--accent":accent},cls:"compact",extra:h("button",{type:"button",className:"site-btn"},"Subscribe")}),
+      p([c(":root",{key:"r"}),' is the top of the page: the <html> element. A variable set there works everywhere inside it.'])));
 }
 
 /* ---------- JavaScript: a button that swaps the stylesheet ----------
@@ -362,29 +486,9 @@ Deck.start([
  notes:"Three languages, three jobs. Each one does something on its own, and they work together.",
  render:function(){return h(P.SectionSlide,{title:["HTML, CSS,","JavaScript"],tone:"ink",footer:FOOT})}},
 
-{id:"house",sec:"Big picture",title:"A house: plan, furniture, wiring",
- notes:"The floor plan has the walls and rooms (structure) and the labels for what goes where: chair here, table there. That's the content. It says nothing about how anything looks. CSS chooses the actual furniture. JavaScript is the wiring: flip a switch and something happens. You can change the furniture without moving a wall, and that's exactly how we'll do light and dark mode this afternoon.",
- render:function(n){return h(P.ContentSlide,{title:"A house: plan, furniture, wiring",tone:"plum",number:n,footer:FOOT},
-  h("div",{className:"wide grid3"},
-    solid("HTML",p("The floor plan: rooms, and labels for what goes where. Chair here, table there."),"teal"),
-    h(P.Card,{title:"CSS"},p("The furniture: the oak table, the green velvet chair. How it all looks.")),
-    solid("JavaScript",p("The wiring: flip a switch and something happens."),"pink")))}},
-
-{id:"semantic",sec:"Big picture",title:"Say what it's for",
- notes:"A good floor plan says chair, not brown thing with four legs. Semantic markup says what an element is for: its role and purpose, not its appearance. Browsers and screen readers rely on that role. Next slide: try it.",
- render:function(n){return h(P.ContentSlide,{title:"Say what it's for",number:n,footer:FOOT},
-  h("div",{className:"wide stack"},
-    p("A good floor plan says “chair”, not “brown thing with four legs”.","lead"),
-    h("div",{className:"grid2"},
-      h(P.Card,{title:"Semantic"},h(P.CodeBlock,{size:"slide"},"<button>Save</button>"),p("Says what it is. Browsers and screen readers know what to do with it.")),
-      h(P.Card,{title:"Not semantic"},h(P.CodeBlock,{size:"slide"},'<div class="btn">Save</div>'),p("Can be made to look the same, but it isn't a button.")))))}},
-
-{id:"real-button",sec:"Big picture",title:"Real button, fake button",demo:"Real vs fake button",
- notes:"On your laptop too. Press Tab until one of the buttons has a focus ring, then Enter or Space. Only the real one can be reached and pressed with the keyboard; the div only works with a mouse. A screen reader also announces the first as a button, and the second as plain text. Making a div behave like a button takes tabindex, a role and key handling in JavaScript, and it's easy to get wrong. Use the element that already does it.",
- render:function(n){return h(P.ContentSlide,{title:"Real button, fake button",tone:"teal",number:n,footer:FOOT},
-  h("div",{className:"wide stack"},
-    p("Press Tab to move to a button, then Enter. Then click both."),
-    h(TwoButtons)))}},
+{id:"house",sec:"Big picture",title:"A house: plan, furniture, wiring",demo:"The house",
+ notes:"Step through the three buttons. HTML is the floor plan: the walls and rooms (structure) and the labels for what goes where: sofa here, table there. That's the content; it says nothing about how anything looks. CSS chooses the actual furniture: same plan, now furnished. JavaScript is the wiring: on step 3, flip the switch and the lamp comes on. You can change the furniture without moving a wall, which is exactly how light and dark mode work this afternoon.",
+ render:function(n){return h(P.ContentSlide,{title:"A house: plan, furniture, wiring",tone:"plum",number:n,footer:FOOT},h(House))}},
 
 {id:"peel",sec:"Big picture",title:"Peel off the layers",demo:"Peel the layers",
  notes:"Live demo first on a familiar site. Firefox: View → Page Style → No Style. Chrome: delete the stylesheet links in the Elements panel. JavaScript off in Chrome: DevTools, Ctrl+Shift+P (Cmd+Shift+P on a Mac), type Disable JavaScript, then reload. Keep it brief. This slide is the same idea on our example page, so students can try it on their own laptops. Point out: without CSS the content is all still there and in a sensible order. That's what a screen reader works with.",
@@ -397,39 +501,51 @@ Deck.start([
  render:function(){return h(P.SectionSlide,{title:["Your first","HTML page"],tone:"teal",footer:FOOT})}},
 
 {id:"anatomy",sec:"First HTML page",title:"Tags wrap content",
- notes:"An element is an opening tag, some content and a closing tag. The closing tag has a slash. Attributes go in the opening tag: a name, an equals sign and a value in quotes. Here href says where the link goes. Ask: what would a screen reader say for this? \"Link, About me.\"",
+ notes:"An element is an opening tag, some content and a closing tag. The closing tag has a slash. Attributes go in the opening tag: a name, an equals sign and a value. The value is the part you change: here, where the link goes. Always put it in quotes. Most elements come in pairs like this: p, h1, li. Ask: what would a screen reader say for this? \"Link, About me.\"",
  render:function(n){return h(P.ContentSlide,{title:"Tags wrap content",tone:"plum",number:n,footer:FOOT},
-  h("div",{className:"wide stack"},h(P.Card,null,
+  h("div",{className:"wide"},h(P.Card,null,
     h("div",{className:"anat",role:"img","aria-label":"The element <a href=\"about.html\">About me</a>: opening tag with an href attribute, content, closing tag"},
       p("Element","anat-whole"),
       h("div",{className:"anat-row"},
-        h("div",{className:"seg seg-tag"},h("code",null,"<a ",h("span",{className:"attr"},'href="about.html"'),">"),
-          h("span",{className:"seg-label"},"Opening tag",h("small",null,"with an attribute: name=\"value\""))),
+        h("div",{className:"seg seg-tag"},h("code",null,"<a ",h("span",{className:"attr-name"},"href"),"=",h("span",{className:"attr-val"},'"about.html"'),">"),
+          h("span",{className:"seg-label"},"Opening tag",h("small",null,"with an attribute"))),
         h("div",{className:"seg seg-text"},h("code",null,"About me"),h("span",{className:"seg-label"},"Content")),
-        h("div",{className:"seg seg-tag"},h("code",null,"</a>"),h("span",{className:"seg-label"},"Closing tag",h("small",null,"with a slash")))))),
-    p("Most elements come in pairs like this: <p>…</p>, <h1>…</h1>, <li>…</li>.")))}},
+        h("div",{className:"seg seg-tag"},h("code",null,"</a>"),h("span",{className:"seg-label"},"Closing tag",h("small",null,"with a slash"))))),
+    h("div",{className:"attr-break",role:"img","aria-label":"The attribute: name href, equals sign, value \"about.html\" in quotes"},
+      p("The attribute","h3"),
+      h("div",{className:"anat-row"},
+        h("div",{className:"seg seg-name"},h("code",null,"href"),h("span",{className:"seg-label"},"Name",h("small",null,"which setting"))),
+        h("div",{className:"seg seg-eq"},h("code",null,"=")),
+        h("div",{className:"seg seg-val"},h("code",null,'"about.html"'),h("span",{className:"seg-label"},"Value",h("small",null,"in quotes: where the link goes"))))))))}},
 
 {id:"nesting",sec:"First HTML page",title:"Elements nest inside elements",
- notes:"Elements go inside other elements, like boxes in boxes. Whatever opened last closes first. Overlapping tags is the most common validator error. Some elements have no content, so they have no closing tag: img, br, meta, link. The alt text on an image is what a screen reader reads out; we come back to images in week 48.",
+ notes:"Elements go inside other elements, like boxes in boxes. Whatever opened last closes first. Overlapping tags is the most common validator error. Some elements have no content, so they have no closing tag: img, br, meta, link. That's correct HTML, not a mistake. The alt text on an image is what a screen reader reads out; we come back to images in week 48.",
  render:function(n){return h(P.ContentSlide,{title:"Elements nest inside elements",number:n,footer:FOOT},
   h("div",{className:"wide grid2"},
     h("div",{className:"stack"},
       h(P.Alert,{tone:"success",title:"Close in reverse order"},h(P.CodeBlock,{size:"slide"},"<p>I <em>really</em> like it.</p>")),
       h(P.Alert,{tone:"danger",title:"Overlapping tags"},h(P.CodeBlock,{size:"slide"},"<p>I <em>really</p> like it.</em>"))),
-    h(P.Card,{title:"Empty elements"},
+    h(P.Alert,{tone:"success",title:"Empty elements: no closing tag"},
       h(P.CodeBlock,{size:"slide"},'<img src="me.jpg"\n     alt="Me, sketching">'),
-      p("No content, so no closing tag. Also: <br>, <meta>, <link>."))))}},
+      p("Nothing goes inside, so there's nothing to close. Also <br>, <meta> and <link>."))))}},
 
 {id:"svg",sec:"First HTML page",title:"Fun fact: SVG is the same system",
- notes:"SVG, the format for icons and vector graphics, uses the same tags, attributes and nesting. Only the vocabulary is different: shapes instead of paragraphs. You can paste SVG straight into an HTML page, and Figma can export frames and icons as SVG. Open an exported icon in VS Code and it will look familiar. The slash before the closing bracket closes an empty element in SVG.",
+ notes:"SVG, the format for icons and vector graphics, uses the same tags, attributes and nesting. Only the vocabulary is different: shapes instead of paragraphs. You can paste SVG straight into an HTML page, and Figma can export frames and icons as SVG; open one in VS Code and it will look familiar. SVG is one kind of XML, a general format for any data in tags: RSS feeds are XML, and so is the inside of a Word file (.docx is a zip of XML files). HTML and XML share their angle-bracket syntax; XML is stricter, for example every element must be closed. Further reading is linked on the slide (MDN's SVG and XML sections).",
  render:function(n){return h(P.ContentSlide,{title:"Fun fact: SVG is the same system",tone:"teal",number:n,footer:FOOT},
   h("div",{className:"wide svgdemo"},
     h("div",{className:"stack"},
-      code("icon.svg",'<svg viewBox="0 0 100 100">\n  <rect x="10" y="10"\n        width="80" height="80"\n        fill="gold" />\n  <circle cx="50" cy="50" r="30"\n          fill="tomato" />\n</svg>'),
-      p("Tags, attributes and nesting, with shapes instead of paragraphs.")),
-    h("svg",{viewBox:"0 0 100 100",role:"img","aria-label":"A tomato-red circle on a gold square"},
-      h("rect",{x:10,y:10,width:80,height:80,fill:"gold"}),
-      h("circle",{cx:50,cy:50,r:30,fill:"tomato"}))))}},
+      code("icon.svg",'<svg viewBox="0 0 100 100">\n  <rect x="10" y="10"\n        width="80" height="80"\n        fill="gold" />\n  <circle cx="50" cy="50" r="30"\n          fill="tomato" />\n</svg>')),
+    h("div",{className:"stack"},
+      h("div",{className:"svgside"},
+        h("svg",{viewBox:"0 0 100 100",role:"img","aria-label":"A tomato-red circle on a gold square"},
+          h("rect",{x:10,y:10,width:80,height:80,fill:"gold"}),
+          h("circle",{cx:50,cy:50,r:30,fill:"tomato"})),
+        p("Tags, attributes and nesting, with shapes instead of paragraphs.")),
+      h(P.Card,{title:"Going further: XML"},
+        p("SVG is one kind of XML: a general format for any data in tags."),
+        h("ul",{className:"reslinks"},
+          h("li",null,h("a",{className:"pn-link",href:"https://developer.mozilla.org/en-US/docs/Web/SVG",target:"_blank",rel:"noopener"},"MDN: SVG")),
+          h("li",null,h("a",{className:"pn-link",href:"https://developer.mozilla.org/en-US/docs/Web/XML",target:"_blank",rel:"noopener"},"MDN: XML")))))))}},
 
 {id:"skeleton",sec:"First HTML page",title:"The skeleton of a page",
  notes:"Live-code this in VS Code and open it in the browser. The doctype says this is modern HTML. Everything sits in html. The head holds information about the page (the title in the tab, the character set); the body holds what you see. Set lang from the very first page: screen readers use it to choose a voice and pronunciation, and browsers use it to offer translation. The portfolio's accessibility check flags a missing lang.",
@@ -438,14 +554,14 @@ Deck.start([
   code("index.html",'<!DOCTYPE html>\n<html lang="en">\n  <head>\n    <meta charset="utf-8">\n    <title>My portfolio</title>\n  </head>\n  <body>\n    <h1>Hello</h1>\n  </body>\n</html>'))}},
 
 {id:"elements",sec:"First HTML page",title:"A few elements to start with",
- notes:"Add these to the live page one at a time and reload each time. Headings go in order: one h1, then h2, then h3; don't pick a heading for its size. The portfolio template also uses header, nav, main, article, aside and footer: those are week 48.",
+ notes:"Add these to the live page one at a time and reload each time. Headings go in order: one h1, then h2, then h3; don't pick a heading for its size. A link needs href to say where it goes; an image needs src and alt; list items go in li elements inside the ul. The portfolio template also uses header, nav, main, article, aside and footer: those are week 48.",
  render:function(n){return h(P.ContentSlide,{title:"A few elements to start with",tone:"plum",number:n,footer:FOOT},
   h("div",{className:"wide grid3"},
-    card("<h1> to <h6>",p("Headings, in order. Not chosen for their size.")),
+    card("<h1>",p("The main heading. Smaller headings go below it, in order.")),
     card("<p>",p("A paragraph of text.")),
-    card("<a href>",p("A link to another page.")),
-    card("<ul> and <li>",p("A list, and its items.")),
-    card("<img alt>",p("An image, with alt text describing it.")),
+    card("<a>",p("A link to another page.")),
+    card("<ul>",p("A list of items.")),
+    card("<img>",p("An image, with a text description.")),
     card("<button>",p("Something you press to make a thing happen."))))}},
 
 {id:"validate",sec:"First HTML page",title:"Check it with the validator",
@@ -529,24 +645,16 @@ Deck.start([
     })),
     p("Quick and fun, but you can't ask for “tomato, a bit darker”.")))}},
 
-{id:"hex",sec:"Colour in CSS",title:"Hex and RGB",
- notes:"This is plum from this course's design system, the colour on these slides in the light theme. Hex is three pairs of digits, red, green and blue, each from 00 to FF (0 to 255). RGB writes the same three numbers in decimal. This is what Figma gives you: select a colour style and copy the value straight into your CSS.",
- render:function(n){return h(P.ContentSlide,{title:"Hex and RGB: what Figma gives you",number:n,footer:FOOT},
-  h("div",{className:"wide hexdemo"},
-    h("div",{"data-theme":"light",className:"bigsw",role:"img","aria-label":"A plum-coloured swatch"}),
-    h("div",null,
-      h("p",{className:"notation"},"#5B2A86"),
-      h("div",{className:"hexpairs"},
-        h("span",null,"5B",h("small",null,"red")),h("span",null,"2A",h("small",null,"green")),h("span",null,"86",h("small",null,"blue"))),
-      h("p",{className:"notation"},"rgb(91 42 134)"),
-      p("The same colour, written two ways."))))}},
+{id:"hex",sec:"Colour in CSS",title:"Hex and RGB: mixing light",demo:"RGB mixer",
+ notes:"A screen mixes colour from red, green and blue light. It starts at plum from this course's design system. Each channel goes from 0 (off) to 255 (full); where all three circles overlap you see the mix. Plum is a lot of blue, some red, little green. Hex writes the same three numbers in base 16, as pairs from 00 to FF. This is what Figma gives you: copy the value from a colour style straight into your CSS. Try: all three at 255 gives white; all at 0 gives black. Reset goes back to plum.",
+ render:function(n){return h(P.ContentSlide,{title:"Hex and RGB: mixing light",number:n,footer:FOOT},h(RgbMixer))}},
 
 {id:"hsl",sec:"Colour in CSS",title:"HSL: nudge the lightness",demo:"HSL hover shade",
- notes:"HSL came up in Johannes's colour lecture: hue (around the colour wheel), saturation (grey to vivid) and lightness (black to white). The code version means you can make a darker hover shade by changing only one number. Live: lower the lightness and watch the hover colour and its contrast. Hover the real button to see it. Ask: what happens to contrast if the lightness goes up to 60? Students can try it on their laptops.",
+ notes:"HSL came up in Johannes's colour lecture: hue (around the colour wheel), saturation (grey to vivid) and lightness (black to white). The code version means you can make a darker hover shade by changing only one number. Live: lower the lightness and watch the hover colour and its contrast. Each slider's track shows what you'd get at every position, given the other values. Reset goes back to plum. Hover the real button to see it. Ask: what happens to contrast if the lightness goes up to 60? Students can try it on their laptops.",
  render:function(n){return h(P.ContentSlide,{title:"HSL: nudge the lightness",number:n,footer:FOOT},h(HslDemo))}},
 
 {id:"vars",sec:"Colour in CSS",title:"Define the palette once",demo:"Custom properties",
- notes:"Custom properties are like colour styles in Figma: name a colour once in :root, then use it everywhere with var(). Change it in one place and the whole page follows. Move the hue: header and button change together. Watch the contrast readout: some hues fail with white text at the same lightness (try yellow). This is how the afternoon's light and dark mode work: the second stylesheet only redefines the variables. Design systems in week 49 build on this.",
+ notes:"Custom properties are like colour styles in Figma: name a colour once in :root (the html element, the top of the page), then use it everywhere with var(). Change it in one place and the whole page follows. Move the hue: header and button change together. Watch the contrast readout: some hues fail with white text at the same lightness (try yellow). This is how the afternoon's light and dark mode work: the second stylesheet only redefines the variables. Design systems in week 49 build on this.",
  render:function(n){return h(P.ContentSlide,{title:"Define the palette once",number:n,footer:FOOT},h(VarsDemo))}},
 
 {id:"contrast",sec:"Colour in CSS",title:"Check contrast in DevTools",
@@ -562,7 +670,7 @@ Deck.start([
 
 /* ===== Wrap-up ===== */
 {id:"js",sec:"Wrap-up",title:"JavaScript is the wiring",demo:"Light and dark toggle",
- notes:"Your first JavaScript, and Part 2 of this afternoon. HTML gives the button (a real button, as before), CSS makes it look right, JavaScript makes it do something. The script finds the link and the button, and when the button is clicked it swaps which stylesheet the link points to. Because the palette is in custom properties, dark.css only has to redefine the variables. Press the button on the page. (The demo on the slide swaps a theme attribute rather than a file; same idea.)",
+ notes:"Your first JavaScript, and Part 2 of this afternoon. HTML gives the button (a real button element), CSS makes it look right, JavaScript makes it do something. The script finds the link and the button, and when the button is clicked it swaps which stylesheet the link points to. Because the palette is in custom properties, dark.css only has to redefine the variables. Press the button on the page. (The demo on the slide swaps a theme attribute rather than a file; same idea.)",
  render:function(n){return h(P.ContentSlide,{title:"JavaScript is the wiring",tone:"plum",number:n,footer:FOOT},h(JsDemo))}},
 
 {id:"afternoon",sec:"Wrap-up",title:"This afternoon",
