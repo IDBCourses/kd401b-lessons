@@ -17,6 +17,10 @@
 /* on plum and teal slide grounds, ink-muted lacks contrast: muted labels take the slide's text colour */
 .pn-slide--plum :is(.muted,.lbl,.figcap,.lm-info dt),.pn-slide--teal :is(.muted,.lbl,.figcap,.lm-info dt){color:inherit}
 
+/* a link inside a slide title: the frame's own text colour, underlined */
+.pn-frame a.title-link{color:inherit;text-decoration:underline;text-decoration-thickness:6px;text-underline-offset:.12em}
+.pn-frame a.title-link:focus-visible{outline:var(--focus-width) solid var(--focus);outline-offset:var(--focus-offset)}
+
 /* inline code in body text and cards */
 .pn-slide p code,.pn-slide li code,.pn-slide dd code,.pn-card__title code{font-family:var(--font-mono);font-size:.9em}
 
@@ -614,8 +618,8 @@ Deck.start([
     solid("Text",h("dl",null,h("div",null,h("dt",null,"ch"),h("dd",null,"The width of the character 0. For line length."))),"teal")))}},
 
 {id:"em-rem",sec:"Sizes and units",title:"em compounds, rem doesn't",demo:"em vs rem",
- notes:"Both columns use 1.25 on boxes nested inside each other. With em, each box is 1.25 times its parent, so the text keeps growing: by four levels it's more than twice the size. With rem, every box is 1.25 times the root, however deep it is. That's why we use rem for the type scale. em is still useful for things that should scale with their own text, like padding on a button.",
- render:function(n){return h(P.ContentSlide,{title:"em compounds, rem doesn't",tone:"plum",number:n,footer:FOOT},h(EmRem))}},
+ notes:"The word rem in the title links to a YouTube video (opens in a new tab). Both columns use 1.25 on boxes nested inside each other. With em, each box is 1.25 times its parent, so the text keeps growing: by four levels it's more than twice the size. With rem, every box is 1.25 times the root, however deep it is. That's why we use rem for the type scale. em is still useful for things that should scale with their own text, like padding on a button.",
+ render:function(n){return h(P.ContentSlide,{title:[["em compounds, ",h("a",{key:"rem",className:"title-link",href:"https://www.youtube.com/watch?v=Z0GFRcFm-aY",target:"_blank",rel:"noopener"},"rem")," doesn't"]],tone:"plum",number:n,footer:FOOT},h(EmRem))}},
 
 {id:"px-rem",sec:"Sizes and units",title:"rem follows the reader's setting",demo:"px vs rem",
  notes:"Every browser has a default font size setting, 16px out of the box. Chrome: Settings, Appearance, Font size. Firefox: Settings, Fonts, Size. Many people with low vision raise it. Move the slider: text in rem grows with the setting, text in px stays put. Demo it live afterwards in your own browser on a real site. Students can try the slider on their laptops.",
