@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HTML structure and CSS typography · KD401B Interaction Design: Graphical User Interfaces</title>
+<link rel="stylesheet" href="../shared/pane/tokens/tokens.css">
+<link rel="stylesheet" href="../shared/pane/components/bundle.css">
+<link rel="stylesheet" href="../shared/deck.css">
+<style>
+/* styles used only by this lecture: layout only, colours and sizes from Pane tokens.
+   Exception: the type demos set literal font sizes, axes and line lengths, because those values are
+   what the slide teaches. Roboto Flex is vendored in fonts/ (see fonts/FONTS.md). */
+@font-face{font-family:"Roboto Flex";src:url(fonts/RobotoFlex-Variable.woff2) format("woff2");font-weight:100 1000;font-stretch:25% 151%;font-style:normal;font-display:swap}
+.flex{font-family:"Roboto Flex",var(--font-display)}
+
+/* on plum and teal slide grounds, ink-muted lacks contrast: muted labels take the slide's text colour */
+.pn-slide--plum :is(.muted,.lbl,.figcap,.lm-info dt),.pn-slide--teal :is(.muted,.lbl,.figcap,.lm-info dt){color:inherit}
+
+/* inline code in body text and cards */
+.pn-slide p code,.pn-slide li code,.pn-slide dd code,.pn-card__title code{font-family:var(--font-mono);font-size:.9em}
+
+/* steps lists */
+.steps{margin:0;padding-left:1.2em;font-size:36px;line-height:52px}
+.steps li{margin-bottom:var(--space-3)}
+.steps li::marker{font-family:var(--font-display);font-weight:700}
+.steps code{font-family:var(--font-mono);font-size:32px}
+.checks{list-style:none;margin:0;padding:0;font-size:36px;line-height:50px}
+.checks li{display:flex;gap:var(--space-4);margin-bottom:var(--space-3)}
+.checks li::before{content:"☐";font-family:var(--font-mono);flex:none}
+
+/* canvas link card */
+.linkcard{position:relative}
+.linkcard a{font-family:var(--font-display);font-weight:600;font-size:44px;line-height:52px}
+.linkcard a::after{content:"";position:absolute;inset:0}
+.linkcard p{margin-top:var(--space-2)}
+
+/* ---------- One hierarchy, three layers ---------- */
+.layers{display:grid;grid-template-columns:1.3fr 1fr 1.3fr;border:2px solid var(--ink);box-shadow:var(--shadow-pane-md);background:var(--surface-100);color:var(--ink)}
+.layers > div{padding:var(--space-4) var(--space-6);border-bottom:2px solid var(--border);display:flex;align-items:center;min-height:96px}
+.layers > div:nth-last-child(-n+3){border-bottom:0}
+.layers .lh{font:600 32px/40px var(--font-display);background:var(--surface-300);min-height:0}
+.layers .lh small{font-weight:500;color:var(--ink-muted);margin-left:var(--space-3)}
+.layers code{font:400 32px/44px var(--font-mono)}
+.layers .s1{font:700 64px/72px "Roboto Flex",var(--font-display)}
+.layers .s2{font:700 48px/56px "Roboto Flex",var(--font-display)}
+.layers .s3{font:400 36px/48px "Roboto Flex",var(--font-display)}
+.layers .s4{font:400 28px/38px "Roboto Flex",var(--font-display);color:var(--ink-muted)}
+.layers-note{margin:var(--space-6) 0 0}
+
+/* ---------- Landmark map ---------- */
+.lmap{display:grid;grid-template-columns:1.25fr 1fr;gap:var(--space-7);align-items:start}
+.wire{display:grid;grid-template-columns:2fr 1fr;grid-template-areas:"head head" "main side" "foot foot";gap:var(--space-3);background:var(--surface-200);border:2px solid var(--ink);box-shadow:var(--shadow-pane-md);padding:var(--space-3)}
+.lm{border:2px dashed var(--border-control);border-radius:var(--radius-sm);padding:var(--space-2);display:flex;flex-direction:column;gap:var(--space-2);background:var(--surface-100)}
+.lm.on{border:4px solid var(--ink);background:var(--plum-tint)}
+.lm-head{grid-area:head;flex-direction:row;align-items:center;justify-content:space-between}
+.lm-main{grid-area:main}.lm-side{grid-area:side;min-height:260px}.lm-foot{grid-area:foot}
+.lm-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2)}
+.lm-art{min-height:110px}
+.lmbtn{align-self:flex-start;font:400 28px/36px var(--font-mono);color:var(--ink);background:var(--surface-300);border:2px solid var(--ink);border-radius:var(--radius-sm);padding:var(--space-1) var(--space-3);min-height:var(--target-min);cursor:pointer}
+.lmbtn[aria-pressed="true"]{background:var(--ink);color:var(--surface-100)}
+.lmbtn:focus-visible{outline:var(--focus-width) solid var(--focus);outline-offset:var(--focus-offset)}
+.lm-info dl{margin:0;display:flex;flex-direction:column;gap:var(--space-4)}
+.lm-info dt{font:600 28px/36px var(--font-display);color:var(--ink-muted)}
+.lm-info dd{margin:0;font-size:36px;line-height:48px}
+.lm-info .el{font:400 56px/64px var(--font-mono)}
+
+/* ---------- Fix the outline ---------- */
+.outline{display:grid;grid-template-columns:1.1fr 1fr;gap:var(--space-7);align-items:start}
+.hlist{list-style:none;margin:0;padding:var(--space-3) 0;background:var(--surface-300);border:2px solid var(--ink);border-radius:var(--radius-sm)}
+.hlist li{display:flex;align-items:center;gap:var(--space-4);padding:var(--space-1) var(--space-5)}
+.hlist .tag{font:400 32px/44px var(--font-mono);min-width:4.5ch}
+.hlist .txt{font:600 32px/44px var(--font-display);flex:1}
+.lvlbtn{font:600 32px/1 var(--font-display);width:52px;height:52px;border:2px solid var(--ink);border-radius:var(--radius-sm);background:var(--surface-100);color:var(--ink);cursor:pointer}
+.lvlbtn:disabled{border-style:dashed;color:var(--ink-muted);cursor:not-allowed}
+.lvlbtn:focus-visible{outline:var(--focus-width) solid var(--focus);outline-offset:var(--focus-offset)}
+.problems{margin:0;padding-left:1.1em;font-size:32px;line-height:44px}
+
+/* default (browser) styles at slide scale, as in last week's deck */
+.defaults{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-5)}
+.defaults .pn-card{padding:var(--space-5)}
+.defaults .pn-card__title{margin-bottom:var(--space-2)}
+.uabox{background:var(--surface-200);color:var(--ink);border:2px dashed var(--border-control);padding:0 var(--space-4);min-height:170px;display:flex;align-items:center}
+.uabox .ua,.uabox .ua *:not(svg,svg *){all:revert}
+.uabox .ua{display:block;font-size:28px;line-height:1.3;width:100%}
+.uabox .ua svg{display:block;width:150px;height:80px;overflow:visible}
+.uabox .ua figure{margin:var(--space-3) var(--space-5)}
+.uabox .ua blockquote{margin:var(--space-3) var(--space-7)}
+.uabox .ua ul,.uabox .ua ol,.uabox .ua p{margin:var(--space-3) 0}
+.defaults .desc{margin:var(--space-3) 0 0;font-size:28px;line-height:38px}
+
+/* placeholder image box, drawn like placehold.co's */
+.ph{display:flex;align-items:center;justify-content:center;aspect-ratio:3/2;width:100%;background:var(--surface-300);color:var(--ink-muted);border:2px solid var(--ink);font:500 44px/52px var(--font-display)}
+.figcap{font-size:28px;line-height:38px;color:var(--ink-muted);margin:var(--space-3) 0 0}
+.emmet{display:grid;grid-template-columns:auto auto 1fr;gap:var(--space-4) var(--space-5);align-items:center;margin:0}
+.emmet kbd,kbd.keys{font:400 32px/44px var(--font-mono);background:var(--surface-300);border:2px solid var(--ink);border-radius:var(--radius-sm);padding:0 var(--space-3);color:var(--ink)}
+.emmet span{font:500 32px/44px var(--font-display);color:var(--ink-muted)}
+
+/* units */
+.units{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-5)}
+.units dl{margin:0;display:flex;flex-direction:column;gap:var(--space-3)}
+.units dt{font:400 36px/44px var(--font-mono)}
+.units dd{margin:0;font-size:28px;line-height:38px}
+
+/* sliders (as in last week's deck; the track here is a plain bar) */
+.slider label{display:flex;justify-content:space-between;gap:var(--space-4);font:500 32px/40px var(--font-display);margin-bottom:var(--space-2)}
+.slider output{font-family:var(--font-mono);font-weight:400}
+.slider input{-webkit-appearance:none;appearance:none;display:block;width:100%;height:48px;margin:0;background:transparent;cursor:pointer}
+.slider input::-webkit-slider-runnable-track{height:24px;box-sizing:border-box;border:2px solid var(--ink);border-radius:var(--radius-sm);background:var(--surface-300)}
+.slider input::-moz-range-track{height:20px;border:2px solid var(--ink);border-radius:var(--radius-sm);background:var(--surface-300)}
+.slider input::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:48px;margin-top:-14px;box-sizing:border-box;border:3px solid var(--ink);border-radius:var(--radius-sm);background:var(--plum);box-shadow:0 0 0 2px var(--surface-100)}
+.slider input::-moz-range-thumb{width:16px;height:42px;border:3px solid var(--ink);border-radius:var(--radius-sm);background:var(--plum);box-shadow:0 0 0 2px var(--surface-100)}
+.slider input:focus-visible{outline:var(--focus-width) solid var(--focus);outline-offset:var(--focus-offset)}
+.sliders{display:flex;flex-direction:column;gap:var(--space-4)}
+
+/* demo panels: text samples shown on a plain page */
+.page{background:var(--surface-100);color:var(--ink);border:2px solid var(--ink);box-shadow:var(--shadow-pane-md);padding:var(--space-5) var(--space-6);overflow:hidden}
+.demo2{display:grid;grid-template-columns:1fr 1.2fr;gap:var(--space-7);align-items:start}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5)}
+.lbl{font:500 28px/38px var(--font-display);color:var(--ink-muted);margin:0 0 var(--space-3)}
+.lbl code{font-family:var(--font-mono);font-size:28px;color:var(--ink)}
+.status{font:500 32px/44px var(--font-display);margin:var(--space-3) 0 0}
+.status .ok{color:var(--success)}
+.status .bad{color:var(--danger)}
+
+/* em vs rem: nested boxes */
+.nest{border:2px solid var(--border-control);border-radius:var(--radius-sm);padding:var(--space-1) var(--space-3);margin-top:var(--space-2);font-family:var(--font-display);font-weight:500;line-height:1.15}
+.nest-top{border:0;padding:0;margin:0}
+
+/* line length */
+.measure{font-family:var(--font-text);font-size:28px;line-height:40px;margin:0}
+.measure-wrap{height:440px}
+
+/* clamp */
+.clamp-h{font:700 1em/1.1 var(--font-display);margin:0}
+
+/* type scale builder */
+.scale-ctl{display:flex;flex-direction:column;gap:var(--space-5)}
+.seg-choice{display:flex;gap:var(--space-3);flex-wrap:wrap}
+.seg-choice .pn-btn{font-size:28px;line-height:36px;padding:var(--space-2) var(--space-4)}
+.seg-choice .pn-btn[aria-pressed="true"]{background:var(--ink);color:var(--surface-100)}
+.specimen{font-family:"Roboto Flex",var(--font-display);margin:0}
+.specimen > *{margin:0;line-height:1.15}
+.specimen .srow{display:flex;align-items:baseline;gap:var(--space-4)}
+.specimen .srow span{font:400 28px/1 var(--font-mono);color:var(--ink-muted);min-width:3.2ch}
+.scale3{display:grid;grid-template-columns:520px 1fr 1fr;gap:var(--space-6);align-items:start}
+
+/* do / don't */
+.dodont .sample{background:var(--surface-200);border:2px dashed var(--border-control);padding:var(--space-3) var(--space-4);margin:0 0 var(--space-3)}
+
+/* larger text: three cards */
+.bigtext{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-5);align-items:start}
+.tcard{background:var(--surface-200);border:2px solid var(--ink);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);font-family:var(--font-text)}
+.tcard.fixed{overflow:hidden}
+.tcard b{font-family:var(--font-display);display:block}
+
+/* on/off switches, as in last week's deck */
+.toggles{display:flex;flex-direction:column;gap:var(--space-3)}
+.toggle{display:flex;align-items:center;gap:var(--space-4);background:none;border:0;padding:var(--space-1) 0;color:inherit;font:500 36px/44px var(--font-display);cursor:pointer;min-height:var(--target-min);text-align:left}
+.toggle-track{flex:none;width:96px;height:52px;box-sizing:border-box;border-radius:var(--radius-full);border:var(--border-width) solid var(--border-control);background:var(--surface-300);position:relative}
+.toggle-thumb{position:absolute;top:4px;left:4px;width:40px;height:40px;border-radius:var(--radius-full);background:var(--ink-muted);transition:left .15s}
+.toggle[aria-checked="true"] .toggle-track{background:var(--plum);border-color:var(--ink)}
+.toggle[aria-checked="true"] .toggle-thumb{left:48px;background:var(--on-plum)}
+.toggle-state{font-family:var(--font-mono);font-weight:400;font-size:28px;color:var(--ink-muted);min-width:3ch}
+.toggle:focus-visible{outline:var(--focus-width) solid var(--focus);outline-offset:var(--focus-offset)}
+@media (prefers-reduced-motion:reduce){.toggle-thumb{transition:none}}
+
+/* the example site, with type variables (standard and reading mode) */
+.site{background:var(--surface-100);color:var(--ink);border:2px solid var(--ink);box-shadow:var(--shadow-pane-md);overflow:hidden;text-align:left;
+  --t-body:"Source Serif 4",Georgia,serif;--t-head:"Jost",sans-serif;--t-size:28px;--t-lead:1.4;--t-track:0;--t-measure:40ch}
+.site.reading{--t-body:"Roboto Flex",sans-serif;--t-head:"Roboto Flex",sans-serif;--t-size:34px;--t-lead:1.7;--t-track:.02em;--t-measure:34ch}
+.site-head{background:var(--plum);color:var(--on-plum);padding:var(--space-4) var(--space-6);font:700 36px/44px var(--t-head)}
+.site-main{padding:var(--space-5) var(--space-6);font-family:var(--t-body);font-size:var(--t-size);line-height:var(--t-lead);letter-spacing:var(--t-track)}
+.site-main h3{font:700 1.4em/1.2 var(--t-head);margin:0 0 var(--space-3);letter-spacing:0}
+.site-main p{margin:0;max-width:var(--t-measure)}
+.mode-code{font:400 28px/40px var(--font-mono);margin:0}
+
+/* variable font axes */
+.axes{display:grid;grid-template-columns:1fr 1.15fr;gap:var(--space-7);align-items:start}
+.axis-sample{font-family:"Roboto Flex",var(--font-display);font-size:120px;line-height:1.1;margin:0;white-space:nowrap}
+.btnrow{display:flex;gap:var(--space-3);flex-wrap:wrap}
+
+.atk{font:400 64px/80px var(--font-mono);margin:0;letter-spacing:.05em}
+</style>
+</head>
+<body data-lecture="type" data-home="../">
+<main id="stage"><div id="deck"></div></main>
+
+<script src="../shared/pane/vendor/react.production.min.js"></script>
+<script src="../shared/pane/vendor/react-dom.production.min.js"></script>
+<script src="../shared/pane/components/bundle.js"></script>
+<script src="../shared/deck.js"></script>
+<script>
+(function(){
+"use strict";
+var P=window.Pane,h=React.createElement,useState=React.useState;
+var FOOT="KD401B · HTML structure and CSS type";
+var CANVAS_EX="https://mau.instructure.com/courses/22861/pages/exercise-type-in-html-+-css";
+
+function card(title,body,tone){return h(P.Card,{title:title,tone:tone||"paper"},body)}
+function solid(title,body,fill){return h(P.Card,{title:title,className:"fill-"+fill},body)}
+function p(t,cls){return h("p",cls?{className:cls}:null,t)}
+function c(t){return h("code",null,t)}
+function code(label,text){return h(P.CodeBlock,{size:"slide",label:label},text)}
+function link(href,text){return h("a",{className:"pn-link",href:href,target:"_blank",rel:"noopener"},text)}
+function stop(e){e.preventDefault()}
+function round(v,d){var m=Math.pow(10,d==null?3:d);return Math.round(v*m)/m}
+/* status line: never colour alone, always a symbol and a word */
+function Status(props){
+  return h("p",{className:"status"},h("span",{className:props.ok?"ok":"bad"},(props.ok?"✓ ":"✗ ")+props.word),props.rest?" "+props.rest:null);
+}
+/* a viewer's slider positions survive a reload (Deck.store, this lecture only) */
+function useSaved(key,init){
+  var s=useState(function(){try{var v=JSON.parse(Deck.store.get(key));return v==null?init:v}catch(e){return init}});
+  return [s[0],function(v){s[1](v);Deck.store.set(key,JSON.stringify(v))}];
+}
+
+function Slider(props){
+  var id="sl-"+props.id;
+  return h("div",{className:"slider"},
+    h("label",{htmlFor:id},h("span",null,props.label),h("output",{htmlFor:id},props.show!=null?props.show:props.value+(props.unit||""))),
+    h("input",{id:id,type:"range",min:props.min,max:props.max,step:props.step||1,value:props.value,
+      onChange:function(e){props.set(+e.target.value)}}));
+}
+function Toggle(props){
+  return h("button",{type:"button",role:"switch","aria-checked":props.on?"true":"false",className:"toggle",onClick:function(){props.set(!props.on)}},
+    h("span",{className:"toggle-track","aria-hidden":"true"},h("span",{className:"toggle-thumb"})),
+    h("span",null,props.label),
+    h("span",{className:"toggle-state","aria-hidden":"true"},props.on?"On":"Off"));
+}
+
+/* ---------- One hierarchy, three layers ---------- */
+var ROLES=[
+  ["s1","Heading 1","<h1>","var(--size-h1)"],
+  ["s2","Heading 2","<h2>","var(--size-h2)"],
+  ["s3","Body","<p>","var(--size-body)"],
+  ["s4","Caption","<figcaption>","var(--size-small)"]
+];
+function Layers(){
+  return h("div",{className:"wide"},
+    h("div",{className:"layers",role:"table","aria-label":"Each text role in Figma, HTML and CSS"},
+      h("div",{className:"lh",role:"columnheader"},"Figma",h("small",null,"text style")),
+      h("div",{className:"lh",role:"columnheader"},"HTML",h("small",null,"element")),
+      h("div",{className:"lh",role:"columnheader"},"CSS",h("small",null,"variable")),
+      ROLES.map(function(r){return [
+        h("div",{key:r[0]+"a",role:"cell"},h("span",{className:r[0]},r[1])),
+        h("div",{key:r[0]+"b",role:"cell"},c(r[2])),
+        h("div",{key:r[0]+"c",role:"cell"},c(r[3]))]})),
+    p("Choose the element for what it means. The variable decides how it looks.","lead layers-note"));
+}
+
+/* ---------- Landmark map ---------- */
+var LANDMARKS={
+  header:{what:"The top of the page: site name, often the nav.",sr:"“banner”"},
+  nav:{what:"The main links around the site.",sr:"“navigation”"},
+  main:{what:"This page's own content. One per page.",sr:"“main”"},
+  section:{what:"A group of content with its own heading.",sr:"“region”, but only if it has a name, e.g. aria-labelledby"},
+  article:{what:"Makes sense on its own: a post, a project.",sr:"“article”"},
+  aside:{what:"Related, but not the main thing: a sidebar.",sr:"“complementary”"},
+  footer:{what:"The bottom: contact, copyright.",sr:"“content info”"}
+};
+function LandmarkMap(){
+  var s=useState("main"),sel=s[0];
+  function btn(name){return h("button",{type:"button",className:"lmbtn","aria-pressed":sel===name?"true":"false",onClick:function(){s[1](name)}},"<"+name+">")}
+  function cls(name,extra){return "lm "+extra+(sel===name?" on":"")}
+  var info=LANDMARKS[sel];
+  return h("div",{className:"wide lmap"},
+    h("div",{className:"wire"},
+      h("div",{className:cls("header","lm-head")},btn("header"),h("div",{className:cls("nav","")},btn("nav"))),
+      h("div",{className:cls("main","lm-main")},btn("main"),
+        h("div",{className:cls("section","")},btn("section"),
+          h("div",{className:"lm-row"},
+            h("div",{className:cls("article","lm-art")},btn("article")),
+            h("div",{className:"lm lm-art"})))),
+      h("div",{className:cls("aside","lm-side")},btn("aside")),
+      h("div",{className:cls("footer","lm-foot")},btn("footer"))),
+    h("div",{className:"lm-info","aria-live":"polite"},
+      h("dl",null,
+        h("div",null,h("dt",null,"Element"),h("dd",{className:"el"},"<"+sel+">")),
+        h("div",null,h("dt",null,"What it's for"),h("dd",null,info.what)),
+        h("div",null,h("dt",null,"A screen reader announces"),h("dd",null,info.sr)))));
+}
+
+/* ---------- Fix the outline ---------- */
+var HEADS0=[["My portfolio",1],["Projects",3],["Colour study",4],["Type study",4],["About me",1],["Contact",2]];
+function OutlineFixer(){
+  var st=useState(HEADS0.map(function(x){return x[1]})),lv=st[0];
+  function set(i,d){var n=lv.slice();n[i]=Math.max(1,Math.min(6,n[i]+d));st[1](n)}
+  var probs=[],h1s=lv.filter(function(l){return l===1}).length;
+  if(lv[0]!==1)probs.push("The first heading should be the h1.");
+  if(h1s!==1)probs.push("There are "+h1s+" h1s. Use exactly one.");
+  lv.forEach(function(l,i){if(i>0&&l>lv[i-1]+1)probs.push("“"+HEADS0[i][0]+"” jumps from h"+lv[i-1]+" to h"+l+".")});
+  return h("div",{className:"wide outline"},
+    h("ul",{className:"hlist","aria-label":"Headings on the page, in order"},HEADS0.map(function(x,i){
+      return h("li",{key:i,style:{paddingLeft:"calc(var(--space-5) + "+(lv[i]-1)*40+"px)"}},
+        h("span",{className:"tag"},"<h"+lv[i]+">"),
+        h("span",{className:"txt"},x[0]),
+        h("button",{type:"button",className:"lvlbtn","aria-label":"Make “"+x[0]+"” one level higher",disabled:lv[i]===1,onClick:function(){set(i,-1)}},"−"),
+        h("button",{type:"button",className:"lvlbtn","aria-label":"Make “"+x[0]+"” one level lower",disabled:lv[i]===6,onClick:function(){set(i,1)}},"+"));
+    })),
+    h("div",{className:"stack","aria-live":"polite"},
+      probs.length?h(P.Alert,{tone:"warning",title:probs.length===1?"1 problem":probs.length+" problems"},h("ul",{className:"problems"},probs.map(function(t,i){return h("li",{key:i},t)})))
+        :h(P.Alert,{tone:"success",title:"A clean outline"},"One h1, and every level follows the one above it."),
+      h("div",null,h(P.Button,{variant:"secondary",onClick:function(){st[1](HEADS0.map(function(x){return x[1]}))}},"Reset"))));
+}
+
+/* ---------- em vs rem ---------- */
+var SHOW=2; /* demo text is drawn at 2× so it reads on the projector */
+function EmRem(){
+  var d=useSaved("emrem-depth",3),depth=d[0];
+  function nested(unit){
+    var out=null;
+    for(var i=depth;i>=1;i--){
+      var px=unit==="em"?16*Math.pow(1.25,i):16*1.25;
+      out=h("div",{className:"nest",style:{fontSize:(px*SHOW)+"px"}},"Level "+i+": "+round(px,1)+"px",out);
+    }
+    return h("div",{className:"nest nest-top"},out);
+  }
+  return h("div",{className:"wide stack"},
+    h("div",{style:{maxWidth:"720px"}},h(Slider,{id:"depth",label:"Boxes inside boxes",min:1,max:4,value:depth,set:d[1]})),
+    h("div",{className:"cols2"},
+      h("div",{className:"page"},p([c(".box { font-size: 1.25em; }")],"lbl"),nested("em")),
+      h("div",{className:"page"},p([c(".box { font-size: 1.25rem; }")],"lbl"),nested("rem"))),
+    p("Root font size 16px. Text shown at twice its size.","muted"));
+}
+
+/* ---------- px vs rem: the browser's default font size ---------- */
+function PxRem(){
+  var b=useSaved("pxrem-base",16),base=b[0];
+  return h("div",{className:"wide stack"},
+    h("div",{style:{maxWidth:"900px"}},h(Slider,{id:"base",label:"Browser setting: default font size",min:14,max:32,value:base,set:b[1],unit:"px"})),
+    h("div",{className:"cols2"},
+      h("div",{className:"page"},p(c("p { font-size: 18px; }"),"lbl"),
+        h("p",{style:{fontFamily:"var(--font-text)",fontSize:(18*SHOW)+"px",lineHeight:1.3,margin:0}},"Thanks for reading."),
+        base===16?h("p",{className:"status"},"18px"):h(Status,{ok:false,word:"Still 18px.",rest:"The setting is ignored."})),
+      h("div",{className:"page"},p(c("p { font-size: 1.125rem; }"),"lbl"),
+        h("p",{style:{fontFamily:"var(--font-text)",fontSize:(1.125*base*SHOW)+"px",lineHeight:1.3,margin:0}},"Thanks for reading."),
+        base===16?h("p",{className:"status"},"1.125 × 16 = 18px"):h(Status,{ok:true,word:"Now "+round(1.125*base,1)+"px.",rest:"It follows the setting."}))),
+    p("Text shown at twice its size.","muted"));
+}
+
+/* ---------- line length in ch ---------- */
+var LOREM="Typography is mostly about the reader. If a line is too long, the eye loses its place on the way back to the start of the next one. If it is too short, the reader jumps lines so often that the rhythm breaks. Somewhere between sixty and eighty characters, reading feels easy.";
+function LineLength(){
+  var m=useSaved("measure",100),w=m[0],ok=w>=60&&w<=80;
+  return h("div",{className:"wide stack"},
+    h("div",{className:"cols2"},
+      h(Slider,{id:"measure",label:"max-width",min:25,max:100,value:w,set:m[1],unit:"ch"}),
+      ok?h(Status,{ok:true,word:"Comfortable:",rest:"60 to 80 characters per line."})
+        :h(Status,{ok:false,word:w<60?"Too short:":"Too long:",rest:"aim for 60 to 80 characters."})),
+    h("div",{className:"page measure-wrap"},h("p",{className:"measure",style:{maxWidth:w+"ch"}},LOREM)));
+}
+
+/* ---------- fluid type with clamp() ---------- */
+function Clamp(){
+  var v=useSaved("vw",1280),vw=v[0];
+  var pref=16+0.04*vw,size=Math.min(64,Math.max(32,pref));
+  var which=pref<32?"the minimum, 2rem":pref>64?"the maximum, 4rem":"the middle value, 1rem + 4vw";
+  return h("div",{className:"wide demo2"},
+    h("div",{className:"stack"},
+      code("style.css","h1 {\n  font-size: clamp(2rem, 1rem + 4vw, 4rem);\n}"),
+      h("dl",{className:"units",style:{gridTemplateColumns:"repeat(3,1fr)"}},
+        h("div",null,h("dt",null,"2rem"),h("dd",null,"never smaller")),
+        h("div",null,h("dt",null,"1rem + 4vw"),h("dd",null,"grows with the window")),
+        h("div",null,h("dt",null,"4rem"),h("dd",null,"never larger")))),
+    h("div",{className:"stack"},
+      h(Slider,{id:"vw",label:"Window width",min:320,max:1920,step:10,value:vw,set:v[1],unit:"px"}),
+      h("div",{className:"page",style:{height:"200px"}},h("p",{className:"clamp-h",style:{fontSize:size+"px"}},"My portfolio")),
+      p(["h1 is ",h("b",{key:"b"},round(size,1)+"px"),": "+which+"."])));
+}
+
+/* ---------- type scale builder ---------- */
+var RATIOS=[[1.125,"1.125"],[1.2,"1.2"],[1.25,"1.25"],[1.333,"1.333"],[1.5,"1.5"]];
+function TypeScale(){
+  var b=useSaved("scale-base",16),r=useSaved("scale-ratio",1.25),base=b[0],ratio=r[0];
+  var rem=base/16;
+  function step(n){return round(rem*Math.pow(ratio,n))}
+  var rows=[["h1",3,700],["h2",2,700],["h3",1,600],["p",0,400]];
+  return h("div",{className:"wide scale3"},
+    h("div",{className:"scale-ctl"},
+      h(Slider,{id:"sbase",label:"Body size",min:14,max:22,value:base,set:b[1],show:rem+"rem ("+base+"px)"}),
+      h("fieldset",{style:{border:0,margin:0,padding:0}},
+        h("legend",{className:"lbl"},"Ratio between steps"),
+        h("div",{className:"seg-choice"},RATIOS.map(function(x){
+          return h("button",{key:x[1],type:"button",className:"pn-btn pn-btn--secondary","aria-pressed":ratio===x[0]?"true":"false",onClick:function(){r[1](x[0])}},x[1]);
+        }))),
+      p("Each step is the one below it times the ratio.","muted")),
+    h("div",{className:"page specimen"},rows.map(function(x){
+      return h("div",{key:x[0],className:"srow"},h("span",{"aria-hidden":"true"},x[0]),
+        h("p",{style:{fontSize:(16*step(x[1])*SHOW)+"px",fontWeight:x[2]}},x[1]===0?"Body text":"Type"));
+    }),p("Shown at twice its size.","lbl")),
+    code("style.css",":root {\n  --size-h1: "+step(3)+"rem;\n  --size-h2: "+step(2)+"rem;\n  --size-h3: "+step(1)+"rem;\n  --size-body: "+step(0)+"rem;\n  --size-small: "+step(-1)+"rem;\n}"));
+}
+
+/* ---------- larger text: what breaks ---------- */
+function BigText(){
+  var s=useState(false),big=s[0],base=big?32:16,k=1.75;
+  var txt="Two palettes, one page, and a toggle between them.";
+  function body(px){return h("p",{style:{fontSize:(px*k)+"px",lineHeight:1.3,margin:0}},txt)}
+  return h("div",{className:"wide stack"},
+    h(Toggle,{label:"Browser default font size: "+base+"px",on:big,set:s[1]}),
+    h("div",{className:"bigtext"},
+      h("div",null,p(c("font-size: 16px;"),"lbl"),
+        h("div",{className:"tcard"},h("b",null,"Colour study"),body(16)),
+        big?h(Status,{ok:false,word:"Didn't grow."}):null),
+      h("div",null,p([c("font-size: 1rem;"),h("br",{key:"b"}),c("height: 120px;")],"lbl"),
+        h("div",{className:"tcard fixed",style:{height:(120*k)+"px"}},h("b",null,"Colour study"),body(base)),
+        big?h(Status,{ok:false,word:"Text cut off."}):null),
+      h("div",null,p([c("font-size: 1rem;"),h("br",{key:"b"}),c("min-height: 120px;")],"lbl"),
+        h("div",{className:"tcard",style:{minHeight:(120*k)+"px"}},h("b",null,"Colour study"),body(base)),
+        big?h(Status,{ok:true,word:"Grows with the text."}):null)));
+}
+
+/* ---------- colour and type: two independent toggles ---------- */
+function TwoToggles(){
+  var d=useState(false),r=useState(false);
+  return h("div",{className:"wide demo2"},
+    h("div",{className:"stack"},
+      h("div",{className:"toggles"},
+        h(Toggle,{label:"Dark colours",on:d[0],set:d[1]}),
+        h(Toggle,{label:"Reading mode",on:r[0],set:r[1]})),
+      h("pre",{className:"mode-code"},'<link id="colour" href="'+(d[0]?"dark":"light")+'.css">\n<link id="type"   href="'+(r[0]?"reading":"type")+'.css">'),
+      p("Two links, two buttons. Any colours work with either type mode.")),
+    h("div",{className:"site"+(r[0]?" reading":""),"data-theme":d[0]?"dark":"light"},
+      h("div",{className:"site-head"},"My portfolio"),
+      h("div",{className:"site-main"},
+        h("h3",null,"Colour study"),
+        p("Two palettes for the same page, one light and one dark, and a toggle between them."))));
+}
+
+/* ---------- variable font axes ---------- */
+var AX0={wght:400,wdth:100,opsz:72,GRAD:0};
+function Axes(){
+  var a=useSaved("axes",AX0),ax=a[0];
+  function set(k){return function(v){var n={};for(var x in ax)n[x]=ax[x];n[k]=v;a[1](n)}}
+  var fvs='"opsz" '+ax.opsz+', "GRAD" '+ax.GRAD;
+  return h("div",{className:"wide axes"},
+    h("div",{className:"stack"},
+      h("div",{className:"page"},h("p",{className:"axis-sample",style:{fontWeight:ax.wght,fontStretch:ax.wdth+"%",fontVariationSettings:fvs}},"Hierarchy")),
+      code("style.css","h1 {\n  font-weight: "+ax.wght+";\n  font-stretch: "+ax.wdth+"%;\n  font-variation-settings: "+fvs+";\n}")),
+    h("div",{className:"stack"},
+      h("div",{className:"sliders"},
+        h(Slider,{id:"wght",label:"wght: weight",min:100,max:1000,value:ax.wght,set:set("wght")}),
+        h(Slider,{id:"wdth",label:"wdth: width",min:25,max:151,value:ax.wdth,set:set("wdth"),unit:"%"}),
+        h(Slider,{id:"opsz",label:"opsz: optical size",min:8,max:144,value:ax.opsz,set:set("opsz")}),
+        h(Slider,{id:"GRAD",label:"GRAD: grade",min:-200,max:150,value:ax.GRAD,set:set("GRAD")})),
+      h("div",{className:"btnrow"},
+        h(P.Button,{variant:"secondary",onClick:function(){a[1]({wght:450,wdth:110,opsz:14,GRAD:50})}},"Reading mode"),
+        h(P.Button,{variant:"secondary",onClick:function(){a[1](AX0)}},"Reset"))));
+}
+
+Deck.start([
+/* ===== Opening ===== */
+{id:"cover",sec:"Opening",title:"One hierarchy, three layers",
+ notes:"Yesterday with Johannes: type, and in the afternoon three type sets in Figma, one of them chosen, with text styles named by role. Today we build that one set. The idea for the whole session: explore in Figma, commit in CSS. And build it so it respects the reader's own settings. First, a few minutes on last week's exercise.",
+ render:function(){return h(P.TitleSlide,{title:["One hierarchy,","three layers"],subtitle:"HTML structure and CSS typography",meta:"David · KD401B HT26 · Week 47"})}},
+
+{id:"layers",sec:"Opening",title:"One hierarchy, three layers",
+ notes:"The through-line for today. Yesterday you named text styles by role in Figma: heading 1, heading 2, body, caption. In HTML those roles become elements: h1, h2, p, figcaption. In CSS the same elements get their size from variables. Choose elements for meaning, not looks: using an h2 because it looks the right size breaks the structure for screen reader users, who move around a page by its headings. If the semantics are right, the type scale maps straight onto the document. We come back to this slide at the end.",
+ render:function(n){return h(P.ContentSlide,{title:"One hierarchy, three layers",number:n,footer:FOOT},h(Layers))}},
+
+/* ===== Catch-up ===== */
+{id:"catchup",sec:"Catch-up",title:"Finish week 46 first",
+ notes:"Before this: check replies to the Canvas announcement. As of 17 Nov only 7 of 42 portfolio repositories had the v0.1 tag, and 31 were unchanged since they were created. Don't show the numbers; say that most of you aren't there yet, and that's what this afternoon's first step is for. Then live-code the walkthrough in VS Code: the palette as custom properties in :root, the second stylesheet and the dark mode toggle, then commit, push, merge into main and the annotated tag (git tag -a v0.1 -m \"Colour\", git push origin v0.1). Show where the tag appears on GitHub.",
+ render:function(n){return h(P.ContentSlide,{title:"Finish week 46 first",tone:"plum",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h("ul",{className:"checks","aria-label":"Week 46 checklist"},
+      h("li",null,h("span",null,"Palette as custom properties in ",c(":root"))),
+      h("li",null,h("span",null,"A second stylesheet and a button that swaps them")),
+      h("li",null,h("span",null,"The validator passes")),
+      h("li",null,h("span",null,"Committed, pushed and merged into ",c("main"))),
+      h("li",null,h("span",null,"Tag ",c("v0.1")," pushed, and visible on GitHub"))),
+    solid("Not there yet?",p("That's this afternoon's first step, before anything new. The TAs can help."),"teal")))}},
+
+/* ===== HTML structure ===== */
+{id:"html",sec:"HTML structure",title:"HTML document structure",
+ notes:"The layer in the middle: the elements. Landmarks, headings, the text elements beyond p, and placeholder content to fill the page so the type has something to work on.",
+ render:function(){return h(P.SectionSlide,{title:["HTML document","structure"],tone:"teal",footer:FOOT})}},
+
+{id:"skeleton",sec:"HTML structure",title:"The skeleton you already have",
+ notes:"Recap from last week, now with the elements inside body. Your portfolio template already has most of these: open it and check which are there. header and footer for the top and bottom, nav for the links, main for the page's own content, with sections and articles inside. A div says nothing about its content; these elements do. Screen readers, search engines and reader mode all use them.",
+ render:function(n){return h(P.ContentSlide,{title:"The skeleton you already have",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    code("index.html",'<body>\n  <header>\n    <nav>…</nav>\n  </header>\n  <main>\n    <section>\n      <article>…</article>\n    </section>\n  </main>\n  <footer>…</footer>\n</body>'),
+    h("div",{className:"stack"},
+      p("Each element says what its content is. A div says nothing.","lead"),
+      p("Screen readers, search engines and reader mode all read these.","muted"))))}},
+
+{id:"landmarks",sec:"HTML structure",title:"Landmarks: what a screen reader hears",demo:"Landmark map",
+ notes:"Click through the regions; students can do the same on their laptops. Screen reader users can list a page's landmarks and jump straight to one: with VoiceOver on a Mac it's the rotor (VO+U), with NVDA on Windows the D key. So a page built from divs has no landmarks to jump to. Note that section only becomes a landmark (region) when it has a name, for example aria-labelledby pointing at its heading. header and footer count as banner and content info only when they're not inside an article or section. Rule of thumb: one main per page.",
+ render:function(n){return h(P.ContentSlide,{title:"Landmarks: what a screen reader hears",tone:"plum",number:n,footer:FOOT},h(LandmarkMap))}},
+
+{id:"outline",sec:"HTML structure",title:"Fix the outline",demo:"Fix the outline",ex:"Fix the outline",
+ notes:"Headings are the other main way screen reader users move around a page: they list the headings and jump between them (H in NVDA, the rotor in VoiceOver). Two rules: one h1, and no skipped levels going down (going back up is fine: h4 then h2 is OK). Let students fix it on their laptops, then do it together. The answer: Projects h2, Colour study and Type study h3, About me h2, Contact stays h2. Then ask: what if Projects looked too big as an h2? Answer: change the CSS, not the element.",
+ render:function(n){return h(P.ContentSlide,{title:"Fix the outline",number:n,footer:FOOT},h(OutlineFixer))}},
+
+{id:"text-elements",sec:"HTML structure",title:"Text beyond the paragraph",
+ notes:"Each box shows the element with no CSS: the browser's default styles. blockquote for a quotation from somewhere else (indented by default). figure wraps an image, a diagram or code with its figcaption. ul for a list where order doesn't matter, ol where it does. small is for side comments and fine print, not just for making text small. strong is importance, em is stress: a screen reader may change its voice for them. If you only want bold or italic for looks, use CSS. These give this afternoon's type scale something to work on.",
+ render:function(n){
+  function demo(title,desc,sample){return h(P.Card,{title:title},h("div",{className:"uabox","data-theme":"light","aria-hidden":"true"},h("div",{className:"ua"},sample)),p(desc,"desc"))}
+  return h(P.ContentSlide,{title:"Text beyond the paragraph",tone:"teal",number:n,footer:FOOT},
+  h("div",{className:"wide defaults"},
+    demo("<blockquote>","A quotation",h("blockquote",null,"Less, but better.")),
+    demo("<figure>","An image with its caption",h("figure",null,
+      h("svg",{viewBox:"0 0 150 80"},h("rect",{x:1,y:1,width:148,height:78,style:{fill:"none",stroke:"currentColor",strokeWidth:2}}),h("path",{d:"M1 1 L149 79 M149 1 L1 79",style:{fill:"none",stroke:"currentColor",strokeWidth:2}})),
+      h("figcaption",null,"Fig. 1. A sketch"))),
+    demo("<ul> and <ol>","Lists, unordered or in order",h("ol",null,h("li",null,"Sketch"),h("li",null,"Build"))),
+    demo("<small>","Side notes and fine print",h("p",null,h("small",null,"© 2026 My portfolio"))),
+    demo("<strong>","Important",h("p",null,"Save ",h("strong",null,"before")," you close.")),
+    demo("<em>","Stressed, as you'd say it",h("p",null,"I ",h("em",null,"did")," read it."))))}},
+
+{id:"lorem",sec:"HTML structure",title:"Placeholder text: lorem ipsum",
+ notes:"Lorem ipsum is scrambled Latin used as dummy text, so you can judge a layout without being distracted by what the words say. In VS Code, the shortcut is Emmet, which is built in: type lorem and press Tab for a paragraph, lorem30 for 30 words, p>lorem30 for a p element with 30 words, ul>li*3>lorem4 for a list. Or copy from lipsum.com. Use it to fill out the page so the type scale has something to show, and replace it with real content later. Demo it live in VS Code.",
+ render:function(n){return h(P.ContentSlide,{title:"Placeholder text: lorem ipsum",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h("div",{className:"stack"},
+      p("Dummy text, so you judge the type, not the words.","lead"),
+      p(["In VS Code, type a shortcut and press ",h("kbd",{key:"k",className:"keys"},"Tab"),":"]),
+      h("div",{className:"emmet"},
+        h("kbd",null,"lorem"),h("span",null,"→"),h("span",null,"a paragraph"),
+        h("kbd",null,"p>lorem30"),h("span",null,"→"),h("span",null,"a <p> with 30 words"),
+        h("kbd",null,"ul>li*3>lorem4"),h("span",null,"→"),h("span",null,"a list of three"))),
+    h(P.Card,{title:"Or copy it"},
+      p(link("https://www.lipsum.com","lipsum.com")),
+      p("Replace it with real text later.","muted"))))}},
+
+{id:"placeholder-images",sec:"HTML structure",title:"Placeholder images",
+ notes:"Stand-ins for photos you don't have yet. picsum.photos gives a random photo at the size in the address: 600 wide, 400 high. Add /seed/ and any word to get the same photo every time; otherwise it changes on each reload. placehold.co gives a plain grey box with its size on it. Either way: the image still goes in a figure, with an alt attribute that says what it shows. And swap them for your own images later.",
+ render:function(n){return h(P.ContentSlide,{title:"Placeholder images",number:n,footer:FOOT},
+  h("div",{className:"wide demo2"},
+    h("div",{className:"stack"},
+      code("index.html",'<figure>\n  <img src="https://picsum.photos/\n            seed/portfolio/600/400"\n       alt="Placeholder photo">\n  <figcaption>My project</figcaption>\n</figure>'),
+      p([link("https://picsum.photos","picsum.photos"),": a random photo. ",link("https://placehold.co","placehold.co"),": a plain box."])),
+    h("div",null,
+      h("div",{className:"ph",role:"img","aria-label":"A grey placeholder box labelled 600 × 400"},"600 × 400"),
+      p("placehold.co/600x400","figcap"))))}},
+
+/* ===== Sizes and units ===== */
+{id:"units",sec:"Sizes and units",title:"Sizes and units",
+ notes:"Before the type scale, the units it's written in. This is new: we haven't covered units before.",
+ render:function(){return h(P.SectionSlide,{title:["Sizes and units"],tone:"ink",footer:FOOT})}},
+
+{id:"unit-families",sec:"Sizes and units",title:"Four kinds of unit",
+ notes:"px is fixed: it ignores the font size the user chose in their browser. em is relative to the font size of the parent element, so it compounds when you nest. rem is relative to the root (the html element), which is the browser's default font size unless you change it: predictable. Percent is relative to the parent; vw and vh are a hundredth of the window's width and height. ch is the width of the zero character in the current font: handy for line length. Rule for today: rem for font sizes.",
+ render:function(n){return h(P.ContentSlide,{title:"Four kinds of unit",number:n,footer:FOOT},
+  h("div",{className:"wide units"},
+    card("Absolute",h("dl",null,h("div",null,h("dt",null,"px"),h("dd",null,"Fixed. Ignores the user's font setting.")))),
+    card("Font-relative",h("dl",null,
+      h("div",null,h("dt",null,"em"),h("dd",null,"The parent's font size.")),
+      h("div",null,h("dt",null,"rem"),h("dd",null,"The root's font size.")))),
+    card("Space-relative",h("dl",null,
+      h("div",null,h("dt",null,"%"),h("dd",null,"Of the parent.")),
+      h("div",null,h("dt",null,"vw  vh"),h("dd",null,"1% of the window's width, height.")))),
+    solid("Text",h("dl",null,h("div",null,h("dt",null,"ch"),h("dd",null,"The width of the character 0. For line length."))),"teal")))}},
+
+{id:"em-rem",sec:"Sizes and units",title:"em compounds, rem doesn't",demo:"em vs rem",
+ notes:"Both columns use 1.25 on boxes nested inside each other. With em, each box is 1.25 times its parent, so the text keeps growing: by four levels it's more than twice the size. With rem, every box is 1.25 times the root, however deep it is. That's why we use rem for the type scale. em is still useful for things that should scale with their own text, like padding on a button.",
+ render:function(n){return h(P.ContentSlide,{title:"em compounds, rem doesn't",tone:"plum",number:n,footer:FOOT},h(EmRem))}},
+
+{id:"px-rem",sec:"Sizes and units",title:"rem follows the reader's setting",demo:"px vs rem",
+ notes:"Every browser has a default font size setting, 16px out of the box. Chrome: Settings, Appearance, Font size. Firefox: Settings, Fonts, Size. Many people with low vision raise it. Move the slider: text in rem grows with the setting, text in px stays put. Demo it live afterwards in your own browser on a real site. Students can try the slider on their laptops.",
+ render:function(n){return h(P.ContentSlide,{title:"rem follows the reader's setting",number:n,footer:FOOT},h(PxRem))}},
+
+{id:"line-length",sec:"Sizes and units",title:"Line length in ch",demo:"Line length",
+ notes:"Long lines are tiring: the eye loses its place on the way back to the next line. Short lines break the rhythm. Somewhere around 60 to 80 characters is comfortable for body text. In CSS, max-width in ch sets this directly, and because ch depends on the font, it stays about right when the font size changes. A line holds a few more characters than its ch value in most fonts, since many letters are narrower than a zero. Starts too long on purpose: move it into the range.",
+ render:function(n){return h(P.ContentSlide,{title:"Line length in ch",number:n,footer:FOOT},h(LineLength))}},
+
+{id:"clamp",sec:"Sizes and units",title:"Fluid type with clamp()",demo:"clamp()",
+ notes:"clamp takes three values: a minimum, a preferred value and a maximum. The middle value mixes rem and vw, so the heading grows with the window but never goes below 2rem or above 4rem. Move the slider from phone width to a wide screen and watch which of the three values is in use. Keep the minimum and maximum in rem, so the reader's setting still counts. Optional for this afternoon; a fixed rem scale is fine.",
+ render:function(n){return h(P.ContentSlide,{title:"Fluid type with clamp()",tone:"teal",number:n,footer:FOOT},h(Clamp))}},
+
+{id:"break",sec:"Break",title:"Break",
+ notes:"Break. After it: fonts, the type scale, and the reader's own settings.",
+ render:function(){return h(P.SectionSlide,{title:["Break"],tone:"plum",footer:"Next: type in CSS"})}},
+
+/* ===== Type in CSS ===== */
+{id:"type-css",sec:"Fonts",title:"Type in CSS",
+ notes:"The CSS layer: getting the fonts onto the page, then the type scale as custom properties next to last week's colours.",
+ render:function(){return h(P.SectionSlide,{title:["Type in CSS"],tone:"pink",footer:FOOT})}},
+
+{id:"google-fonts",sec:"Fonts",title:"Google Fonts: copy a link",
+ notes:"The quick way. On fonts.google.com, pick the family and only the weights you need, then Get font, Get embed code. Paste the link elements into the head, before your own stylesheet, and use the family name in font-family. display=swap at the end of the address is the same as font-display: swap on the next slide. The preconnect links make it a little faster; Google's embed code includes them.",
+ render:function(n){return h(P.ContentSlide,{title:"Google Fonts: copy a link",number:n,footer:FOOT},
+  h("div",{className:"wide stack"},
+    code("index.html — in the <head>",'<link rel="stylesheet"\n  href="https://fonts.googleapis.com/css2?family=Literata:wght@400;700&display=swap">'),
+    code("style.css","body {\n  font-family: \"Literata\", Georgia, serif;\n}")))}},
+
+{id:"font-face",sec:"Fonts",title:"@font-face: host it yourself",
+ notes:"The other way: download the font files (woff2 is the format to use) into your repository and declare them with @font-face. Your page then doesn't depend on Google, and it works offline. This deck does exactly that for Roboto Flex. font-display: swap means: show the text right away in the fallback font, and swap in the real one when it arrives. Without it some browsers show no text at all while the font loads. A variable font gives a whole weight range from one file, so font-weight takes a range here.",
+ render:function(n){return h(P.ContentSlide,{title:"@font-face: host it yourself",tone:"plum",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    code("style.css",'@font-face {\n  font-family: "Roboto Flex";\n  src: url("fonts/RobotoFlex.woff2")\n       format("woff2");\n  font-weight: 100 1000;\n  font-display: swap;\n}'),
+    h("div",{className:"stack"},
+      card(c("font-display: swap"),p("Show the text at once in a fallback font. Swap when the font arrives.")),
+      p("No dependency on Google, and it works offline.","muted"))))}},
+
+{id:"stacks",sec:"Fonts",title:"Fallbacks, and only what you use",
+ notes:"A font stack is a list: if the first font can't load, the browser tries the next, and the last item is a generic family (serif, sans-serif, monospace, system-ui), which always exists. Pick fallbacks that look similar so the page doesn't jump much when the font swaps in. Performance: each weight and style of a static font is a separate file. Load only the ones you actually use, typically regular, bold and maybe italic. A variable font is one file for every weight.",
+ render:function(n){return h(P.ContentSlide,{title:"Fallbacks, and only what you use",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h("div",{className:"stack"},
+      code("style.css",'font-family: "Literata",\n             Georgia,\n             serif;'),
+      p("If the first can't load, the next one is used. End with a generic family.")),
+    solid("Each weight is a file",h("ul",null,
+      h("li",null,"Load only the weights you use"),
+      h("li",null,"Regular and bold are often enough"),
+      h("li",null,"A variable font: one file, every weight")),"plum")))}},
+
+{id:"type-vars",sec:"Type scale",title:"Type as custom properties",
+ notes:"The same idea as last week's palette: name every type decision once in :root, then use var() everywhere. Families, weights, the size scale, line heights and the measure. They sit right next to the colour variables. In the afternoon, the reading mode file only redefines these variables, exactly like dark.css only redefined the colours.",
+ render:function(n){return h(P.ContentSlide,{title:"Type as custom properties",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    code("style.css",':root {\n  --color-text: hsl(270 30% 15%);\n\n  --font-body: "Literata", Georgia, serif;\n  --font-heading: "Jost", sans-serif;\n  --size-body: 1rem;\n  --size-h1: 2.441rem;\n  --leading-body: 1.5;\n  --measure: 65ch;\n}'),
+    code("style.css",'body {\n  font-family: var(--font-body);\n  font-size: var(--size-body);\n  line-height: var(--leading-body);\n}\np { max-width: var(--measure); }\nh1 {\n  font-family: var(--font-heading);\n  font-size: var(--size-h1);\n}')))}},
+
+{id:"scale",sec:"Type scale",title:"Build a type scale",demo:"Type scale builder",ex:"Build a type scale",
+ notes:"A type scale multiplies up from the body size by a fixed ratio: each step is the one below times the ratio. Small ratios (1.125, 1.2) give a calm hierarchy, good for text-heavy pages; larger ones (1.333, 1.5) give dramatic headings. Students: try to match the sizes from your Figma text styles from yesterday, then copy the CSS. Keep the body at 1rem unless you have a reason; 1rem is whatever the reader has chosen. The sizes don't have to come from a ratio: if your Figma styles have their own sizes, convert them to rem by dividing by 16.",
+ render:function(n){return h(P.ContentSlide,{title:"Build a type scale",tone:"plum",number:n,footer:FOOT},h(TypeScale))}},
+
+{id:"spacing",sec:"Type scale",title:"Line height, spacing, capitals",
+ notes:"Line height without a unit (1.5, not 24px) scales with the font size. Body text around 1.4 to 1.6; headings tighter, around 1.1 to 1.2, because big text with big gaps falls apart. letter-spacing: leave body text alone; a little extra helps small capitals and labels. text-transform: uppercase for short labels at most, never paragraphs: all caps is slower to read. Write the text in normal case in the HTML and transform it in CSS; some screen readers spell out words typed in capitals letter by letter.",
+ render:function(n){return h(P.ContentSlide,{title:"Line height, spacing, capitals",number:n,footer:FOOT},
+  h("div",{className:"wide grid3 dodont"},
+    card(c("line-height"),[h("p",{key:"s",className:"sample",style:{lineHeight:1.5}},"Body: about 1.5. Headings: tighter."),p("No unit, so it scales with the size.","muted")]),
+    card(c("letter-spacing"),[h("p",{key:"s",className:"sample",style:{letterSpacing:".08em",textTransform:"uppercase",fontFamily:"var(--font-display)",fontWeight:600}},"Label"),p("A little, for labels. Not for body text.","muted")]),
+    card(c("text-transform"),[h("p",{key:"s",className:"sample",style:{textTransform:"uppercase"}},"All caps is slower to read."),p("Short labels only. Type normal case in the HTML.","muted")])))}},
+
+/* ===== The reader's settings ===== */
+{id:"reader",sec:"The reader's settings",title:"The reader decides",
+ notes:"The last part: the reader's own settings, an accessible reading mode, and variable fonts.",
+ render:function(){return h(P.SectionSlide,{title:["The reader","decides"],tone:"teal",footer:FOOT})}},
+
+{id:"settings",sec:"The reader's settings",title:"What readers change",
+ notes:"Ask the room: has anyone changed one of these? Many people do, without thinking of it as accessibility. A larger default font size (people with low vision, or anyone on a big screen far away). Page zoom with Ctrl or Cmd and plus. Reader mode in Safari and Firefox, which strips the page down to its main content, and only works well if your HTML has a proper main and article. And extensions or settings that force a different font or a minimum font size. Your page should survive all four. That matters more than any toggle you build.",
+ render:function(n){return h(P.ContentSlide,{title:"What readers change",tone:"plum",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    card("Default font size",p("Raised in the browser's settings.")),
+    card("Zoom",p([h("kbd",{key:"k",className:"keys"},"Ctrl"),"  ",h("kbd",{key:"p",className:"keys"},"+"),"  up to 200% and more."])),
+    card("Reader mode",p("Strips the page to its main content.")),
+    card("Their own font",p("Extensions and settings that replace yours."))))}},
+
+{id:"bigger",sec:"The reader's settings",title:"What breaks when text gets bigger",demo:"Larger text",
+ notes:"Switch it on: the browser default goes from 16 to 32px. The first card's text is in px, so it doesn't grow: the reader's setting is ignored. The second has its text in rem but a fixed height, so the text grows and gets cut off. The third uses min-height: at least this tall, taller if the content needs it. Then demo it live: raise your browser's default font size, and zoom to 200% on a student's portfolio (with permission) or on your own. Rule: rem for type, and no fixed heights on anything that holds text.",
+ render:function(n){return h(P.ContentSlide,{title:"What breaks when text gets bigger",number:n,footer:FOOT},h(BigText))}},
+
+{id:"reading-file",sec:"Reading mode",title:"Reading mode is one more file",
+ notes:"An accessible reading mode works exactly like last week's dark mode. A second CSS file that only redefines the type variables: bigger body size, more line height, a bit of letter and word spacing, a shorter measure, maybe a different font. The button swaps which file the link points to: the same JavaScript as last week, with a different id. Colour and type get a link each, so they stay independent.",
+ render:function(n){return h(P.ContentSlide,{title:"Reading mode is one more file",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    code("reading.css",':root {\n  --size-body: 1.25rem;\n  --leading-body: 1.8;\n  --tracking-body: 0.02em;\n  --measure: 55ch;\n}'),
+    code("index.html",'<link id="colour" rel="stylesheet"\n      href="light.css">\n<link id="type" rel="stylesheet"\n      href="type.css">\n\n<button id="reading" type="button">\n  Reading mode\n</button>')))}},
+
+{id:"two-toggles",sec:"Reading mode",title:"Colours and type, switched separately",demo:"Two toggles",
+ notes:"Two switches, four combinations: light or dark, standard or reading mode. Because the colour file only sets colour variables and the type file only sets type variables, any combination works without extra code. Try all four. Here the reading mode switches to Roboto Flex, raises the size and line height, adds a little letter spacing and shortens the line.",
+ render:function(n){return h(P.ContentSlide,{title:"Colours and type, switched separately",tone:"teal",number:n,footer:FOOT},h(TwoToggles))}},
+
+{id:"dyslexia",sec:"Reading mode",title:"What actually helps",
+ notes:"Fonts marketed for dyslexia, such as OpenDyslexic and Dyslexie, have mixed research behind them: studies have generally not found that they make reading faster or more accurate, though some readers prefer them. What does help is the reading mode recipe: larger text, more space between letters, words and lines, and shorter lines. Atkinson Hyperlegible is a free font from the Braille Institute, designed for readers with low vision: letters that are easy to confuse, like capital I, lower-case l and the digit 1, are drawn clearly differently. The slide shows its monospaced cousin, which this course's design system uses for code. TODO (David): add a reference here if you want to cite a specific study.",
+ render:function(n){return h(P.ContentSlide,{title:"What actually helps",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h("div",{className:"stack"},
+      solid("Size, spacing, line length",p("These help most readers more than a special font does."),"plum"),
+      p("Research on fonts made for dyslexia is mixed.","muted")),
+    card("Atkinson Hyperlegible",[h("p",{key:"a",className:"atk","aria-label":"Sample letters: capital I, lower-case l, digit 1, capital O, digit 0"},"Il1 O0"),p("Letters that are easy to mix up look different. Free on Google Fonts.","muted")])))}},
+
+{id:"variable-css",sec:"Variable fonts",title:"Variable fonts in CSS",
+ notes:"Johannes introduced variable fonts yesterday; this is the CSS side. A variable font is one file with axes you can set to any value. The standard axes have their own properties: font-weight for wght, font-stretch for wdth, and font-optical-sizing for opsz (on by default, so opsz follows the font size). Anything else, like Roboto Flex's grade (GRAD), goes in font-variation-settings, with the axis name in quotes. Watch out: font-variation-settings replaces the whole list, so a rule that sets only GRAD resets any opsz set elsewhere. List every axis you set each time.",
+ render:function(n){return h(P.ContentSlide,{title:"Variable fonts in CSS",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    code("style.css",'h1 {\n  font-family: "Roboto Flex", sans-serif;\n  font-weight: 750;\n  font-stretch: 120%;\n  font-variation-settings: "GRAD" 50;\n}'),
+    h("dl",{className:"units",style:{gridTemplateColumns:"1fr"}},
+      h("div",null,h("dt",null,"wght  wdth"),h("dd",null,"font-weight, font-stretch")),
+      h("div",null,h("dt",null,"opsz"),h("dd",null,"follows the size: font-optical-sizing")),
+      h("div",null,h("dt",null,"GRAD and others"),h("dd",null,"font-variation-settings, all in one list")))))}},
+
+{id:"axes",sec:"Variable fonts",title:"Roboto Flex, axis by axis",demo:"Variable font axes",
+ notes:"Move each axis. Weight changes stroke thickness and the word gets wider; grade also changes thickness but the width stays the same, so text doesn't reflow. That makes grade useful for a hover state, and for dark mode, where light text on a dark background looks heavier: lower the grade a little. Optical size adjusts details for small or large text: low values open up the letters for reading at small sizes. Width saves space in tight layouts. The Reading mode button shows one way to use axes instead of switching to a different font: a bit heavier, a bit wider, opened up for text sizes. Students who made a Roboto Flex set yesterday can use this in the optional step this afternoon.",
+ render:function(n){return h(P.ContentSlide,{title:"Roboto Flex, axis by axis",tone:"plum",number:n,footer:FOOT},h(Axes))}},
+
+/* ===== Wrap-up ===== */
+{id:"layers-again",sec:"Wrap-up",title:"One hierarchy, three layers (again)",
+ notes:"Back to where we started. This afternoon: your Figma text styles become HTML elements, chosen for meaning, and CSS variables, in rem. If the elements are right, the scale maps straight onto the page, and the reader can still change it.",
+ render:function(n){return h(P.ContentSlide,{title:"One hierarchy, three layers",tone:"teal",number:n,footer:FOOT},h(Layers))}},
+
+{id:"afternoon",sec:"Wrap-up",title:"This afternoon",
+ notes:"Individual work, sitting together; the TAs are there. Do this first: anyone without the v0.1 tag finishes last week's exercise before starting. Then the steps, in order; the full brief with all the links is on Canvas. Step 3 on Canvas is optional: using Roboto Flex for those who made a set with it yesterday. The real requirement in step 5 is not breaking the reader's settings; the toggle is the bonus.",
+ render:function(n){return h(P.ContentSlide,{title:"This afternoon: type in your portfolio",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h("div",{className:"stack"},
+      h(P.Alert,{tone:"warning",title:"Do this first"},"No v0.1 tag yet? Finish last week's exercise."),
+      h(P.Card,{interactive:true,className:"linkcard fill-teal"},
+        link(CANVAS_EX,"The brief, on Canvas"),
+        p("Steps, links and the optional Roboto Flex step"))),
+    h("ol",{className:"steps"},
+      h("li",null,"Extend the structure"),
+      h("li",null,"Your type set as variables, in rem"),
+      h("li",null,"Optional: Roboto Flex"),
+      h("li",null,"A reading mode file and toggle"),
+      h("li",null,"Test: larger text and 200% zoom"),
+      h("li",null,"Validate, then tag ",c("v0.2")))))}},
+
+{id:"deliverables",sec:"Wrap-up",title:"Done when",
+ notes:"The deliverables from the brief, and the stretch goals for anyone who finishes. The localStorage stretch goal: remember the reader's choice between visits; the MDN links are on Canvas. Helping a classmate counts.",
+ render:function(n){return h(P.ContentSlide,{title:"Done when",tone:"plum",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h(P.Card,{title:"Deliverables"},h("ul",null,
+      h("li",null,"Semantic structure, valid HTML, headings in order"),
+      h("li",null,"Your type set as variables, in rem"),
+      h("li",null,"Reading mode file and a working toggle"),
+      h("li",null,"Works with larger text and at 200% zoom"),
+      h("li",null,"Tag v0.2 pushed"))),
+    h(P.Card,{title:"Going further"},h("ul",null,
+      h("li",null,"A slider for Roboto Flex's axes"),
+      h("li",null,"Remember the reading mode with localStorage"),
+      h("li",null,"Help a classmate")))))}},
+
+{id:"tag",sec:"Wrap-up",title:"End of the week: tag v0.2",
+ notes:"Same as last week. Merge your branch into main first if you used one, then the annotated tag with the message Type, and push the tag by name. Check that v0.2 appears under Tags on GitHub.",
+ render:function(n){return h(P.ContentSlide,{title:"End of the week: tag it",tone:"teal",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    code("Terminal",'git add .\ngit commit -m "Add type scale"\ngit push\n\ngit tag -a v0.2 -m "Type"\ngit push origin v0.2'),
+    h("div",{className:"stack"},
+      p("Your portfolio at the end of week 47."),
+      h(P.Alert,{tone:"info",title:"Working on a branch?"},"Merge it into main before you tag."))))}}
+]);
+})();
+</script>
+</body>
+</html>
