@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>HTML structure and CSS typography · KD401B Interaction Design: Graphical User Interfaces</title>
+<title>Type · KD401B Interaction Design: Graphical User Interfaces</title>
 <link rel="stylesheet" href="../shared/pane/tokens/tokens.css">
 <link rel="stylesheet" href="../shared/pane/components/bundle.css">
 <link rel="stylesheet" href="../shared/deck.css">
@@ -47,6 +47,21 @@
 .layers .s3{font:400 36px/48px "Roboto Flex",var(--font-display)}
 .layers .s4{font:400 28px/38px "Roboto Flex",var(--font-display);color:var(--ink-muted)}
 .layers-note{margin:var(--space-6) 0 0}
+
+/* ---------- Today: the outline ---------- */
+.today{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6)}
+.today ol{margin:0;padding-left:1.2em}
+.today .pn-card__title small{display:block;font:500 28px/38px var(--font-display);opacity:.85}
+
+/* ---------- Block and inline ---------- */
+.flow{font-family:var(--font-text);font-size:32px;line-height:1.4}
+.flow > *{margin:0 0 var(--space-3)}
+.flow > :last-child{margin-bottom:0}
+.flow h3{font:700 44px/1.2 var(--font-display)}
+.flow ul{padding-left:1.4em}
+.show .b{position:relative;outline:3px dashed var(--ink);outline-offset:2px;background:var(--plum-tint)}
+.show .b::after{content:attr(data-tag);position:absolute;right:var(--space-2);top:0;font:400 28px/38px var(--font-mono);background:var(--surface-100);padding:0 var(--space-2)}
+.show .i{outline:3px solid var(--ink);background:var(--teal-tint)}
 
 /* ---------- Landmark map ---------- */
 .lmap{display:grid;grid-template-columns:1.25fr 1fr;gap:var(--space-7);align-items:start}
@@ -194,7 +209,7 @@
 (function(){
 "use strict";
 var P=window.Pane,h=React.createElement,useState=React.useState;
-var FOOT="KD401B · HTML structure and CSS type";
+var FOOT="KD401B · Type";
 var CANVAS_EX="https://mau.instructure.com/courses/22861/pages/exercise-type-in-html-+-css";
 
 function card(title,body,tone){return h(P.Card,{title:title,tone:tone||"paper"},body)}
@@ -247,6 +262,24 @@ function Layers(){
         h("div",{key:r[0]+"b",role:"cell"},c(r[2])),
         h("div",{key:r[0]+"c",role:"cell"},c(r[3]))]})),
     p("Choose the element for what it means. The variable decides how it looks.","lead layers-note"));
+}
+
+/* ---------- Block and inline: show the boxes ---------- */
+function BlockInline(){
+  var s=useState(false),on=s[0];
+  function B(tag,props,kids){return h(tag,Object.assign({className:"b","data-tag":"<"+tag+">"},props||{}),kids)}
+  function I(tag,kids){return h(tag,{className:"i"},kids)}
+  return h("div",{className:"wide demo2"},
+    h("div",{className:"stack"},
+      h(Toggle,{label:"Show the boxes",on:on,set:s[1]}),
+      h(P.Card,{title:"Block"},p("Starts on a new line and takes the full width. h1, p, ul, li …")),
+      h(P.Card,{title:"Inline"},p("Flows inside a line of text, as wide as its content. a, strong, em …"))),
+    h("div",{className:"stack"},
+      h("div",{className:"page flow"+(on?" show":"")},
+        B("h3",null,"Colour study"),
+        B("p",null,["Two palettes for ",I("strong","one page"),", and a ",h("a",{key:"a",className:"i pn-link",href:"#",tabIndex:-1,onClick:stop},"toggle")," between them."]),
+        B("ul",null,[B("li",{key:1},"A light palette"),B("li",{key:2},"A dark palette")])),
+      on?p("Dashed: block boxes, labelled. Solid: inline boxes.","muted"):null));
 }
 
 /* ---------- Landmark map ---------- */
@@ -451,13 +484,26 @@ function Axes(){
 
 Deck.start([
 /* ===== Opening ===== */
-{id:"cover",sec:"Opening",title:"One hierarchy, three layers",
- notes:"Yesterday with Johannes: type, and in the afternoon three type sets in Figma, one of them chosen, with text styles named by role. Today we build that one set. The idea for the whole session: explore in Figma, commit in CSS. And build it so it respects the reader's own settings. First, a few minutes on last week's exercise.",
- render:function(){return h(P.TitleSlide,{title:["One hierarchy,","three layers"],subtitle:"HTML structure and CSS typography",meta:"David · KD401B HT26 · Week 47"})}},
+{id:"cover",sec:"Opening",title:"Type",
+ notes:"Yesterday with Johannes: type, and in the afternoon three type sets in Figma, one of them chosen, with text styles named by role. Today we build that one set. The idea for the whole session: explore in Figma, commit in CSS. And build it so it respects the reader's own settings.",
+ render:function(){return h(P.TitleSlide,{title:["Type"],subtitle:"HTML structure and CSS typography",meta:"David · KD401B HT26 · Week 47"})}},
 
-{id:"layers",sec:"Opening",title:"One hierarchy, three layers",
- notes:"The through-line for today. Yesterday you named text styles by role in Figma: heading 1, heading 2, body, caption. In HTML those roles become elements: h1, h2, p, figcaption. In CSS the same elements get their size from variables. Choose elements for meaning, not looks: using an h2 because it looks the right size breaks the structure for screen reader users, who move around a page by its headings. If the semantics are right, the type scale maps straight onto the document. We come back to this slide at the end.",
- render:function(n){return h(P.ContentSlide,{title:"One hierarchy, three layers",number:n,footer:FOOT},h(Layers))}},
+{id:"today",sec:"Opening",title:"Today",
+ notes:"The plan for the morning. A few minutes on last week's exercise first. Then some more basic HTML: block and inline, div and span, and the elements that describe a page's structure. That gives the type something to work on. After the break, CSS typography: units, fonts, a type scale, and how to respect the reader's own settings. This afternoon you put your type set from yesterday into your portfolio.",
+ render:function(n){return h(P.ContentSlide,{title:"Today",number:n,footer:FOOT},
+  h("div",{className:"wide today"},
+    h(P.Card,{title:h("span",null,"First: more HTML",h("small",null,"so the type has something to work on"))},
+      h("ol",null,
+        h("li",null,"Last week's checklist"),
+        h("li",null,"Block and inline, div and span"),
+        h("li",null,"Structure and headings"),
+        h("li",null,"Placeholder content"))),
+    solid(h("span",null,"Then: CSS typography",h("small",null,"after the break")),
+      h("ol",{start:5},
+        h("li",null,"Sizes and units"),
+        h("li",null,"Fonts and a type scale"),
+        h("li",null,"The reader's settings"),
+        h("li",null,"Variable fonts")),"plum")))}},
 
 /* ===== Catch-up ===== */
 {id:"catchup",sec:"Catch-up",title:"Finish week 46 first",
@@ -477,13 +523,27 @@ Deck.start([
  notes:"The layer in the middle: the elements. Landmarks, headings, the text elements beyond p, and placeholder content to fill the page so the type has something to work on.",
  render:function(){return h(P.SectionSlide,{title:["HTML document","structure"],tone:"teal",footer:FOOT})}},
 
+{id:"block-inline",sec:"HTML structure",title:"Block and inline",demo:"Show the boxes",
+ notes:"Every element is a box, and the browser lays boxes out in one of two ways. Block elements start on a new line and stretch across the full width: headings, paragraphs, lists and list items. Inline elements sit inside a line of text and are only as wide as their content: links, strong, em. Switch Show the boxes on. Ask: what happens if you put a top margin on a link? (Nothing much: inline boxes don't push other lines away.) CSS can change this with display, which comes back in week 49. One rule from it now: don't put a block, like a p, inside an inline element like a.",
+ render:function(n){return h(P.ContentSlide,{title:"Block and inline",number:n,footer:FOOT},h(BlockInline))}},
+
+{id:"div-span",sec:"HTML structure",title:"div and span: boxes with no meaning",
+ notes:"div is a block box and span is an inline box, and neither says anything about what's inside. They exist so you can group things for CSS: a card, a highlighted phrase. A screen reader says nothing about them. Use them when nothing else fits. But a lot of what people build with divs has a proper element: the next slides show the ones for a page's structure. Rule of thumb: reach for a meaningful element first, and use a div or span when there isn't one.",
+ render:function(n){return h(P.ContentSlide,{title:"div and span: boxes with no meaning",tone:"teal",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    code("index.html",'<div class="card">\n  <h3>Colour study</h3>\n  <p>Two palettes,\n    <span class="note">one page</span>.\n  </p>\n</div>'),
+    h("div",{className:"stack"},
+      card(c("<div>"),p("A block box. Groups things for CSS.")),
+      card(c("<span>"),p("An inline box. Marks part of a line.")),
+      p("Use them when no other element fits."))))}},
+
 {id:"skeleton",sec:"HTML structure",title:"The skeleton you already have",
- notes:"Recap from last week, now with the elements inside body. Your portfolio template already has most of these: open it and check which are there. header and footer for the top and bottom, nav for the links, main for the page's own content, with sections and articles inside. A div says nothing about its content; these elements do. Screen readers, search engines and reader mode all use them.",
+ notes:"Last week's skeleton, now with the elements inside body. These are blocks too, like div, but each one says what it contains. Your portfolio template already has most of these: open it and check which are there. header and footer for the top and bottom, nav for the links, main for the page's own content, with sections and articles inside. A div says nothing about its content; these elements do. Screen readers, search engines and reader mode all use them.",
  render:function(n){return h(P.ContentSlide,{title:"The skeleton you already have",number:n,footer:FOOT},
   h("div",{className:"wide grid2"},
     code("index.html",'<body>\n  <header>\n    <nav>…</nav>\n  </header>\n  <main>\n    <section>\n      <article>…</article>\n    </section>\n  </main>\n  <footer>…</footer>\n</body>'),
     h("div",{className:"stack"},
-      p("Each element says what its content is. A div says nothing.","lead"),
+      p("Like a div, but each one says what's inside.","lead"),
       p("Screen readers, search engines and reader mode all read these.","muted"))))}},
 
 {id:"landmarks",sec:"HTML structure",title:"Landmarks: what a screen reader hears",demo:"Landmark map",
@@ -678,8 +738,8 @@ Deck.start([
  render:function(n){return h(P.ContentSlide,{title:"Roboto Flex, axis by axis",tone:"plum",number:n,footer:FOOT},h(Axes))}},
 
 /* ===== Wrap-up ===== */
-{id:"layers-again",sec:"Wrap-up",title:"One hierarchy, three layers (again)",
- notes:"Back to where we started. This afternoon: your Figma text styles become HTML elements, chosen for meaning, and CSS variables, in rem. If the elements are right, the scale maps straight onto the page, and the reader can still change it.",
+{id:"layers",sec:"Wrap-up",title:"One hierarchy, three layers",
+ notes:"How the pieces fit. Yesterday you named text styles by role in Figma. In HTML those roles become elements, chosen for meaning: using an h2 because it looks the right size breaks the structure for screen reader users. In CSS the elements get their sizes from the variables. This afternoon: your Figma text styles become HTML elements, chosen for meaning, and CSS variables, in rem. If the elements are right, the scale maps straight onto the page, and the reader can still change it.",
  render:function(n){return h(P.ContentSlide,{title:"One hierarchy, three layers",tone:"teal",number:n,footer:FOOT},h(Layers))}},
 
 {id:"afternoon",sec:"Wrap-up",title:"This afternoon",
