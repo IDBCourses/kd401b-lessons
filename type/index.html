@@ -164,11 +164,17 @@
 .specimen .srow span{font:400 28px/1 var(--font-mono);color:var(--ink-muted);min-width:3.2ch}
 .scale3{display:grid;grid-template-columns:520px 1fr 1fr;gap:var(--space-6);align-items:start}
 
-/* do / don't */
-.dodont .sample{background:var(--surface-200);border:2px dashed var(--border-control);padding:var(--space-3) var(--space-4);margin:0 0 var(--space-3)}
+/* line height, spacing, capitals: three adjustable samples */
+.spacing .pn-card{display:flex;flex-direction:column;gap:var(--space-3)}
+.spacing .sample{background:var(--surface-200);color:var(--ink);border:2px dashed var(--border-control);padding:var(--space-3) var(--space-4);margin:0;height:250px;overflow:hidden;font-family:var(--font-text);font-size:28px}
+.spacing .sample.label{display:flex;align-items:center;justify-content:center;font:600 36px/1.3 var(--font-display);text-transform:uppercase}
+.spacing .lbl{margin:0}
+.spacing .status{margin:0;font-size:28px;line-height:38px}
+.spacing .seg-choice .pn-btn{font-size:28px;padding:var(--space-1) var(--space-3)}
 
 /* larger text: three cards */
 .bigtext{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-5);align-items:start}
+.bigtext .lbl{min-height:76px}
 .tcard{background:var(--surface-200);border:2px solid var(--ink);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);font-family:var(--font-text)}
 .tcard.fixed{overflow:hidden}
 .tcard b{font-family:var(--font-display);display:block}
@@ -429,6 +435,31 @@ function TypeScale(){
     code("style.css",":root {\n  --size-h1: "+step(3)+"rem;\n  --size-h2: "+step(2)+"rem;\n  --size-h3: "+step(1)+"rem;\n  --size-body: "+step(0)+"rem;\n  --size-small: "+step(-1)+"rem;\n}"));
 }
 
+/* ---------- line height, letter-spacing, text-transform ---------- */
+var SPACE_TEXT="Somewhere between sixty and eighty characters, with enough space between the lines, reading feels easy.";
+function Spacing(){
+  var lh=useSaved("sp-lh",1.5),ls=useSaved("sp-ls",0.08),lt=useSaved("sp-lt","label"),tt=useSaved("sp-tt","uppercase");
+  var l=lh[0],sp=ls[0],isLabel=lt[0]==="label",tr=tt[0];
+  var lhOk=l>=1.3&&l<=1.8,lsOk=isLabel?(sp>=0.02&&sp<=0.15):(sp>=-0.01&&sp<=0.03);
+  function seg(opts,cur,set,label){return h("div",{className:"seg-choice",role:"group","aria-label":label},opts.map(function(o){
+    return h("button",{key:o,type:"button",className:"pn-btn pn-btn--secondary","aria-pressed":cur===o?"true":"false",onClick:function(){set(o)}},o)}))}
+  return h("div",{className:"wide grid3 spacing"},
+    h(P.Card,{title:c("line-height")},
+      h("p",{className:"sample",style:{lineHeight:l}},SPACE_TEXT),
+      h(Slider,{id:"lh",label:"line-height",min:0.8,max:2.5,step:0.1,value:l,set:lh[1],show:l.toFixed(1)}),
+      lhOk?h(Status,{ok:true,word:"Comfortable",rest:"for body text."}):h(Status,{ok:false,word:l<1.3?"Cramped.":"Lines drift apart."})),
+    h(P.Card,{title:c("letter-spacing")},
+      seg(["label","body text"],lt[0],lt[1],"Apply to"),
+      h("p",{className:"sample"+(isLabel?" label":""),style:{letterSpacing:sp+"em"}},isLabel?"Projects":SPACE_TEXT),
+      h(Slider,{id:"ls",label:"letter-spacing",min:-0.1,max:0.3,step:0.01,value:sp,set:ls[1],show:sp.toFixed(2)+"em"}),
+      lsOk?h(Status,{ok:true,word:"Fine",rest:isLabel?"for a short label.":"for body text."}):h(Status,{ok:false,word:sp<0?"Letters collide.":"Too loose",rest:isLabel?null:"for body text."})),
+    h(P.Card,{title:c("text-transform")},
+      seg(["none","uppercase","capitalize"],tr,tt[1],"text-transform"),
+      h("p",{className:"sample",style:{textTransform:tr,lineHeight:1.5}},SPACE_TEXT),
+      p(c("text-transform: "+tr+";"),"lbl"),
+      tr==="none"?h(Status,{ok:true,word:"Easy to read."}):h(Status,{ok:false,word:"Slower to read",rest:"in long text. Short labels only."})));
+}
+
 /* ---------- larger text: what breaks ---------- */
 function BigText(){
   var s=useState(false),big=s[0],base=big?32:16,k=1.75;
@@ -681,13 +712,9 @@ Deck.start([
  notes:"A type scale multiplies up from the body size by a fixed ratio: each step is the one below times the ratio. Small ratios (1.125, 1.2) give a calm hierarchy, good for text-heavy pages; larger ones (1.333, 1.5) give dramatic headings. Students: try to match the sizes from your Figma text styles from yesterday, then copy the CSS. Keep the body at 1rem unless you have a reason; 1rem is whatever the reader has chosen. The sizes don't have to come from a ratio: if your Figma styles have their own sizes, convert them to rem by dividing by 16.",
  render:function(n){return h(P.ContentSlide,{title:"Build a type scale",tone:"plum",number:n,footer:FOOT},h(TypeScale))}},
 
-{id:"spacing",sec:"Type scale",title:"Line height, spacing, capitals",
- notes:"Line height without a unit (1.5, not 24px) scales with the font size. Body text around 1.4 to 1.6; headings tighter, around 1.1 to 1.2, because big text with big gaps falls apart. letter-spacing: leave body text alone; a little extra helps small capitals and labels. text-transform: uppercase for short labels at most, never paragraphs: all caps is slower to read. Write the text in normal case in the HTML and transform it in CSS; some screen readers spell out words typed in capitals letter by letter.",
- render:function(n){return h(P.ContentSlide,{title:"Line height, spacing, capitals",number:n,footer:FOOT},
-  h("div",{className:"wide grid3 dodont"},
-    card(c("line-height"),[h("p",{key:"s",className:"sample",style:{lineHeight:1.5}},"Body: about 1.5. Headings: tighter."),p("No unit, so it scales with the size.","muted")]),
-    card(c("letter-spacing"),[h("p",{key:"s",className:"sample",style:{letterSpacing:".08em",textTransform:"uppercase",fontFamily:"var(--font-display)",fontWeight:600}},"Label"),p("A little, for labels. Not for body text.","muted")]),
-    card(c("text-transform"),[h("p",{key:"s",className:"sample",style:{textTransform:"uppercase"}},"All caps is slower to read."),p("Short labels only. Type normal case in the HTML.","muted")])))}},
+{id:"spacing",sec:"Type scale",title:"Line height, spacing, capitals",demo:"Spacing",
+ notes:"Each card can be adjusted; students can try them on their laptops. line-height: without a unit (1.5, not 24px) it scales with the font size. Body text around 1.4 to 1.6; headings tighter, around 1.1 to 1.2, because big text with big gaps falls apart. Drag it down to 1 and up to 2.5 to show both failures. letter-spacing: switch between the label and body text. A little extra helps short labels in capitals; body text is best left alone, and negative values make letters collide. text-transform: uppercase is fine for a short label, never for paragraphs: all caps is slower to read. Write the text in normal case in the HTML and transform it in CSS; some screen readers spell out words typed in capitals letter by letter.",
+ render:function(n){return h(P.ContentSlide,{title:"Line height, spacing, capitals",number:n,footer:FOOT},h(Spacing))}},
 
 /* ===== The reader's settings ===== */
 {id:"reader",sec:"The reader's settings",title:"The reader decides",
