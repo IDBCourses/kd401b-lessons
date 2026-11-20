@@ -146,30 +146,21 @@
 .units dt{font:400 36px/44px var(--font-mono)}
 .units dd{margin:0;font-size:28px;line-height:38px}
 
-/* four kinds of unit: one small diagram per unit */
+/* four kinds of unit: two boxes per card, each a label and one plum shape (what gets measured) */
 .ukinds{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-5);align-items:stretch}
 .ukinds .pn-card{display:flex;flex-direction:column;gap:var(--space-3)}
 .ufig{display:flex;flex-direction:column;gap:var(--space-3)}
-.ufig > div{background:var(--surface-200);color:var(--ink);border:2px dashed var(--border-control);padding:var(--space-3);display:flex;flex-direction:column;gap:var(--space-2);justify-content:center}
-.ufig .tall{height:300px}
-.ufig .half{height:142px}
+.ufig > div{background:var(--surface-200);color:var(--ink);border:2px dashed var(--border-control);padding:var(--space-3);height:142px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between}
+.uwhat{font:500 28px/36px var(--font-display);margin:0}
+.uchip{align-self:flex-start;background:var(--plum);color:var(--on-plum);border:2px solid var(--ink);padding:0 var(--space-3);font:600 36px/52px var(--font-text)}
+.uchip.big{font-size:48px;line-height:56px}
+.ubar{height:48px;border:2px solid var(--ink);background:var(--surface-100);position:relative;box-sizing:border-box}
+.ubar span{position:absolute;inset:0 auto 0 0;width:50%;background:var(--plum);color:var(--on-plum);font:500 28px/44px var(--font-display);padding-left:var(--space-2);border-right:2px solid var(--ink)}
+.uzeros{margin:0;font:400 36px/1 var(--font-text);width:10ch;border-bottom:8px solid var(--plum);padding-bottom:var(--space-1)}
+.ulines{width:100%}
+.ulines span{display:block;height:12px;background:var(--plum);margin-top:8px}
 .ucode{font:400 32px/40px var(--font-mono);margin:0}
 .unote{font-size:28px;line-height:36px;margin:0}
-.uwhat{font:500 28px/36px var(--font-display);margin:0;color:var(--ink-muted)}
-.urow{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-3)}
-.uaa{font:600 48px/1 var(--font-text)}
-.ubox{border:2px solid var(--ink);padding:var(--space-1) var(--space-2)}
-.ubox .ubox{margin-top:var(--space-1);background:var(--plum-tint)}
-.ubox .ubox .unote{font-size:36px;line-height:44px}
-.ubar{height:40px;border:2px solid var(--ink);background:var(--surface-100);position:relative}
-.ubar span{position:absolute;inset:0 auto 0 0;width:50%;background:var(--plum);color:var(--on-plum);font:500 28px/36px var(--font-display);padding-left:var(--space-2)}
-.uwin{border:2px solid var(--ink);background:var(--surface-100)}
-.uwin i{display:block;height:14px;border-bottom:2px solid var(--ink);background:var(--surface-300)}
-.uwin .ubar{margin:var(--space-3) 0;border-left:0;border-right:0}
-.uzeros{font:400 36px/1 var(--font-text);letter-spacing:0;margin:0}
-.ubrace{width:10ch;font:400 36px/1 var(--font-text);border:3px solid var(--ink);border-top:0;height:14px}
-.ubrace + span{font:400 28px/36px var(--font-mono)}
-.ulines span{display:block;height:12px;background:var(--border-control);margin-bottom:10px}
 
 /* sliders (as in last week's deck; the track here is a plain bar) */
 .slider label{display:flex;justify-content:space-between;gap:var(--space-4);font:500 32px/40px var(--font-display);margin-bottom:var(--space-2)}
@@ -730,33 +721,30 @@ Deck.start([
  render:function(){return h(P.SectionSlide,{title:["Sizes and units"],tone:"ink",footer:FOOT})}},
 
 {id:"unit-families",sec:"Sizes and units",title:"Four kinds of unit",
- notes:"Go card by card, using the pictures. px is fixed: the same size whatever the reader set in their browser, top and bottom row. em is relative to the font size of the parent element, so it compounds when you nest (next slide). rem is relative to the root, the html element, which is the browser's default font size: the same everywhere on the page, and it follows the reader's setting. Percent is relative to the parent element; vw and vh are a hundredth of the window's width and height, so 50vw is half the window whatever it sits in. ch is the width of the zero character in the current font: ten zeros are 10ch. Handy for line length. Rule for today: rem for font sizes, ch for line length.",
+ notes:"Go card by card, using the pictures. px is fixed: the same size whatever the reader set in their browser, as in both boxes of the first card. em is relative to the font size of the parent element, so it compounds when you nest (next slide). rem is relative to the root, the html element, which is the browser's default font size: the same everywhere on the page, and it follows the reader's setting. Percent is relative to the parent element; vw and vh are a hundredth of the window's width and height, so 50vw is half the window whatever it sits in. ch is the width of the zero character in the current font: ten zeros are 10ch. Handy for line length. Rule for today: rem for font sizes, ch for line length.",
  render:function(n){
   return h(P.ContentSlide,{title:"Four kinds of unit",number:n,footer:FOOT},
   h("div",{className:"wide ukinds"},
     h(P.Card,{title:"Absolute"},
-      h("div",{className:"ufig","aria-hidden":"true"},h("div",{className:"tall"},
-        p("Reader's setting","uwhat"),
-        h("div",{className:"urow"},h("span",{className:"unote"},"16px"),h("span",{className:"uaa"},"Aa")),
-        h("div",{className:"urow"},h("span",{className:"unote"},"24px"),h("span",{className:"uaa"},"Aa")),
-        p("Text in px: the same.","unote"))),
-      p("px","ucode"),p("Fixed. Ignores the reader's setting.","unote")),
+      h("div",{className:"ufig","aria-hidden":"true"},
+        h("div",null,p("Reader's setting: 16px","uwhat"),h("span",{className:"uchip big"},"Aa")),
+        h("div",null,p("Reader's setting: 24px","uwhat"),h("span",{className:"uchip big"},"Aa"))),
+      p("px","ucode"),p("Fixed: the same size at any setting.","unote")),
     h(P.Card,{title:"Font-relative"},
       h("div",{className:"ufig","aria-hidden":"true"},
-        h("div",{className:"half"},h("div",{className:"ubox"},h("span",{className:"unote"},"parent: 20px"),h("div",{className:"ubox"},h("span",{className:"unote"},"1.5em = 30px")))),
-        h("div",{className:"half"},h("div",{className:"ubox"},h("span",{className:"unote"},"<html>: 16px"),h("div",{className:"ubox"},h("span",{className:"unote"},"1.5rem = 24px"))))),
-      p("em  rem","ucode"),p("em: the parent's size. rem: the root's.","unote")),
+        h("div",null,p("Parent: 20px","uwhat"),h("span",{className:"uchip"},"1.5em = 30px")),
+        h("div",null,p("<html>: 16px","uwhat"),h("span",{className:"uchip"},"1.5rem = 24px"))),
+      p("em  rem","ucode"),p("em: of the parent. rem: of the root.","unote")),
     h(P.Card,{title:"Space-relative"},
       h("div",{className:"ufig","aria-hidden":"true"},
-        h("div",{className:"half"},p("parent","uwhat"),h("div",{className:"ubar"},h("span",null,"50%"))),
-        h("div",{className:"half"},h("div",{className:"uwin"},h("i"),h("div",{className:"ubar"},h("span",null,"50vw"))))),
+        h("div",null,p("Parent","uwhat"),h("div",{className:"ubar"},h("span",null,"50%"))),
+        h("div",null,p("Window","uwhat"),h("div",{className:"ubar"},h("span",null,"50vw")))),
       p("%  vw  vh","ucode"),p("Of the parent, or of the window.","unote")),
-    solid("Text",[
-      h("div",{key:"f",className:"ufig","aria-hidden":"true"},h("div",{className:"tall"},
-        p("0000000000","uzeros"),h("div",{className:"ubrace"}),h("span",null,"10ch"),
-        h("div",{className:"ulines",style:{marginTop:"var(--space-3)"}},h("span",null),h("span",null),h("span",{style:{width:"70%"}})),
-        p("max-width: 65ch","unote"))),
-      h("p",{key:"c",className:"ucode"},"ch"),h("p",{key:"d",className:"unote"},"The width of a 0. For line length.")],"teal")))}},
+    h(P.Card,{title:"Text"},
+      h("div",{className:"ufig","aria-hidden":"true"},
+        h("div",null,p("10ch: ten zeros wide","uwhat"),h("p",{className:"uzeros"},"0000000000")),
+        h("div",null,p("max-width: 65ch","uwhat"),h("div",{className:"ulines"},h("span",null),h("span",null),h("span",{style:{width:"70%"}})))),
+      p("ch","ucode"),p("The width of a 0. For line length.","unote"))))}},
 
 {id:"em-rem",sec:"Sizes and units",title:"em compounds, rem doesn't",demo:"em vs rem",
  notes:"The word rem in the title links to a YouTube video (opens in a new tab). Both columns use 1.25 on boxes nested inside each other. With em, each box is 1.25 times its parent, so the text keeps growing: by four levels it's more than twice the size. With rem, every box is 1.25 times the root, however deep it is. That's why we use rem for the type scale. em is still useful for things that should scale with their own text, like padding on a button.",
