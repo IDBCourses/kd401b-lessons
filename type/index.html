@@ -67,6 +67,31 @@
 .show .b::after{content:attr(data-tag);position:absolute;right:var(--space-2);top:0;font:400 28px/38px var(--font-mono);background:var(--surface-100);padding:0 var(--space-2)}
 .show .i{outline:3px solid var(--ink);background:var(--teal-tint)}
 
+/* ---------- Instead of a div ---------- */
+.swap{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:auto auto auto;gap:var(--space-3) var(--space-3);align-items:center}
+.swap li{display:contents}
+.swaps{display:flex;gap:var(--space-6);justify-content:space-between}
+.swap code{white-space:nowrap;font:400 28px/38px var(--font-mono);padding:var(--space-1) var(--space-2);border:2px solid var(--ink);border-radius:var(--radius-sm);background:var(--surface-200);color:var(--ink);justify-self:start}
+.swap .to code{background:var(--teal);color:var(--on-teal);font-weight:700}
+.swap-head{display:flex;justify-content:space-between;gap:var(--space-4);font:600 28px/36px var(--font-display);margin:0 0 var(--space-3)}
+
+/* ---------- Headings are an outline ---------- */
+.toc{list-style:none;margin:0;padding:var(--space-4) var(--space-5);background:var(--surface-200);color:var(--ink);border:2px solid var(--ink);box-shadow:var(--shadow-pane-md)}
+.toc li{display:flex;gap:var(--space-4);align-items:baseline;font:600 36px/56px var(--font-display)}
+.toc li span{font:400 28px/1 var(--font-mono);color:var(--ink-muted);min-width:2.4ch}
+.toc .gap{font-weight:500;font-style:italic;color:var(--danger);border:2px dashed var(--danger);padding:0 var(--space-3);border-radius:var(--radius-sm)}
+
+/* ---------- Google Fonts steps (a simplified drawing, not a screenshot) ---------- */
+.gsteps{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-5)}
+.gshot{background:var(--surface-100);color:var(--ink);border:2px solid var(--ink);box-shadow:var(--shadow-pane-md);height:250px;display:flex;flex-direction:column}
+.gshot i{display:block;height:20px;border-bottom:2px solid var(--ink);background:var(--surface-300)}
+.gshot .body{flex:1;padding:var(--space-4);display:flex;flex-direction:column;justify-content:space-between;gap:var(--space-3)}
+.gshot .fam{font:400 56px/1.1 var(--font-text)}
+.gshot .gbtn{align-self:flex-end;font:600 28px/36px var(--font-display);background:var(--plum);color:var(--on-plum);border:3px solid var(--ink);border-radius:var(--radius-full);padding:var(--space-2) var(--space-5);outline:4px solid var(--pink);outline-offset:4px}
+.gshot .gcode{font:400 28px/36px var(--font-mono);background:var(--surface-300);padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm);white-space:nowrap;overflow:hidden}
+.gstep p{margin:var(--space-4) 0 0}
+.gstep b{font-family:var(--font-display)}
+
 /* ---------- Landmark map ---------- */
 .lmap{display:grid;grid-template-columns:1.25fr 1fr;gap:var(--space-7);align-items:start}
 .wire{display:grid;grid-template-columns:2fr 1fr;grid-template-areas:"head head" "main side" "foot foot";gap:var(--space-3);background:var(--surface-200);border:2px solid var(--ink);box-shadow:var(--shadow-pane-md);padding:var(--space-3)}
@@ -173,7 +198,7 @@
 
 /* line length */
 .measure{font-family:var(--font-text);font-size:28px;line-height:40px;margin:0}
-.measure-wrap{height:440px}
+.measure-wrap{height:330px}
 
 /* clamp */
 .clamp-h{font:700 1em/1.1 var(--font-display);margin:0}
@@ -319,13 +344,13 @@ function BlockInline(){
 
 /* ---------- Landmark map ---------- */
 var LANDMARKS={
-  header:{what:"The top of the page: site name, often the nav.",sr:"“banner”"},
-  nav:{what:"The main links around the site.",sr:"“navigation”"},
-  main:{what:"This page's own content. One per page.",sr:"“main”"},
-  section:{what:"A group of content with its own heading.",sr:"“region”, but only if it has a name, e.g. aria-labelledby"},
-  article:{what:"Makes sense on its own: a post, a project.",sr:"“article”"},
-  aside:{what:"Related, but not the main thing: a sidebar.",sr:"“complementary”"},
-  footer:{what:"The bottom: contact, copyright.",sr:"“content info”"}
+  header:{what:"The top of the page.",holds:"Site name, logo, often the nav"},
+  nav:{what:"The main ways around the site.",holds:"Links to your other pages"},
+  main:{what:"This page's own content. One per page.",holds:"Everything the page is about"},
+  section:{what:"A part of the page with its own heading.",holds:"A heading and what belongs under it"},
+  article:{what:"Something that makes sense on its own.",holds:"A blog post, a project"},
+  aside:{what:"Related, but not the main thing.",holds:"A sidebar, a note, related links"},
+  footer:{what:"The bottom of the page.",holds:"Contact details, copyright"}
 };
 function LandmarkMap(){
   var s=useState("main"),sel=s[0];
@@ -346,7 +371,7 @@ function LandmarkMap(){
       h("dl",null,
         h("div",null,h("dt",null,"Element"),h("dd",{className:"el"},"<"+sel+">")),
         h("div",null,h("dt",null,"What it's for"),h("dd",null,info.what)),
-        h("div",null,h("dt",null,"A screen reader announces"),h("dd",null,info.sr)))));
+        h("div",null,h("dt",null,"Typically holds"),h("dd",null,info.holds)))));
 }
 
 /* ---------- Fix the outline ---------- */
@@ -413,9 +438,13 @@ function LineLength(){
   var m=useSaved("measure",100),w=m[0],ok=w>=60&&w<=80;
   return h("div",{className:"wide stack"},
     h("div",{className:"cols2"},
-      h(Slider,{id:"measure",label:"max-width",min:25,max:100,value:w,set:m[1],unit:"ch"}),
-      ok?h(Status,{ok:true,word:"Comfortable:",rest:"60 to 80 characters per line."})
-        :h(Status,{ok:false,word:w<60?"Too short:":"Too long:",rest:"aim for 60 to 80 characters."})),
+      h("div",{className:"stack",style:{gap:"var(--space-3)"}},
+        h("p",{className:"ucode"},"p { max-width: "+w+"ch; }"),
+        p("max-width: at most this wide. In a narrow window it gets narrower; in a wide one it stops here.","unote")),
+      h("div",null,
+        h(Slider,{id:"measure",label:"max-width",min:35,max:100,value:w,set:m[1],unit:"ch"}),
+        ok?h(Status,{ok:true,word:"Comfortable:",rest:"60 to 80 characters per line."})
+          :h(Status,{ok:false,word:w<60?"Too short:":"Too long:",rest:"aim for 60 to 80 characters."}))),
     h("div",{className:"page measure-wrap"},h("p",{className:"measure",style:{maxWidth:w+"ch"}},LOREM)));
 }
 
@@ -424,7 +453,7 @@ function Clamp(){
   var v=useSaved("vw",1280),vw=v[0];
   var pref=16+0.04*vw,size=Math.min(64,Math.max(32,pref));
   var which=pref<32?"the minimum, 2rem":pref>64?"the maximum, 4rem":"the middle value, 1rem + 4vw";
-  return h("div",{className:"wide demo2"},
+  return h("div",{className:"wide stack"},h("div",{className:"demo2"},
     h("div",{className:"stack"},
       code("style.css","h1 {\n  font-size: clamp(2rem, 1rem + 4vw, 4rem);\n}"),
       h("dl",{className:"units",style:{gridTemplateColumns:"repeat(3,1fr)"}},
@@ -433,8 +462,9 @@ function Clamp(){
         h("div",null,h("dt",null,"4rem"),h("dd",null,"never larger")))),
     h("div",{className:"stack"},
       h(Slider,{id:"vw",label:"Window width",min:320,max:1920,step:10,value:vw,set:v[1],unit:"px"}),
-      h("div",{className:"page",style:{height:"200px"}},h("p",{className:"clamp-h",style:{fontSize:size+"px"}},"My portfolio")),
-      p(["h1 is ",h("b",{key:"b"},round(size,1)+"px"),": "+which+"."])));
+      h("div",{className:"page",style:{height:"120px"}},h("p",{className:"clamp-h",style:{fontSize:size+"px"}},"My portfolio")),
+      p(["h1 is ",h("b",{key:"b"},round(size,1)+"px"),": "+which+"."]))),
+    p(["Other useful functions: ",c("calc()"),", ",c("min()"),", ",c("max()"),", ",c("var()"),", ",c("hsl()"),". ",link("https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Functions","All CSS functions, on MDN"),"."]));
 }
 
 /* ---------- type scale builder ---------- */
@@ -597,18 +627,53 @@ Deck.start([
       card(c("<span>"),p("An inline box. Marks part of a line.")),
       p("Use them when no other element fits."))))}},
 
+{id:"instead",sec:"HTML structure",title:"Instead of a div, use …",
+ notes:"Before reaching for a div or span, check whether an element already says what the thing is. Each row on the left is something people often build from divs and classes; the right is the element made for it. The button row matters most: a div with a click handler can't be reached with the keyboard and isn't announced as a button, a real button gets all of that for free. strong and em are for meaning; if you only want bold or italic for looks, use a span or a class with CSS.",
+ render:function(n){
+  function row(a,b){return h("li",{key:a},c(a),h("span",{"aria-hidden":"true",className:"lead"},"→"),h("span",{className:"to"},c(b)))}
+  return h(P.ContentSlide,{title:"Instead of a div, use …",tone:"plum",number:n,footer:FOOT},
+  h("div",{className:"wide"},h(P.Card,{title:"Instead of → use"},h("div",{className:"swaps"},
+    h("ul",{className:"swap"},
+      row('<div class="header">',"<header>"),
+      row('<div class="nav">',"<nav>"),
+      row('<div class="main">',"<main>"),
+      row('<div class="post">',"<article>"),
+      row('<div class="footer">',"<footer>")),
+    h("ul",{className:"swap"},
+      row('<div class="sidebar">',"<aside>"),
+      row('<div class="quote">',"<blockquote>"),
+      row('<div class="caption">',"<figcaption>"),
+      row('<span class="bold">',"<strong>"),
+      row('<div class="button">',"<button>"))))))}},
+
 {id:"skeleton",sec:"HTML structure",title:"The skeleton you already have",
- notes:"Last week's skeleton, now with the elements inside body. These are blocks too, like div, but each one says what it contains. Your portfolio template already has most of these: open it and check which are there. header and footer for the top and bottom, nav for the links, main for the page's own content, with sections and articles inside. A div says nothing about its content; these elements do. Screen readers, search engines and reader mode all use them.",
+ notes:"Last week's skeleton, now with the elements inside body. These are blocks too, like div, but each one says what it contains. Your portfolio template already has most of these: open it and check which are there. header and footer for the top and bottom, nav for the links, main for the page's own content, with sections and articles inside. A div says nothing about its content; these elements do, to anyone reading the code and to the browser.",
  render:function(n){return h(P.ContentSlide,{title:"The skeleton you already have",number:n,footer:FOOT},
   h("div",{className:"wide grid2"},
     code("index.html",'<body>\n  <header>\n    <nav>…</nav>\n  </header>\n  <main>\n    <section>\n      <article>…</article>\n    </section>\n  </main>\n  <footer>…</footer>\n</body>'),
     h("div",{className:"stack"},
       p("Like a div, but each one says what's inside.","lead"),
-      p("Screen readers, search engines and reader mode all read these.","muted"))))}},
+      p("People reading your code can see what's what, and so can browsers and search engines.","muted"))))}},
 
-{id:"landmarks",sec:"HTML structure",title:"Landmarks: what a screen reader hears",demo:"Landmark map",
- notes:"Click through the regions; students can do the same on their laptops. Screen reader users can list a page's landmarks and jump straight to one: with VoiceOver on a Mac it's the rotor (VO+U), with NVDA on Windows the D key. So a page built from divs has no landmarks to jump to. Note that section only becomes a landmark (region) when it has a name, for example aria-labelledby pointing at its heading. header and footer count as banner and content info only when they're not inside an article or section. Rule of thumb: one main per page.",
- render:function(n){return h(P.ContentSlide,{title:"Landmarks: what a screen reader hears",tone:"plum",number:n,footer:FOOT},h(LandmarkMap))}},
+{id:"landmarks",sec:"HTML structure",title:"Each part says what it is",demo:"Page structure",
+ notes:"Click through the regions; students can do the same on their laptops. The point is a page whose structure makes sense: someone reading the code, or a program reading the page (a browser's reader mode, a search engine), can tell what's there without guessing from class names. One main per page. section is for a part of the page that has its own heading; if you can't think of a heading for it, it's probably a div.",
+ render:function(n){return h(P.ContentSlide,{title:"Each part says what it is",tone:"plum",number:n,footer:FOOT},h(LandmarkMap))}},
+
+{id:"heading-rules",sec:"HTML structure",title:"Headings are the page's outline",
+ notes:"Why the rules? The headings together are the page's table of contents, like chapters and sections in a report. The h1 is the title: what the whole page is about, so there's one. Each level below sits inside the one above it: h3s are sections of an h2. If you jump from h2 straight to h4, the outline has a hole: a sub-section with no section around it. Going back up is fine: after an h4 the next heading can be an h2, which simply starts a new chapter. Browsers, search engines and reading tools build their lists of headings from this. So choose the level for the heading's place in the outline, and set its size in CSS.",
+ render:function(n){return h(P.ContentSlide,{title:"Headings are the page's outline",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h("ol",{className:"toc","aria-label":"A heading outline with a skipped level"},
+      h("li",null,h("span",null,"h1"),"My portfolio"),
+      h("li",{style:{paddingLeft:"48px"}},h("span",null,"h2"),"Projects"),
+      h("li",{style:{paddingLeft:"96px"}},h("span",null,"h3"),"Colour study"),
+      h("li",{style:{paddingLeft:"48px"}},h("span",null,"h2"),"About me"),
+      h("li",{style:{paddingLeft:"96px"}},h("span",null,"h3"),h("span",{className:"gap"},"missing")),
+      h("li",{style:{paddingLeft:"144px"}},h("span",null,"h4"),"Contact")),
+    h("div",{className:"stack"},
+      card("One h1",p("It's the title: what the whole page is about.")),
+      card("No skipped levels",p("Each level sits inside the one above. h2 to h4 leaves a hole. Going back up is fine.")),
+      p("Pick the level for its place in the outline. Set the size in CSS.","muted"))))}},
 
 {id:"outline",sec:"HTML structure",title:"Fix the outline",demo:"Fix the outline",ex:"Fix the outline",
  notes:"Headings are the other main way screen reader users move around a page: they list the headings and jump between them (H in NVDA, the rotor in VoiceOver). Two rules: one h1, and no skipped levels going down (going back up is fine: h4 then h2 is OK). Let students fix it on their laptops, then do it together. The answer: Projects h2, Colour study and Type study h3, About me h2, Contact stays h2. Then ask: what if Projects looked too big as an h2? Answer: change the CSS, not the element.",
@@ -629,7 +694,11 @@ Deck.start([
     demo("<strong>","Important",h("p",null,"Save ",h("strong",null,"before")," you close.")),
     demo("<em>","Stressed, as you'd say it",h("p",null,"I ",h("em",null,"did")," read it."))))}},
 
-{id:"lorem",sec:"HTML structure",title:"Placeholder text: lorem ipsum",
+{id:"placeholders",sec:"Placeholder content",title:"Placeholder content",
+ notes:"A short one. Your portfolio doesn't have all its real content yet, but the type needs something to work on this afternoon: placeholder text and images fill the gaps.",
+ render:function(){return h(P.SectionSlide,{title:["Placeholder","content"],tone:"plum",footer:FOOT})}},
+
+{id:"lorem",sec:"Placeholder content",title:"Placeholder text: lorem ipsum",
  notes:"Lorem ipsum is scrambled Latin used as dummy text, so you can judge a layout without being distracted by what the words say. In VS Code, the shortcut is Emmet, which is built in: type lorem and press Tab for a paragraph, lorem30 for 30 words, p>lorem30 for a p element with 30 words, ul>li*3>lorem4 for a list. Or copy from lipsum.com. Use it to fill out the page so the type scale has something to show, and replace it with real content later. Demo it live in VS Code.",
  render:function(n){return h(P.ContentSlide,{title:"Placeholder text: lorem ipsum",number:n,footer:FOOT},
   h("div",{className:"wide grid2"},
@@ -644,7 +713,7 @@ Deck.start([
       p(link("https://www.lipsum.com","lipsum.com")),
       p("Replace it with real text later.","muted"))))}},
 
-{id:"placeholder-images",sec:"HTML structure",title:"Placeholder images",
+{id:"placeholder-images",sec:"Placeholder content",title:"Placeholder images",
  notes:"Stand-ins for photos you don't have yet. picsum.photos gives a random photo at the size in the address: 600 wide, 400 high. Add /seed/ and any word to get the same photo every time; otherwise it changes on each reload. placehold.co gives a plain grey box with its size on it. Either way: the image still goes in a figure, with an alt attribute that says what it shows. And swap them for your own images later.",
  render:function(n){return h(P.ContentSlide,{title:"Placeholder images",number:n,footer:FOOT},
   h("div",{className:"wide demo2"},
@@ -698,11 +767,11 @@ Deck.start([
  render:function(n){return h(P.ContentSlide,{title:"rem follows the reader's setting",number:n,footer:FOOT},h(PxRem))}},
 
 {id:"line-length",sec:"Sizes and units",title:"Line length in ch",demo:"Line length",
- notes:"Long lines are tiring: the eye loses its place on the way back to the next line. Short lines break the rhythm. Somewhere around 60 to 80 characters is comfortable for body text. In CSS, max-width in ch sets this directly, and because ch depends on the font, it stays about right when the font size changes. A line holds a few more characters than its ch value in most fonts, since many letters are narrower than a zero. Starts too long on purpose: move it into the range.",
+ notes:"Long lines are tiring: the eye loses its place on the way back to the next line. Short lines break the rhythm. Somewhere around 60 to 80 characters is comfortable for body text. max-width sets the most an element may be: it can be narrower (in a narrow window it shrinks with it), but never wider. In ch it sets the line length directly, and because ch depends on the font, it stays about right when the font size changes. A line holds a few more characters than its ch value in most fonts, since many letters are narrower than a zero. Starts too long on purpose: move it into the range.",
  render:function(n){return h(P.ContentSlide,{title:"Line length in ch",number:n,footer:FOOT},h(LineLength))}},
 
 {id:"clamp",sec:"Sizes and units",title:"Fluid type with clamp()",demo:"clamp()",
- notes:"clamp takes three values: a minimum, a preferred value and a maximum. The middle value mixes rem and vw, so the heading grows with the window but never goes below 2rem or above 4rem. Move the slider from phone width to a wide screen and watch which of the three values is in use. Keep the minimum and maximum in rem, so the reader's setting still counts. Optional for this afternoon; a fixed rem scale is fine.",
+ notes:"clamp takes three values: a minimum, a preferred value and a maximum. The middle value mixes rem and vw, so the heading grows with the window but never goes below 2rem or above 4rem. Move the slider from phone width to a wide screen and watch which of the three values is in use. Keep the minimum and maximum in rem, so the reader's setting still counts. Optional for this afternoon; a fixed rem scale is fine. clamp is one of many CSS functions: calc() does arithmetic and can mix units (100% - 2rem), min() and max() pick the smaller or larger value (max-width: min(65ch, 100%)), and you've already used var() and hsl(). The link goes to MDN's list of all of them.",
  render:function(n){return h(P.ContentSlide,{title:"Fluid type with clamp()",tone:"teal",number:n,footer:FOOT},h(Clamp))}},
 
 {id:"break",sec:"Break",title:"Break",
@@ -714,21 +783,28 @@ Deck.start([
  notes:"The CSS layer: getting the fonts onto the page, then the type scale as custom properties next to last week's colours.",
  render:function(){return h(P.SectionSlide,{title:["Type in CSS"],tone:"pink",footer:FOOT})}},
 
-{id:"google-fonts",sec:"Fonts",title:"Google Fonts: copy a link",
- notes:"The quick way. On fonts.google.com, pick the family and only the weights you need, then Get font, Get embed code. Paste the link elements into the head, before your own stylesheet, and use the family name in font-family. display=swap at the end of the address is the same as font-display: swap on the next slide. The preconnect links make it a little faster; Google's embed code includes them.",
- render:function(n){return h(P.ContentSlide,{title:"Google Fonts: copy a link",number:n,footer:FOOT},
+{id:"google-fonts",sec:"Fonts",title:"Google Fonts: get the embed code",
+ notes:"One way to load a font, and the one to use this afternoon. On fonts.google.com, open the font's page and press Get font. That adds it to your selection; you can add more fonts. Then press Get embed code. On that page choose only the weights and styles you use, and copy the code under Web, the link elements. The drawings are simplified; demo it live on the real site. Google's own guide is linked on the next slide.",
+ render:function(n){
+  function shot(kind){return h("div",{className:"gshot","aria-hidden":"true"},h("i"),h("div",{className:"body"},
+    kind==="font"?[h("span",{key:"f",className:"fam"},"Literata"),h("span",{key:"b",className:"gbtn"},"Get font")]
+    :kind==="embed"?[h("span",{key:"f",className:"unote"},"Your selection: Literata"),h("span",{key:"b",className:"gbtn"},"Get embed code")]
+    :[h("span",{key:"f",className:"unote"},"Web: <link>"),h("span",{key:"c",className:"gcode"},'<link href="https://fonts.goo…'),h("span",{key:"b",className:"gbtn"},"Copy code")]))}
+  return h(P.ContentSlide,{title:"Google Fonts: get the embed code",number:n,footer:FOOT},
+  h("div",{className:"wide stack"},
+    h("ol",{className:"gsteps",style:{listStyle:"none",margin:0,padding:0}},
+      h("li",{className:"gstep"},shot("font"),p([h("b",{key:"b"},"1. "),"On the font's page, press ",h("b",{key:"c"},"Get font"),"."])),
+      h("li",{className:"gstep"},shot("embed"),p([h("b",{key:"b"},"2. "),"Press ",h("b",{key:"c"},"Get embed code"),"."])),
+      h("li",{className:"gstep"},shot("code"),p([h("b",{key:"b"},"3. "),"Pick your weights, copy the ",c("<link>"),"."]))),
+    p(["Simplified drawings. Try it on ",link("https://fonts.google.com","fonts.google.com"),"."],"muted")))}},
+
+{id:"google-fonts-code",sec:"Fonts",title:"Paste it into the head",
+ notes:"Paste the link elements into the head, before your own stylesheet, then use the family name in font-family, with fallbacks (next slide). display=swap at the end of the address means: show the text right away in a fallback font, and swap in the real one when it arrives. The preconnect links Google gives you make it a little faster; keep them. Google's getting started guide is linked on the slide.",
+ render:function(n){return h(P.ContentSlide,{title:"Paste it into the head",tone:"plum",number:n,footer:FOOT},
   h("div",{className:"wide stack"},
     code("index.html — in the <head>",'<link rel="stylesheet"\n  href="https://fonts.googleapis.com/css2?family=Literata:wght@400;700&display=swap">'),
-    code("style.css","body {\n  font-family: \"Literata\", Georgia, serif;\n}")))}},
-
-{id:"font-face",sec:"Fonts",title:"@font-face: host it yourself",
- notes:"The other way: download the font files (woff2 is the format to use) into your repository and declare them with @font-face. Your page then doesn't depend on Google, and it works offline. This deck does exactly that for Roboto Flex. font-display: swap means: show the text right away in the fallback font, and swap in the real one when it arrives. Without it some browsers show no text at all while the font loads. A variable font gives a whole weight range from one file, so font-weight takes a range here.",
- render:function(n){return h(P.ContentSlide,{title:"@font-face: host it yourself",tone:"plum",number:n,footer:FOOT},
-  h("div",{className:"wide grid2"},
-    code("style.css",'@font-face {\n  font-family: "Roboto Flex";\n  src: url("fonts/RobotoFlex.woff2")\n       format("woff2");\n  font-weight: 100 1000;\n  font-display: swap;\n}'),
-    h("div",{className:"stack"},
-      card(c("font-display: swap"),p("Show the text at once in a fallback font. Swap when the font arrives.")),
-      p("No dependency on Google, and it works offline.","muted"))))}},
+    code("style.css","body {\n  font-family: \"Literata\", Georgia, serif;\n}"),
+    p(["Step by step: ",link("https://developers.google.com/fonts/docs/getting_started","Google Fonts: getting started"),"."])))}},
 
 {id:"stacks",sec:"Fonts",title:"Fallbacks, and only what you use",
  notes:"A font stack is a list: if the first font can't load, the browser tries the next, and the last item is a generic family (serif, sans-serif, monospace, system-ui), which always exists. Pick fallbacks that look similar so the page doesn't jump much when the font swaps in. Performance: each weight and style of a static font is a separate file. Load only the ones you actually use, typically regular, bold and maybe italic. A variable font is one file for every weight.",
@@ -775,12 +851,14 @@ Deck.start([
  notes:"Switch it on: the browser default goes from 16 to 32px. The first card's text is in px, so it doesn't grow: the reader's setting is ignored. The second has its text in rem but a fixed height, so the text grows and gets cut off. The third uses min-height: at least this tall, taller if the content needs it. Then demo it live: raise your browser's default font size, and zoom to 200% on a student's portfolio (with permission) or on your own. Rule: rem for type, and no fixed heights on anything that holds text.",
  render:function(n){return h(P.ContentSlide,{title:"What breaks when text gets bigger",number:n,footer:FOOT},h(BigText))}},
 
-{id:"reading-file",sec:"Reading mode",title:"Reading mode is one more file",
- notes:"An accessible reading mode works exactly like last week's dark mode. A second CSS file that only redefines the type variables: bigger body size, more line height, a bit of letter and word spacing, a shorter measure, maybe a different font. The button swaps which file the link points to: the same JavaScript as last week, with a different id. Colour and type get a link each, so they stay independent.",
- render:function(n){return h(P.ContentSlide,{title:"Reading mode is one more file",number:n,footer:FOOT},
+{id:"reading-file",sec:"Reading mode",title:"Your own reading mode is one more file",
+ notes:"This is a custom reading mode, built into your own site. Most browsers already have a reading mode of their own: Reader in Safari, Reader View in Firefox, Immersive Reader in Edge, Reading mode in Chrome's side panel. Show one live. Those strip your design away and use the browser's own; they work best when your HTML has a proper main and article. Yours keeps your design and only changes the type. It works exactly like last week's dark mode. A second CSS file that only redefines the type variables: bigger body size, more line height, a bit of letter and word spacing, a shorter measure, maybe a different font. The button swaps which file the link points to: the same JavaScript as last week, with a different id. Colour and type get a link each, so they stay independent.",
+ render:function(n){return h(P.ContentSlide,{title:"Your own reading mode is one more file",number:n,footer:FOOT},
+  h("div",{className:"wide stack"},
+  h(P.Alert,{tone:"info",title:"A custom reading mode"},"Most browsers have one built in: Safari Reader, Firefox Reader View, Edge Immersive Reader, Chrome's Reading mode. Yours keeps your own design."),
   h("div",{className:"wide grid2"},
     code("reading.css",':root {\n  --size-body: 1.25rem;\n  --leading-body: 1.8;\n  --tracking-body: 0.02em;\n  --measure: 55ch;\n}'),
-    code("index.html",'<link id="colour" rel="stylesheet"\n      href="light.css">\n<link id="type" rel="stylesheet"\n      href="type.css">\n\n<button id="reading" type="button">\n  Reading mode\n</button>')))}},
+    code("index.html",'<link id="type" rel="stylesheet"\n      href="type.css">\n\n<button id="reading" type="button">\n  Reading mode\n</button>'))))}},
 
 {id:"two-toggles",sec:"Reading mode",title:"Colours and type, switched separately",demo:"Two toggles",
  notes:"Two switches, four combinations: light or dark, standard or reading mode. Because the colour file only sets colour variables and the type file only sets type variables, any combination works without extra code. Try all four. Here the reading mode switches to Roboto Flex, raises the size and line height, adds a little letter spacing and shortens the line.",
