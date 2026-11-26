@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Forms · KD401B Interaction Design: Graphical User Interfaces</title>
+<link rel="stylesheet" href="../shared/pane/tokens/tokens.css">
+<link rel="stylesheet" href="../shared/pane/components/bundle.css">
+<link rel="stylesheet" href="../shared/deck.css">
+<style>
+/* styles used only by this lecture: layout only, colours and sizes from Pane tokens.
+   Exception: the box model and Flexbox demos set literal pixel sizes, because those values are what
+   the slide teaches. Icons are inline SVG in the style of Lucide (ISC licence), drawn with currentColor. */
+
+/* on plum and teal slide grounds, ink-muted lacks contrast: muted labels take the slide's text colour */
+.pn-slide--plum :is(.muted,.lbl,.figcap,.toggle-state),.pn-slide--teal :is(.muted,.lbl,.figcap,.toggle-state){color:inherit}
+
+/* links and list markers on plum and teal grounds take the colour of what they sit on */
+.pn-slide--plum .pn-content__text > p .pn-link,.pn-slide--teal .pn-content__text > p .pn-link{color:inherit}
+.pn-slide--plum .pn-card li::marker,.pn-slide--teal .pn-card li::marker{color:inherit}
+
+/* inline code in body text and cards */
+.pn-slide p code,.pn-slide li code,.pn-slide dd code,.pn-card__title code,.pn-slide .lead code{font-family:var(--font-mono);font-size:.9em}
+
+/* steps and checklists */
+.steps{margin:0;padding-left:1.2em;font-size:36px;line-height:52px}
+.steps li{margin-bottom:var(--space-3)}
+.steps li::marker{font-family:var(--font-display);font-weight:700}
+.steps code{font-family:var(--font-mono);font-size:32px}
+
+/* link cards */
+.linkcard{position:relative}
+.linkcard a{font-family:var(--font-display);font-weight:600;font-size:44px;line-height:52px}
+.linkcard a::after{content:"";position:absolute;inset:0}
+.linkcard p{margin-top:var(--space-2)}
+.linkcard a:focus-visible{outline:var(--focus-width) solid var(--focus);outline-offset:var(--focus-offset)}
+
+/* small labels and status lines */
+.lbl{font:500 28px/38px var(--font-display);color:var(--ink-muted);margin:0 0 var(--space-3)}
+.lbl code{font-family:var(--font-mono);font-size:28px}
+.status{font:500 32px/44px var(--font-display);margin:0}
+.status .ok{color:var(--success)}
+.status .bad{color:var(--danger)}
+.demo2{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-7);align-items:start}
+.demo2b{display:grid;grid-template-columns:1.1fr 1fr;gap:var(--space-7);align-items:start}
+
+/* a plain page that holds a live sample */
+.page{background:var(--surface-100);color:var(--ink);border:2px solid var(--ink);box-shadow:var(--shadow-pane-md);padding:var(--space-5) var(--space-6)}
+
+/* on/off switches, as in last week's deck */
+.toggles{display:flex;flex-direction:column;gap:var(--space-2)}
+.toggle{display:flex;align-items:center;gap:var(--space-4);background:none;border:0;padding:var(--space-1) 0;color:inherit;font:500 36px/44px var(--font-display);cursor:pointer;min-height:var(--target-min);text-align:left}
+.toggle-track{flex:none;width:96px;height:52px;box-sizing:border-box;border-radius:var(--radius-full);border:var(--border-width) solid var(--border-control);background:var(--surface-300);position:relative}
+.toggle-thumb{position:absolute;top:4px;left:4px;width:40px;height:40px;border-radius:var(--radius-full);background:var(--ink-muted);transition:left .15s}
+.toggle[aria-checked="true"] .toggle-track{background:var(--plum);border-color:var(--ink)}
+.toggle[aria-checked="true"] .toggle-thumb{left:48px;background:var(--on-plum)}
+.toggle-state{font-family:var(--font-mono);font-weight:400;font-size:28px;color:var(--ink-muted);min-width:3ch}
+.toggle:focus-visible{outline:var(--focus-width) solid var(--focus);outline-offset:var(--focus-offset)}
+@media (prefers-reduced-motion:reduce){.toggle-thumb{transition:none}}
+
+/* sliders, as in last week's deck */
+.slider label{display:flex;justify-content:space-between;gap:var(--space-4);font:500 32px/40px var(--font-display);margin-bottom:var(--space-2)}
+.slider output{font-family:var(--font-mono);font-weight:400}
+.slider input{-webkit-appearance:none;appearance:none;display:block;width:100%;height:48px;margin:0;background:transparent;cursor:pointer}
+.slider input::-webkit-slider-runnable-track{height:24px;box-sizing:border-box;border:2px solid var(--ink);border-radius:var(--radius-sm);background:var(--surface-300)}
+.slider input::-moz-range-track{height:20px;border:2px solid var(--ink);border-radius:var(--radius-sm);background:var(--surface-300)}
+.slider input::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:48px;margin-top:-14px;box-sizing:border-box;border:3px solid var(--ink);border-radius:var(--radius-sm);background:var(--plum);box-shadow:0 0 0 2px var(--surface-100)}
+.slider input::-moz-range-thumb{width:16px;height:42px;border:3px solid var(--ink);border-radius:var(--radius-sm);background:var(--plum);box-shadow:0 0 0 2px var(--surface-100)}
+.slider input:focus-visible{outline:var(--focus-width) solid var(--focus);outline-offset:var(--focus-offset)}
+.sliders{display:flex;flex-direction:column;gap:var(--space-3)}
+
+/* segmented choice */
+.seg-choice{display:flex;gap:var(--space-3);flex-wrap:wrap}
+.seg-choice .pn-btn{font-size:28px;line-height:36px;padding:var(--space-2) var(--space-4)}
+.seg-choice .pn-btn[aria-pressed="true"]{background:var(--ink);color:var(--surface-100)}
+
+/* icons: inline SVG that follows the text colour */
+.ic,.pn-figure__frame svg.ic{display:inline-block;width:1.15em;height:1.15em;flex:none;vertical-align:-.2em}
+
+/* ---------- slide-size form controls (the samples students build) ---------- */
+.f{display:flex;flex-direction:column;gap:var(--space-5);margin:0}
+.f .field{display:flex;flex-direction:column;gap:var(--space-2)}
+.f label,.f .flabel{font:600 32px/40px var(--font-display)}
+.f input[type=text],.f input[type=email],.f textarea{box-sizing:border-box;width:100%;min-height:68px;padding:var(--space-2) var(--space-4);font:400 32px/44px var(--font-display);color:var(--ink);background:var(--surface-200);border:var(--border-width) solid var(--border-control);border-radius:var(--radius-md)}
+.f textarea{min-height:120px;resize:none}
+.f input::placeholder,.f textarea::placeholder{color:var(--ink-muted);opacity:1}
+.f :is(input,textarea):focus-visible{outline:var(--focus-width) solid var(--focus);outline-offset:var(--focus-offset)}
+.f .hint{font:400 28px/38px var(--font-text);color:var(--ink-muted);margin:0}
+.f .actions{display:flex;gap:var(--space-4);align-items:center}
+.f .pn-btn{font-size:32px;line-height:40px;padding:var(--space-3) var(--space-6);display:inline-flex;gap:var(--space-3);align-items:center}
+.f .pn-btn:focus-visible{outline:var(--focus-width) solid var(--focus);outline-offset:var(--focus-offset)}
+.f .sent{font:500 32px/44px var(--font-display);color:var(--success);margin:0}
+
+/* ---------- Figure 1: an example design (a drawing of Figma frames) ---------- */
+.mock{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);padding:var(--space-5);background:var(--surface-300);color:var(--ink)}
+.mock .frame{background:var(--surface-100);border:2px solid var(--ink);padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-3)}
+.mock .fname{font:500 28px/36px var(--font-display);color:var(--ink-muted);margin:0}
+.mock .mlabel{font:600 28px/36px var(--font-display)}
+.mock .minput{height:52px;border:2px solid var(--border-control);border-radius:var(--radius-md);background:var(--surface-200)}
+.mock .minput.err{border-color:var(--danger);border-width:4px}
+.mock .merr{font:500 28px/34px var(--font-display);color:var(--danger)}
+.mock .mbtn{align-self:flex-start;font:600 28px/36px var(--font-display);background:var(--plum);color:var(--on-plum);border:2px solid var(--ink);border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);display:flex;gap:var(--space-2);align-items:center}
+.mock .mchips{display:flex;flex-wrap:wrap;gap:var(--space-2)}
+.mock .mchip{font:500 28px/36px var(--font-display);border:2px solid var(--ink);border-radius:var(--radius-full);padding:var(--space-1) var(--space-3);display:flex;gap:var(--space-2);align-items:center;background:var(--surface-200)}
+.mock .mchip.on{background:var(--ink);color:var(--surface-100)}
+.mock .mcard{height:64px;border:2px dashed var(--border-control);border-radius:var(--radius-sm)}
+.mock .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2)}
+
+/* ---------- What a screen reader hears ---------- */
+.heard{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6)}
+.heard .pn-card{display:flex;flex-direction:column;gap:var(--space-4)}
+.heard pre{margin:0;font:400 28px/40px var(--font-mono);white-space:pre-wrap;background:var(--surface-300);color:var(--ink);border:2px solid var(--ink);border-radius:var(--radius-sm);padding:var(--space-3) var(--space-4)}
+.heard .pn-card{gap:var(--space-3)}
+.heard-wrap .pn-slide .pn-tabs__panel,.heard-wrap .pn-tabs__panel{padding-top:var(--space-5)}
+/* the rendered result of a code sample: a plain page, dashed, not interactive */
+.res{display:flex;flex-direction:column;gap:var(--space-2);align-items:flex-start;background:var(--surface-100);color:var(--ink);border:2px dashed var(--border-control);border-radius:var(--radius-sm);padding:var(--space-3) var(--space-4)}
+.res .lbl{margin:0}
+.res .flabel,.res label{font:600 30px/38px var(--font-display);margin:0}
+.res input{box-sizing:border-box;width:100%;min-height:56px;font:400 28px/38px var(--font-display);background:var(--surface-200);color:var(--ink);border:var(--border-width) solid var(--border-control);border-radius:var(--radius-md)}
+.res .pn-btn{font-size:30px;line-height:38px;padding:var(--space-2) var(--space-5);display:inline-flex;gap:var(--space-3);align-items:center}
+.res .pn-btn.iconbtn{padding:var(--space-2) var(--space-3)}
+.res .btns{display:flex;gap:var(--space-4);align-items:center}
+.say{display:flex;gap:var(--space-3);align-items:center;font:600 36px/48px var(--font-display);margin:0}
+.say .ic{width:44px;height:44px}
+.say q{quotes:"“" "”"}
+.say small{font:400 28px/38px var(--font-text);display:block}
+
+/* ---------- Keyboard demo: a small page to tab through ---------- */
+.kb{position:relative;background:var(--surface-100);color:var(--ink);border:2px solid var(--ink);box-shadow:var(--shadow-pane-md);font-family:var(--font-display);overflow:hidden}
+.kb a,.kb button,.kb input{color:inherit}
+.kb:focus{outline:none}
+.kb :is(a,button,input):focus-visible{outline:var(--focus-width) solid var(--focus);outline-offset:var(--focus-offset)}
+.kb.nofocus :is(a,button,input,main):focus,.kb.nofocus :is(a,button,input,main):focus-visible{outline:none}
+.kb .skip{position:absolute;left:var(--space-4);top:-200px;z-index:2;background:var(--ink);color:var(--surface-100);font:600 28px/36px var(--font-display);padding:var(--space-2) var(--space-4)}
+.kb .skip:focus{top:var(--space-3)}
+.kb header{display:flex;justify-content:space-between;align-items:center;gap:var(--space-4);padding:var(--space-4) var(--space-5);border-bottom:2px solid var(--ink);background:var(--surface-200)}
+.kb header b{font:700 32px/40px var(--font-display)}
+.kb nav ul{display:flex;gap:var(--space-2);list-style:none;margin:0;padding:0}
+.kb nav a{display:block;font:500 28px/36px var(--font-display);padding:var(--space-2) var(--space-3);text-decoration:none}
+.kb nav a[aria-current="page"]{text-decoration:underline;text-decoration-thickness:4px;text-underline-offset:8px;font-weight:700}
+.kb main{padding:var(--space-5);display:flex;flex-direction:column;gap:var(--space-3)}
+.kb main h3{font:700 36px/44px var(--font-display);margin:0}
+.kb main label{font:600 28px/36px var(--font-display)}
+.kb main input{box-sizing:border-box;width:100%;min-height:60px;font:400 28px/40px var(--font-display);padding:var(--space-2) var(--space-3);background:var(--surface-200);border:2px solid var(--border-control);border-radius:var(--radius-md)}
+.kb main .row{display:flex;gap:var(--space-4);align-items:end}
+.kb main .row > div{flex:1;display:flex;flex-direction:column;gap:var(--space-2)}
+.kb .kbtn{font:600 28px/36px var(--font-display);background:var(--plum);color:var(--on-plum);border:2px solid var(--ink);border-radius:var(--radius-md);padding:var(--space-3) var(--space-5);min-height:60px;cursor:pointer}
+.focusline{font:500 32px/44px var(--font-display);margin:0}
+.focusline code{font:400 32px/44px var(--font-mono);background:var(--surface-300);color:var(--ink);padding:0 var(--space-2);border-radius:var(--radius-sm)}
+kbd{font:400 30px/40px var(--font-mono);background:var(--surface-300);color:var(--ink);border:2px solid var(--ink);border-radius:var(--radius-sm);padding:0 var(--space-2)}
+
+/* ---------- Placeholder vs label ---------- */
+.ph-demo .page{display:flex;flex-direction:column;gap:var(--space-4)}
+
+/* ---------- Project filter ---------- */
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.filter{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:var(--space-3);align-items:center;min-width:0}
+.filter legend{float:left;font:600 32px/40px var(--font-display);margin-right:var(--space-3)}
+.chip{display:inline-flex;align-items:center;gap:var(--space-2);min-height:var(--target-min);font:500 30px/38px var(--font-display);padding:var(--space-2) var(--space-4);border:2px solid var(--border-control);border-radius:var(--radius-full);background:var(--surface-200);color:var(--ink);cursor:pointer;user-select:none}
+.chip .tick{display:none}
+input:checked + .chip{background:var(--ink);color:var(--surface-100);border-color:var(--ink);font-weight:700}
+input:checked + .chip .tick{display:inline-block}
+input:focus-visible + .chip{outline:var(--focus-width) solid var(--focus);outline-offset:var(--focus-offset)}
+.projects{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);margin-top:var(--space-5)}
+.proj{border:2px solid var(--ink);background:var(--surface-200);border-radius:var(--radius-sm);padding:var(--space-3) var(--space-4);display:flex;flex-direction:column;gap:var(--space-1)}
+.proj[hidden]{display:none}
+.proj b{font:600 30px/38px var(--font-display)}
+.proj span{font:400 28px/36px var(--font-mono);color:var(--ink-muted)}
+.filter-page{min-height:560px}
+
+/* ---------- Box model ---------- */
+.boxes .b{outline:none}
+.boxes.show *{outline:3px solid var(--danger);outline-offset:-1px}
+.boxes h3{font:700 40px/48px var(--font-display);margin:0 0 var(--space-3)}
+.boxes p{font:400 30px/42px var(--font-text);margin:0 0 var(--space-4)}
+.bm{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-7);align-items:start}
+.bm-margin{display:inline-block;background:var(--pink-tint);border:2px dashed var(--ink);position:relative}
+.bm-border{border-style:solid;border-color:var(--ink);background:var(--teal-tint);position:relative}
+.bm-content{background:var(--plum-tint);color:var(--ink);font:600 32px/40px var(--font-display);white-space:nowrap;display:flex;gap:var(--space-2);align-items:center}
+.bm-tag{position:absolute;font:400 28px/1 var(--font-mono);color:var(--ink)}
+.bm-margin > .bm-tag{top:6px;left:8px}
+.bm-wrap{display:flex;justify-content:center;align-items:center;min-height:420px;background:var(--surface-100);border:2px solid var(--ink);box-shadow:var(--shadow-pane-md)}
+.legend{display:flex;flex-wrap:wrap;gap:var(--space-3) var(--space-5);margin:var(--space-4) 0 0;padding:0;list-style:none;font:500 28px/36px var(--font-display)}
+.legend li{display:flex;gap:var(--space-2);align-items:center}
+.legend i{display:inline-block;width:32px;height:32px;border:2px solid var(--ink)}
+.legend .m{background:var(--pink-tint);border-style:dashed}.legend .bd{background:var(--ink)}.legend .pd{background:var(--teal-tint)}.legend .ct{background:var(--plum-tint)}
+.sizing{display:flex;flex-direction:column;gap:var(--space-5)}
+.sz{display:flex;flex-direction:column;gap:var(--space-2)}
+.sz .bar{height:80px;box-sizing:content-box;border:8px solid var(--ink);background:var(--teal-tint);padding:0 40px;display:flex;align-items:center}
+.sz .bar span{background:var(--plum-tint);height:100%;display:flex;align-items:center;justify-content:center;flex:1;font:400 28px/1 var(--font-mono);color:var(--ink)}
+.sz.border-box .bar{box-sizing:border-box}
+.ruler{height:0;border-top:3px solid var(--ink);position:relative;width:400px}
+.ruler::before,.ruler::after{content:"";position:absolute;top:-12px;height:21px;border-left:3px solid var(--ink)}
+.ruler::before{left:0}.ruler::after{right:0}
+
+/* ---------- Flexbox ---------- */
+.fx-page{background:var(--surface-100);color:var(--ink);border:2px solid var(--ink);box-shadow:var(--shadow-pane-md);padding:var(--space-4) var(--space-5)}
+.fx-form{margin:0}
+.fx-form .field{background:var(--teal-tint);outline:2px dashed var(--ink)}
+.fx-form label{font:600 30px/38px var(--font-display)}
+.fx-form input{box-sizing:border-box;min-height:56px;font:400 28px/38px var(--font-display);padding:var(--space-1) var(--space-3);background:var(--surface-200);color:var(--ink);border:2px solid var(--border-control);border-radius:var(--radius-md)}
+.fx-form.flex input{width:100%}
+.fx-form .pn-btn{font-size:28px;line-height:36px;padding:var(--space-2) var(--space-5)}
+.fx-code{font:400 28px/40px var(--font-mono);margin:0;white-space:pre;background:var(--surface-300);color:var(--ink);border:2px solid var(--ink);border-radius:var(--radius-sm);padding:var(--space-3) var(--space-4)}
+.wrapbox{color:var(--ink);border:3px dashed var(--ink);padding:var(--space-3);background:var(--surface-200);overflow:hidden}
+.wrapbox .filter{flex-wrap:nowrap}
+.wrapbox.wraps .filter{flex-wrap:wrap}
+.wrapbox .chip{white-space:nowrap}
+
+/* ---------- SVG ---------- */
+.svgdemo{display:grid;grid-template-columns:auto 1fr;gap:var(--space-7);align-items:center}
+.bigicon{width:300px;height:300px;display:flex;align-items:center;justify-content:center;background:var(--surface-100);color:var(--ink);border:2px solid var(--ink);box-shadow:var(--shadow-pane-md)}
+.bigicon svg{width:240px;height:240px}
+.cc{display:flex;flex-direction:column;gap:var(--space-4);font:500 34px/44px var(--font-display);padding:var(--space-5)}
+.cc .row{display:flex;gap:var(--space-3);align-items:center}
+.cc .ccbtn{align-self:flex-start;display:flex;gap:var(--space-3);align-items:center;font:600 32px/40px var(--font-display);border:2px solid currentColor;border-radius:var(--radius-md);padding:var(--space-2) var(--space-4)}
+.cc a{color:var(--link)}
+.cc .err{color:var(--danger)}
+</style>
+</head>
+<body data-lecture="forms" data-home="../">
+<main id="stage"><div id="deck"></div></main>
+
+<script src="../shared/pane/vendor/react.production.min.js"></script>
+<script src="../shared/pane/vendor/react-dom.production.min.js"></script>
+<script src="../shared/pane/components/bundle.js"></script>
+<script src="../shared/deck.js"></script>
+<script>
+(function(){
+"use strict";
+var P=window.Pane,h=React.createElement,useState=React.useState;
+var FOOT="KD401B · Forms";
+var CANVAS_EX="https://mau.instructure.com/courses/22861/pages/exercise-semantic-html-forms-+-icons";
+
+function card(title,body,tone){return h(P.Card,{title:title,tone:tone||"paper"},body)}
+function solid(title,body,fill){return h(P.Card,{title:title,className:"fill-"+fill},body)}
+function p(t,cls){return h("p",cls?{className:cls}:null,t)}
+function c(t){return h("code",null,t)}
+function code(label,text){return h(P.CodeBlock,{size:"slide",label:label},text)}
+function link(href,text){return h("a",{className:"pn-link",href:href,target:"_blank",rel:"noopener"},text)}
+function stop(e){e.preventDefault()}
+
+/* a viewer's demo settings survive a reload (Deck.store, this lecture only) */
+function useSaved(key,init){
+  var s=useState(function(){try{var v=JSON.parse(Deck.store.get(key));return v==null?init:v}catch(e){return init}});
+  return [s[0],function(v){s[1](v);Deck.store.set(key,JSON.stringify(v))}];
+}
+function Slider(props){
+  var id="sl-"+props.id;
+  return h("div",{className:"slider"},
+    h("label",{htmlFor:id},h("span",null,props.label),h("output",{htmlFor:id},props.value+(props.unit||""))),
+    h("input",{id:id,type:"range",min:props.min,max:props.max,step:props.step||1,value:props.value,
+      onChange:function(e){props.set(+e.target.value)}}));
+}
+function Toggle(props){
+  return h("button",{type:"button",role:"switch","aria-checked":props.on?"true":"false",className:"toggle",onClick:function(){props.set(!props.on)}},
+    h("span",{className:"toggle-track","aria-hidden":"true"},h("span",{className:"toggle-thumb"})),
+    h("span",null,props.label),
+    h("span",{className:"toggle-state","aria-hidden":"true"},props.on?"On":"Off"));
+}
+function Seg(props){
+  return h("div",{className:"seg-choice",role:"group","aria-label":props.label},props.options.map(function(o){
+    return h("button",{key:o,type:"button",className:"pn-btn pn-btn--secondary","aria-pressed":props.value===o?"true":"false",onClick:function(){props.set(o)}},o)}));
+}
+
+/* ---------- icons (Lucide-style outlines, 24×24, stroke = currentColor) ---------- */
+var ICONS={
+  mail:[["rect",{x:2,y:4,width:20,height:16,rx:2}],["path",{d:"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"}]],
+  send:[["path",{d:"M22 2 11 13"}],["path",{d:"m22 2-7 20-4-9-9-4Z"}]],
+  close:[["path",{d:"M18 6 6 18"}],["path",{d:"m6 6 12 12"}]],
+  check:[["path",{d:"M20 6 9 17l-5-5"}]],
+  code:[["path",{d:"m16 18 6-6-6-6"}],["path",{d:"m8 6-6 6 6 6"}]],
+  pen:[["path",{d:"M12 20h9"}],["path",{d:"M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"}]],
+  layout:[["rect",{x:3,y:3,width:18,height:18,rx:2}],["path",{d:"M3 9h18"}],["path",{d:"M9 21V9"}]],
+  speaker:[["path",{d:"M11 5 6 9H2v6h4l5 4V5Z"}],["path",{d:"M15.5 8.5a5 5 0 0 1 0 7"}],["path",{d:"M19 5a10 10 0 0 1 0 14"}]]
+};
+function Icon(props){
+  return h("svg",{className:"ic"+(props.className?" "+props.className:""),viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:2,strokeLinecap:"round",strokeLinejoin:"round","aria-hidden":"true",focusable:"false"},
+    ICONS[props.name].map(function(e,i){return h(e[0],Object.assign({key:i},e[1]))}));
+}
+
+/* ---------- Figure 1: an example design from Thursday ---------- */
+function ExampleDesign(){
+  return h("div",{className:"mock",role:"img","aria-label":"Two Figma frames. Left: a contact form with the fields Name and Email, the email field outlined in red with the error Enter an email address, like name@example.com, and a Send message button. Right: a project filter with the chips UX, Illustration and Code, UX selected, above a grid of project cards."},
+    h("div",{className:"frame"},
+      p("Contact form · error state","fname"),
+      h("span",{className:"mlabel"},"Name"),h("div",{className:"minput"}),
+      h("span",{className:"mlabel"},"Email"),h("div",{className:"minput err"}),
+      h("span",{className:"merr"},"Enter an email address, like name@example.com"),
+      h("span",{className:"mbtn"},h(Icon,{name:"send"}),"Send message")),
+    h("div",{className:"frame"},
+      p("Project filter","fname"),
+      h("span",{className:"mlabel"},"Show projects"),
+      h("div",{className:"mchips"},
+        h("span",{className:"mchip on"},h(Icon,{name:"check"}),"UX"),
+        h("span",{className:"mchip"},h(Icon,{name:"pen"}),"Illustration"),
+        h("span",{className:"mchip"},h(Icon,{name:"code"}),"Code")),
+      h("div",{className:"mgrid"},h("div",{className:"mcard"}),h("div",{className:"mcard"}),h("div",{className:"mcard"}),h("div",{className:"mcard"}))));
+}
+
+/* ---------- What a screen reader hears ---------- */
+var HEARD=[
+  {id:"field",label:"A text field",
+   bad:'<p>Email</p>\n<input type="text">',badSay:"edit text",badWhy:"Which field? The word Email isn't connected to it.",
+   good:'<label for="email">Email</label>\n<input type="email" id="email"\n       name="email" required>',goodSay:"Email, required, edit text",goodWhy:"Name, state and role."},
+  {id:"button",label:"A button",
+   bad:'<div class="btn"\n     onclick="send()">\n  Send\n</div>',badSay:"Send",badWhy:"Read as text. Tab skips it, Enter does nothing.",
+   good:'<button type="submit">\n  Send\n</button>',goodSay:"Send, button",goodWhy:"Tab reaches it; Enter and Space press it."},
+  {id:"icon",label:"An icon button",
+   bad:'<button>\n  <svg>…</svg>\n</button>',badSay:"button",badWhy:"A button that does what?",
+   good:'<button aria-label="Close">\n  <svg aria-hidden="true">…</svg>\n</button>',goodSay:"Close, button",goodWhy:"The icon is hidden; the name is read."}
+];
+function Result(props){
+  return h("div",{className:"res",inert:"","aria-hidden":"true"},h("p",{className:"lbl"},"Result"),props.children);
+}
+var HEARD_RES={
+  field:[
+    function(){return h(Result,null,h("p",{key:1,className:"flabel"},"Email"),h("input",{key:2,type:"text",tabIndex:-1,readOnly:true}))},
+    function(){return h(Result,null,h("label",{key:1,htmlFor:"hr-email"},"Email"),h("input",{key:2,type:"email",id:"hr-email",tabIndex:-1,readOnly:true}))}],
+  button:[
+    function(){return h(Result,null,h("div",{key:1,className:"pn-btn pn-btn--primary"},"Send"))},
+    function(){return h(Result,null,h("button",{key:1,type:"submit",className:"pn-btn pn-btn--primary",tabIndex:-1},"Send"))}],
+  icon:[
+    function(){return h(Result,null,h("button",{key:1,type:"button",className:"pn-btn pn-btn--secondary iconbtn",tabIndex:-1},h(Icon,{name:"close"})))},
+    function(){return h(Result,null,h("button",{key:1,type:"button",className:"pn-btn pn-btn--secondary iconbtn",tabIndex:-1,"aria-label":"Close"},h(Icon,{name:"close"})))}]
+};
+function Heard(){
+  function side(title,src,say,why,ok,res){
+    return h(P.Card,{title:title},
+      h("pre",null,src),
+      res(),
+      h("p",{className:"say"},h(Icon,{name:"speaker"}),h("span",null,h("q",null,say),h("small",{className:ok?"status":"status"},h("span",{className:ok?"ok":"bad"},ok?"✓ ":"✗ "),why))));
+  }
+  return h("div",{className:"wide heard-wrap"},h(P.Tabs,{label:"Examples",tabs:HEARD.map(function(x){return {id:x.id,label:x.label,content:
+    h("div",{className:"heard"},side("Built from divs",x.bad,x.badSay,x.badWhy,false,HEARD_RES[x.id][0]),side("Built from HTML",x.good,x.goodSay,x.goodWhy,true,HEARD_RES[x.id][1]))}})}));
+}
+
+/* ---------- Keyboard: tab through a small page ---------- */
+function KeyboardDemo(){
+  var sk=useSaved("kb-skip",true),fo=useSaved("kb-focus",true),fc=useState("nothing yet");
+  var mainRef=React.useRef(null);
+  function onFocus(e){fc[1](e.target.getAttribute("data-say")||"")}
+  function nav(t,cur){return h("li",{key:t},h("a",{href:"#",onClick:stop,"data-say":"link, "+t+(cur?", current page":""),"aria-current":cur?"page":null},t))}
+  return h("div",{className:"wide demo2b"},
+    h("div",{className:"kb"+(fo[0]?"":" nofocus"),onFocus:onFocus,tabIndex:-1,"data-say":"the page (press Tab)"},
+      sk[0]?h("a",{className:"skip",href:"#",onClick:function(e){e.preventDefault();if(mainRef.current)mainRef.current.focus()},"data-say":"link, Skip to main content"},"Skip to main content"):null,
+      h("header",null,h("b",null,"Alex Lund"),
+        h("nav",{"aria-label":"Main"},h("ul",null,nav("Work",false),nav("About",false),nav("Contact",true)))),
+      h("main",{ref:mainRef,tabIndex:-1,"data-say":"main"},
+        h("h3",null,"Get in touch"),
+        h("div",{className:"row"},
+          h("div",null,h("label",{htmlFor:"kb-email"},"Email"),h("input",{id:"kb-email",type:"email","data-say":"Email, edit text"})),
+          h("button",{type:"button",className:"kbtn","data-say":"Send, button"},"Send")))),
+    h("div",{className:"stack"},
+      p([h("kbd",{key:"k"},"Tab")," moves forward, ",h("kbd",{key:"s"},"Shift"),"+",h("kbd",{key:"t"},"Tab")," back. Click the page, then try it."]),
+      h("div",{className:"toggles"},
+        h(Toggle,{label:"Skip link",on:sk[0],set:sk[1]}),
+        h(Toggle,{label:"Visible focus",on:fo[0],set:fo[1]})),
+      h("p",{className:"focusline","aria-live":"polite"},"Focus is on: ",h("code",null,fc[0]))));
+}
+
+/* ---------- Labels: click the label ---------- */
+function LabelDemo(){
+  var on=useSaved("lbl-on",false),msg=useState("");
+  function hit(name){return function(){msg[1](on[0]?"✓ "+name+" field focused":"✗ Nothing happened")}}
+  var html=on[0]
+    ?'<label for="name">Name</label>\n<input type="text" id="name"\n       name="name">'
+    :'<p>Name</p>\n<input type="text" name="name">';
+  return h("div",{className:"wide demo2"},
+    h("div",{className:"page"},
+      h("form",{className:"f",onSubmit:stop},
+        h("div",{className:"field"},
+          on[0]?h("label",{htmlFor:"lb-name",onClick:hit("Name")},"Name"):h("span",{className:"flabel",onClick:hit("Name")},"Name"),
+          h("input",{type:"text",id:"lb-name",name:"name","aria-label":on[0]?null:"Name (unlabelled in the demo)"})),
+        h("div",{className:"field"},
+          on[0]?h("label",{htmlFor:"lb-email",onClick:hit("Email")},"Email"):h("span",{className:"flabel",onClick:hit("Email")},"Email"),
+          h("input",{type:"email",id:"lb-email",name:"email","aria-label":on[0]?null:"Email (unlabelled in the demo)"})))),
+    h("div",{className:"stack"},
+      h(Toggle,{label:"Connect the labels",on:on[0],set:function(v){on[1](v);msg[1]("")}}),
+      code("contact.html",html),
+      h("p",{className:"status","aria-live":"polite"},msg[0]?h("span",{className:msg[0].charAt(0)==="✓"?"ok":"bad"},msg[0]):"Click a label")));
+}
+
+/* ---------- Placeholder is not a label ---------- */
+function PlaceholderDemo(){
+  return h("div",{className:"wide demo2 ph-demo"},
+    h("div",{className:"stack"},
+      p("Placeholder only","h3"),
+      h("div",{className:"page"},h("form",{className:"f",onSubmit:stop},
+        h("input",{type:"email",name:"email",placeholder:"Email, like name@example.com","aria-label":"Email (placeholder only, as in the bad example)"}))),
+      p("Type in it: the hint is gone. Its grey text is often too faint to read.","muted")),
+    h("div",{className:"stack"},
+      p("Label and helper text","h3"),
+      h("div",{className:"page"},h("form",{className:"f",onSubmit:stop},
+        h("div",{className:"field"},
+          h("label",{htmlFor:"ph-email"},"Email"),
+          h("p",{className:"hint",id:"ph-hint"},"So I can reply. I won't share it."),
+          h("input",{type:"email",id:"ph-email",name:"email","aria-describedby":"ph-hint"})))),
+      p(["The hint stays. ",c("aria-describedby")," reads it after the label."],"muted")));
+}
+
+/* ---------- required: try to send it empty ---------- */
+function RequiredDemo(){
+  var s=useState(false);
+  return h("div",{className:"page"},
+    h("form",{className:"f",onSubmit:function(e){e.preventDefault();s[1](true)},onInput:function(){s[1](false)}},
+      h("div",{className:"field"},h("label",{htmlFor:"rq-name"},"Name"),h("input",{type:"text",id:"rq-name",name:"name",required:true})),
+      h("div",{className:"field"},h("label",{htmlFor:"rq-email"},"Email"),h("input",{type:"email",id:"rq-email",name:"email",required:true})),
+      h("div",{className:"actions"},
+        h("button",{type:"submit",className:"pn-btn pn-btn--primary"},h(Icon,{name:"send"}),"Send message"),
+        s[0]?h("p",{className:"sent",role:"status"},"✓ Sent (not really, it's a slide)"):null)));
+}
+
+/* ---------- Project filter ---------- */
+var CATS=[["ux","UX","layout"],["illustration","Illustration","pen"],["code","Code","code"]];
+var PROJECTS=[["Bus app","ux"],["Zine covers","illustration"],["Colour picker","code"],["Library kiosk","ux"],["Plant labels","illustration"],["Reading mode","code"]];
+function Chips(props){
+  return h("fieldset",{className:"filter"},
+    h("legend",null,"Show projects"),
+    CATS.map(function(cat){
+      var id=props.idp+"-"+cat[0];
+      return h(React.Fragment,{key:cat[0]},
+        h("input",{type:"checkbox",className:"vh",id:id,value:cat[0],checked:props.on.indexOf(cat[0])>=0,
+          onChange:function(e){props.set(e.target.checked?props.on.concat([cat[0]]):props.on.filter(function(x){return x!==cat[0]}))}}),
+        h("label",{htmlFor:id,className:"chip"},h(Icon,{name:"check",className:"tick"}),h(Icon,{name:cat[2]}),cat[1]));
+    }));
+}
+function FilterDemo(){
+  var on=useSaved("filter-on",["ux"]);
+  return h("div",{className:"wide demo2b"},
+    h("div",{className:"page filter-page"},
+      h(Chips,{idp:"fd",on:on[0],set:on[1]}),
+      h("div",{className:"projects"},PROJECTS.map(function(pr){
+        var show=on[0].length===0||on[0].indexOf(pr[1])>=0;
+        return h("article",{key:pr[0],className:"proj","data-category":pr[1],hidden:!show},h("b",null,pr[0]),h("span",null,pr[1]))}))),
+    h("div",{className:"stack"},
+      card("Selected",h("ul",null,
+        h("li",null,"Filled, bolder, and a ✓"),
+        h("li",null,"Not colour alone"),
+        h("li",null,"Styled with ",c("input:checked + label")))),
+      p([h("kbd",{key:"t"},"Tab")," to a chip, ",h("kbd",{key:"s"},"Space")," to switch it. Nothing selected shows everything."],"muted")));
+}
+
+/* ---------- Everything is a box ---------- */
+function BoxesDemo(){
+  var on=useSaved("boxes-on",false);
+  return h("div",{className:"wide demo2"},
+    h("div",{className:"page boxes"+(on[0]?" show":"")},
+      h("h3",null,"Get in touch"),
+      h("p",null,"Questions about a project? Write to me."),
+      h("form",{className:"f",onSubmit:stop},
+        h("div",{className:"field"},h("label",{htmlFor:"bx-email"},"Email"),h("input",{type:"email",id:"bx-email",name:"email"})),
+        h("div",{className:"actions"},h("button",{type:"submit",className:"pn-btn pn-btn--primary"},"Send message")))),
+    h("div",{className:"stack"},
+      h(Toggle,{label:"Outline every element",on:on[0],set:on[1]}),
+      code("style.css","* {\n  outline: 2px solid red;\n}"),
+      p("Paste it in, look, then take it out again.","muted")));
+}
+
+/* ---------- Content, padding, border, margin ---------- */
+function BoxModel(){
+  var pd=useSaved("bm-pad",24),bd=useSaved("bm-border",4),mg=useSaved("bm-margin",32);
+  return h("div",{className:"wide bm"},
+    h("div",null,
+      h("div",{className:"bm-wrap"},
+        h("div",{className:"bm-margin",style:{padding:mg[0]+"px"}},
+          mg[0]>=36?h("span",{className:"bm-tag"},"margin"):null,
+          h("div",{className:"bm-border",style:{borderWidth:bd[0]+"px",padding:pd[0]+"px"}},
+            h("div",{className:"bm-content"},h(Icon,{name:"send"}),"Send message")))),
+      h("ul",{className:"legend"},
+        h("li",null,h("i",{className:"ct"}),"content"),h("li",null,h("i",{className:"pd"}),"padding"),
+        h("li",null,h("i",{className:"bd"}),"border"),h("li",null,h("i",{className:"m"}),"margin"))),
+    h("div",{className:"stack"},
+      h("div",{className:"sliders"},
+        h(Slider,{id:"pad",label:"padding",min:0,max:64,value:pd[0],set:pd[1],unit:"px"}),
+        h(Slider,{id:"border",label:"border",min:0,max:16,value:bd[0],set:bd[1],unit:"px"}),
+        h(Slider,{id:"margin",label:"margin",min:0,max:64,value:mg[0],set:mg[1],unit:"px"})),
+      code("style.css","button {\n  padding: "+pd[0]+"px;\n  border: "+bd[0]+"px solid;\n  margin: "+mg[0]+"px;\n}")));
+}
+
+/* ---------- Flexbox on the form ---------- */
+function FlexForm(){
+  var fl=useSaved("fx-on",true),fg=useSaved("fx-form-gap",32),ig=useSaved("fx-field-gap",8);
+  var col={display:"flex",flexDirection:"column"};
+  var form=fl[0]?Object.assign({gap:fg[0]+"px"},col):{};
+  var field=fl[0]?Object.assign({gap:ig[0]+"px"},col):{};
+  var css=fl[0]
+    ?"form, .field {\n  display: flex;\n  flex-direction: column;\n}\nform   { gap: "+fg[0]+"px; }\n.field { gap: "+ig[0]+"px; }"
+    :"/* no flex: label and input\n   sit side by side, inline */";
+  return h("div",{className:"wide demo2"},
+    h("div",{className:"stack fx-left",style:{gap:"var(--space-4)"}},
+    h("pre",{className:"fx-code"},'<form>\n  <div class="field">\n    <label for="name">Name</label>\n    <input type="text" id="name">\n  </div>\n  …\n</form>'),
+    h("div",{className:"fx-page"},
+      h("form",{className:"fx-form"+(fl[0]?" flex":""),style:form,onSubmit:stop},
+        h("div",{className:"field",style:field},h("label",{htmlFor:"fx-name"},"Name"),h("input",{type:"text",id:"fx-name",name:"name"})),
+        h("div",{className:"field",style:field},h("label",{htmlFor:"fx-email"},"Email"),h("input",{type:"email",id:"fx-email",name:"email"})),
+        h("div",null,h("button",{type:"submit",className:"pn-btn pn-btn--primary"},"Send message"))))),
+    h("div",{className:"stack"},
+      h(Toggle,{label:"display: flex",on:fl[0],set:fl[1]}),
+      fl[0]?h("div",{className:"sliders"},
+        h(Slider,{id:"fg",label:"Form gap",min:0,max:64,step:4,value:fg[0],set:fg[1],unit:"px"}),
+        h(Slider,{id:"ig",label:"Field gap",min:0,max:32,step:2,value:ig[0],set:ig[1],unit:"px"})):null,
+      h("pre",{className:"fx-code"},css)));
+}
+
+/* ---------- flex-wrap on the chips ---------- */
+function WrapDemo(){
+  var w=useSaved("wrap-w",560),wr=useSaved("wrap-on",true),on=useSaved("wrap-chips",["ux"]);
+  return h("div",{className:"wide demo2b"},
+    h("div",null,
+      h("div",{className:"wrapbox"+(wr[0]?" wraps":""),style:{width:w[0]+"px"}},h(Chips,{idp:"wr",on:on[0],set:on[1]})),
+      p("Dashed: the container. Drag the width as if you were resizing the window.","lbl")),
+    h("div",{className:"stack"},
+      h(Toggle,{label:"flex-wrap: wrap",on:wr[0],set:wr[1]}),
+      h(Slider,{id:"ww",label:"Container width",min:320,max:960,step:20,value:w[0],set:w[1],unit:"px"}),
+      h("pre",{className:"fx-code"},".filter {\n  display: flex;\n  flex-wrap: "+(wr[0]?"wrap":"nowrap")+";\n  gap: 0.75rem;\n}")));
+}
+
+/* ---------- currentColor ---------- */
+function CurrentColor(){
+  var col=useSaved("cc-col","Text");
+  var map={"Text":"var(--ink)","Link":"var(--link)","Success":"var(--success)"};
+  return h("div",{className:"wide demo2"},
+    h("div",{className:"page cc",style:{color:map[col[0]]}},
+      h("div",{className:"row"},h(Icon,{name:"mail"}),"hello@example.com"),
+      h("span",{className:"ccbtn"},h(Icon,{name:"send"}),"Send message"),
+      h("div",{className:"row"},h(Icon,{name:"code"}),"Code projects"),
+      h("div",{className:"row err"},h(Icon,{name:"close"}),"Enter an email address")),
+    h("div",{className:"stack"},
+      h(Seg,{label:"Text colour",options:["Text","Link","Success"],value:col[0],set:col[1]}),
+      p("Press T to switch the theme as well. The icons follow the text, the error line keeps its own colour.","muted"),
+      code("style.css",".icon {\n  width: 1.25em;\n  height: 1.25em;\n  stroke: currentColor;\n}")));
+}
+
+var SVG_SRC='<svg xmlns="http://www.w3.org/2000/svg"\n     viewBox="0 0 24 24" fill="none"\n     stroke="currentColor" stroke-width="2"\n     stroke-linecap="round"\n     stroke-linejoin="round">\n  <rect x="2" y="4" width="20" height="16" rx="2"/>\n  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1\n           -2.06 0L2 7"/>\n</svg>';
+
+Deck.start([
+/* ================= Opening ================= */
+{id:"cover",sec:"Opening",title:"Forms",
+ notes:"Week 48, Friday. Yesterday Johannes covered content, UX writing and icons, and in the afternoon everyone designed a contact form and a project filter in Figma. Today we build them in HTML, and start on the box model and Flexbox. Box model and Flexbox are split over this week and next so it isn't all at once.",
+ render:function(){return h(P.TitleSlide,{title:["Forms"],subtitle:"Semantic HTML, forms and SVG icons",meta:"David · KD401B HT26 · Week 48"})}},
+
+{id:"today",sec:"Opening",title:"Today",
+ notes:"The plan for the morning. The first part is why any of this matters: what a screen reader user actually hears. Then nav and the two forms you designed yesterday, then the boxes everything is made of and a first look at Flexbox, then icons. This afternoon you build it all in your portfolio.",
+ render:function(n){return h(P.ContentSlide,{title:"Today",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h(P.Card,{title:"Before the break"},h("ol",null,
+      h("li",null,"What a screen reader hears"),
+      h("li",null,"Navigation"),
+      h("li",null,"The contact form"),
+      h("li",null,"The project filter"))),
+    h(P.Card,{title:"After the break"},h("ol",{start:5},
+      h("li",null,"The box model"),
+      h("li",null,"A first look at Flexbox"),
+      h("li",null,"SVG icons"),
+      h("li",null,"This afternoon")))))}},
+
+{id:"hook",sec:"Opening",title:"Yesterday you designed this",
+ notes:"An example of what yesterday's exercise asked for: a contact form with its error state, and a project filter with one chip selected. TODO (David): swap in or show your own Figma frames if you have them. The point: every label, helper text, button text and error message you wrote yesterday becomes a real HTML element today. And those words are exactly what a screen reader user hears, so the microcopy work wasn't decoration. Ask: who has their microcopy list ready to paste?",
+ render:function(n){return h(P.FigureSlide,{title:["Yesterday you designed this.","Today you build it."],number:n,footer:FOOT,
+   figure:h(ExampleDesign),caption:"Figure 1. An example of Thursday's two forms, drawn as Figma frames."},
+  h("ul",{className:"steps"},
+    h("li",null,"Every label becomes a ",c("<label>")),
+    h("li",null,"Every button becomes a ",c("<button>")),
+    h("li",null,"Every chip becomes a checkbox"),
+    h("li",null,"Your words are what a screen reader says")))}},
+
+/* ================= What a screen reader hears ================= */
+{id:"sr",sec:"Screen readers",title:"What a screen reader hears",
+ notes:"Carried over from last week. Before the HTML, let's hear what it's for.",
+ render:function(){return h(P.SectionSlide,{title:["What a screen","reader hears"],tone:"teal",footer:FOOT})}},
+
+{id:"sr-demo",sec:"Screen readers",title:"Demo: two sites, one screen reader",demo:"Screen reader",
+ notes:"Live demo with VoiceOver on the Mac: Cmd+F5 turns it on and off. Control+Option+arrow keys move through the page; Control+Option+U opens the rotor with lists of headings, landmarks, links and form controls. First the New York Times: landmarks, headings, labelled links. Then the W3C's CityLights survey page, the inaccessible version: unlabelled inputs say 'edit text', the layout tables get read out, the images have no useful alt. Then the fixed version of the same page. On Windows, NVDA is free; on phones, VoiceOver (iOS) and TalkBack (Android) are built in. Students can try it on their own laptops with headphones.",
+ render:function(n){return h(P.ContentSlide,{title:"Two sites, one screen reader",number:n,footer:FOOT},
+  h("div",{className:"wide grid3"},
+    h(P.Card,{interactive:true,className:"linkcard fill-teal"},link("https://www.nytimes.com/","Built well"),p("The New York Times")),
+    h(P.Card,{interactive:true,className:"linkcard fill-plum"},link("https://www.w3.org/WAI/demos/bad/before/survey.html","Built badly"),p("CityLights survey, before")),
+    h(P.Card,{interactive:true,className:"linkcard"},link("https://www.w3.org/WAI/demos/bad/after/survey.html","Fixed"),p("The same survey, after"))),
+  h("p",{className:"lead",style:{marginTop:"var(--space-7)"}},"On a Mac: ",h("kbd",null,"Cmd"),"+",h("kbd",null,"F5")," turns VoiceOver on and off. On Windows: NVDA, free."))}},
+
+{id:"heard",sec:"Screen readers",title:"Same words, different markup",demo:"What it hears",
+ notes:"What we heard in the demo, side by side. Same visible words, different HTML. The field: a p next to an input isn't connected, so the screen reader says 'edit text' and nothing else. A label connected with for and id gives the name, and required and the type come along for free. The button: a div with a click handler looks like a button but isn't one: Tab skips it and Enter does nothing. A real button gets keyboard support and the role 'button' for free. The icon button: an SVG has no words, so the button has no name. aria-label gives it one, and aria-hidden hides the SVG itself. We come back to this at the end with icons. The exact wording differs between screen readers.",
+ render:function(n){return h(P.ContentSlide,{title:"Same words, different markup",number:n,footer:FOOT},h(Heard))}},
+
+{id:"keyboard",sec:"Screen readers",title:"Tab through it",demo:"Keyboard",ex:"Tab through it",
+ notes:"Students do this on their own laptops too. Click the small page, then press Tab. The skip link appears first (it's hidden until it gets focus); Enter on it jumps focus to main, past the nav. Then the nav links, the email field and the Send button, in source order. Now turn off visible focus: press Tab again and you can't tell where you are. That's what outline: none does, and it's one of the most common accessibility bugs. Never remove the focus outline without putting something as visible in its place. Many keyboard users aren't blind: people with motor impairments, power users, anyone with a broken trackpad.",
+ render:function(n){return h(P.ContentSlide,{title:"Tab through it",tone:"plum",number:n,footer:FOOT},h(KeyboardDemo))}},
+
+/* ================= Navigation ================= */
+{id:"nav-list",sec:"Navigation",title:"A nav is a list of links",
+ notes:"Short, since the A3 template already has a nav. Why a list? Because then a screen reader announces 'navigation, list, 3 items' before reading them, so the user knows how many there are and can skip the lot. The nav element makes it a landmark: the rotor lists it, and screen reader users can jump straight to it. The aria-label names it if there's more than one nav on the page, e.g. a footer nav.",
+ render:function(n){return h(P.ContentSlide,{title:"A nav is a list of links",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    code("index.html",'<nav aria-label="Main">\n  <ul>\n    <li><a href="index.html">Work</a></li>\n    <li><a href="about.html">About</a></li>\n    <li><a href="contact.html">Contact</a></li>\n  </ul>\n</nav>'),
+    h("div",{className:"stack"},
+      h("p",{className:"say"},h(Icon,{name:"speaker"}),h("q",null,"Main, navigation, list, 3 items")),
+      p("The list says how many. The landmark lets people jump to it, or past it.","lead"))))}},
+
+{id:"link-button",sec:"Navigation",title:"Links go somewhere, buttons do something",
+ notes:"The rule of thumb for choosing. If it changes the URL, it's a link: another page, a section on this page, a file. If it does something on this page, it's a button: send the form, open a menu, switch the reading mode, filter the projects. The filter chips this afternoon are checkboxes, which is a third answer: a choice you can switch on and off. A link styled as a button is fine, and vice versa; what matters is the element.",
+ render:function(n){return h(P.ContentSlide,{title:"Links go somewhere, buttons do something",tone:"teal",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    solid(h("span",null,c("<a href>")),h("ul",null,h("li",null,"Another page"),h("li",null,"A part of this page"),h("li",null,"A file or another site"),h("li",null,"Changes the address bar")),"plum"),
+    solid(h("span",null,c("<button>")),h("ul",null,h("li",null,"Send the form"),h("li",null,"Open a menu"),h("li",null,"Switch the reading mode"),h("li",null,"Stays on the same page")),"pink")))}},
+
+{id:"current",sec:"Navigation",title:"Mark the current page, add a skip link",
+ notes:"aria-current=page tells a screen reader 'current page' on that link. Then style it in CSS from the same attribute, so what people see and what they hear can't drift apart: there's no separate .active class to forget. Underline or bold rather than colour alone. The skip link is the one from the Tab demo: first thing in the body, hidden off-screen until it gets focus, pointing at the id of main. And a teaser: the nav is a column of links right now. One line of Flexbox turns it into a row; we get there after the break.",
+ render:function(n){return h(P.ContentSlide,{title:"Mark the current page, add a skip link",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    code("contact.html",'<body>\n  <a class="skip" href="#main">\n    Skip to main content</a>\n  …\n  <a href="contact.html"\n     aria-current="page">Contact</a>\n  …\n  <main id="main">'),
+    code("style.css",'nav a[aria-current="page"] {\n  font-weight: 700;\n  text-decoration: underline;\n}\n\n.skip {\n  position: absolute;\n  left: -999px;\n}\n.skip:focus {\n  left: 1rem;\n}')))}},
+
+/* ================= The contact form ================= */
+{id:"contact",sec:"Contact form",title:"The contact form",
+ notes:"The first of yesterday's two designs.",
+ render:function(){return h(P.SectionSlide,{title:["The contact form"],tone:"plum",footer:FOOT})}},
+
+{id:"labels",sec:"Contact form",title:"Every input gets a label",demo:"Connect the labels",ex:"Click the label",
+ notes:"Students try it on their laptops. With the labels off, clicking the word 'Name' does nothing, and a screen reader says 'edit text', like the CityLights survey. Turn them on: the label's for matches the input's id, so clicking the label focuses the input (a bigger target, which helps on phones and for anyone with shaky hands), and the screen reader reads the label. The for/id pair must match exactly and ids are unique on the page. The name attribute is separate: it's the key the data is sent under, which matters in a minute with Formspree.",
+ render:function(n){return h(P.ContentSlide,{title:"Every input gets a label",number:n,footer:FOOT},h(LabelDemo))}},
+
+{id:"types",sec:"Contact form",title:"Pick the right input type",
+ notes:"type=email gives the @ keyboard on phones and checks the format for free when the form is sent. type=text is the default for short text such as a name. textarea isn't an input at all: it's its own element, with a closing tag, for messages over several lines. There are many more types (tel, url, date, number); a contact form rarely needs them. A common mistake: type=email on the name field, or a single-line input for the message.",
+ render:function(n){return h(P.ContentSlide,{title:"Pick the right input type",tone:"plum",number:n,footer:FOOT},
+  h("div",{className:"wide grid3"},
+    card(h("span",null,c('type="email"')),h("ul",null,h("li",null,"@ on the phone keyboard"),h("li",null,"Format checked when sent"))),
+    card(h("span",null,c('type="text"')),h("ul",null,h("li",null,"Short text: a name"),h("li",null,"The default"))),
+    card(h("span",null,c("<textarea>")),h("ul",null,h("li",null,"A message over several lines"),h("li",null,"Its own element, with a closing tag")))))}},
+
+{id:"placeholder",sec:"Contact form",title:"A placeholder is not a label",demo:"Placeholder",
+ notes:"Try typing in both. The placeholder disappears as soon as you type, so the hint is gone when you need it most: when checking what you wrote. Placeholder grey is usually below 4.5:1 contrast, and some screen readers skip it. So: a real label, and helper text in its own element, linked with aria-describedby so it's read after the label. If yesterday's design used placeholder text as the label, move it into a label today. Placeholders are fine for an example of the format, as long as there's a label too.",
+ render:function(n){return h(P.ContentSlide,{title:"A placeholder is not a label",number:n,footer:FOOT},h(PlaceholderDemo))}},
+
+{id:"required",sec:"Contact form",title:"required, and the browser checks it",demo:"Send it empty",ex:"Send it empty",
+ notes:"Students try it: press Send with the fields empty, then with a bad email. The browser stops the form and shows its own message bubble. Free, no JavaScript. The catch: the wording is the browser's, in the browser's language, different in every browser. Not your microcopy from yesterday. Showing your own error text needs a little JavaScript: setCustomValidity(), or novalidate on the form plus your own error element under the field. That's this afternoon's stretch goal, not a requirement.",
+ render:function(n){return h(P.ContentSlide,{title:[[c("required"),", and the browser checks it"]],tone:"teal",number:n,footer:FOOT},
+  h("div",{className:"wide demo2"},
+    h(RequiredDemo),
+    h("div",{className:"stack"},
+      code("contact.html",'<input type="email" id="email"\n       name="email" required>'),
+      h(P.Alert,{tone:"info",title:"The browser's words, not yours"},"Your own error messages need a little JavaScript. That's the stretch goal."))))}},
+
+{id:"formspree",sec:"Contact form",title:"Make it send: Formspree",
+ notes:"GitHub Pages only serves files; it can't receive a form. A form backend receives the POST and emails it to you. Formspree's free plan is enough. Sign up, create a form, copy its endpoint URL, paste it into action. method=post. Every field needs a name attribute, or it isn't sent: the most common reason for an empty email. Then push, open the live site, and send yourself a test. The first submission asks you to confirm your email. Web3Forms works the same way with an access key in a hidden input, if you'd rather use that. Never commit a password or private key: these endpoints are meant to be public.",
+ render:function(n){return h(P.ContentSlide,{title:"Make it send: Formspree",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h("ol",{className:"steps"},
+      h("li",null,"Sign up at ",link("https://formspree.io/","formspree.io")),
+      h("li",null,"New form: copy its URL"),
+      h("li",null,"Paste it into ",c("action")),
+      h("li",null,"Give every field a ",c("name")),
+      h("li",null,"Push, then send yourself a test")),
+    h("div",{className:"stack"},
+      code("contact.html",'<form action="https://formspree.io/f/abcdwxyz"\n      method="post">\n  …\n</form>'),
+      p(["No JavaScript needed. Alternative: ",link("https://web3forms.com/","Web3Forms"),"."],"muted"))))}},
+
+/* ================= The project filter ================= */
+{id:"filter-html",sec:"Project filter",title:"A filter is a group of checkboxes",
+ notes:"Each chip is a real checkbox with a real label. The fieldset groups them, and the legend names the group: a screen reader says 'Show projects, group' and then 'UX, checkbox, checked'. We hide the checkbox itself visually with the vh class (not display: none, which would hide it from screen readers and the keyboard too) and style the label as the chip. Keyboard and screen reader support come for free: Tab to it, Space to switch it. The label comes right after its input, which matters for the CSS on the next slide. The data-category on each project is what the JavaScript matches against.",
+ render:function(n){return h(P.ContentSlide,{title:"A filter is a group of checkboxes",tone:"plum",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    code("index.html",'<fieldset class="filter">\n  <legend>Show projects</legend>\n  <input type="checkbox" id="f-ux"\n         value="ux" class="vh">\n  <label for="f-ux">UX</label>\n  …\n</fieldset>\n\n<article data-category="ux">…'),
+    code("style.css",'/* hidden, but still there\n   for keyboards and\n   screen readers */\n.vh {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  overflow: hidden;\n  clip-path: inset(50%);\n}')))}},
+
+{id:"filter-demo",sec:"Project filter",title:"Selected, and not by colour alone",demo:"Filter",ex:"Filter the projects",
+ notes:"Students try it with the mouse, then with Tab and Space. The selected chip is filled, bolder and gets a tick, so it doesn't rely on colour. In CSS that's input:checked + label: the + means the label right after a checked input. Focus is input:focus-visible + label, so keyboard users see where they are even though the checkbox itself is hidden. Nothing selected shows everything, which is what most people expect.",
+ render:function(n){return h(P.ContentSlide,{title:"Selected, and not by colour alone",number:n,footer:FOOT},h(FilterDemo))}},
+
+{id:"filter-js",sec:"Project filter",title:"A few lines of JavaScript",
+ notes:"Read it top to bottom. Find the fieldset and the projects. Listen for change on the fieldset: one listener covers every checkbox inside it. Make a list of the values that are checked. Then for each project: show it if nothing is checked, or if its data-category is in the list. hidden is a real HTML attribute, so we don't need a CSS class for it. This goes in a script tag at the end of the body, or a separate file with defer. If it doesn't work: check the console, and check that value and data-category are spelled the same.",
+ render:function(n){return h(P.ContentSlide,{title:"A few lines of JavaScript",tone:"teal",number:n,footer:FOOT},
+  h("div",{className:"wide"},code("filter.js",'const filter = document.querySelector(".filter");\nconst projects = document.querySelectorAll("[data-category]");\nfilter.addEventListener("change", function () {\n  const chosen = [];\n  filter.querySelectorAll("input:checked").forEach(function (box) {\n    chosen.push(box.value);\n  });\n  projects.forEach(function (project) {\n    const show = chosen.length === 0 || chosen.includes(project.dataset.category);\n    project.hidden = !show;\n  });\n});')))}},
+
+{id:"break",sec:"Break",title:"Break",
+ notes:"Break. After it: the box model and Flexbox, then icons.",
+ render:function(){return h(P.SectionSlide,{title:["Break"],tone:"plum",footer:"Next: everything is a box"})}},
+
+/* ================= Box model ================= */
+{id:"box-model",sec:"Box model",title:"The box model",
+ notes:"Last week: block and inline. One-line reminder: block boxes stack and take the full width, inline boxes flow inside a line of text. Today: what every box is made of.",
+ render:function(){return h(P.SectionSlide,{title:["Everything","is a box"],tone:"ink",footer:FOOT})}},
+
+{id:"boxes",sec:"Box model",title:"Everything is a box",demo:"Outline everything",
+ notes:"The quickest way to see layout: put an outline on every element. Outline rather than border, because an outline doesn't take up space and so doesn't move anything. Turn it on: the heading, the paragraph, the form, each field, the label, the input, the button are all rectangles inside rectangles. Students can paste the snippet into their own CSS this afternoon when something sits in the wrong place, and take it out again afterwards. Dev tools does the same when you hover elements in the Elements panel.",
+ render:function(n){return h(P.ContentSlide,{title:"Everything is a box",number:n,footer:FOOT},h(BoxesDemo))}},
+
+{id:"layers",sec:"Box model",title:"Content, padding, border, margin",demo:"Box model",ex:"Adjust the box",
+ notes:"From the inside out. Content: the text and icon. Padding: space inside the border, which takes the element's background, so it makes a button bigger to click. Border: the line. Margin: space outside the border, always transparent, pushing other things away. Students drag the sliders. Then open dev tools on any page, select an element, and find the same diagram in the Computed tab (Chrome) or Layout (Firefox). In Figma, padding is the padding in auto layout; there's no margin in Figma, the gap between items does that job, which is where Flexbox comes in.",
+ render:function(n){return h(P.ContentSlide,{title:"Content, padding, border, margin",tone:"plum",number:n,footer:FOOT},h(BoxModel))}},
+
+{id:"border-box",sec:"Box model",title:"The border-box gotcha",
+ notes:"By default, width is the width of the content only: padding and border are added on top. So a box with width 400px, 40px padding and an 8px border is 496px wide, and your neat layout overflows. box-sizing: border-box makes width include padding and border, which is how Figma measures frames too. Put this at the top of every stylesheet; nearly every site does. The three selectors cover the ::before and ::after pseudo-elements as well.",
+ render:function(n){return h(P.ContentSlide,{title:"The border-box gotcha",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h("div",{className:"sizing","aria-label":"Two boxes, both width 400px with 40px padding and an 8px border. The content-box one is 496px wide overall; the border-box one is 400px.",role:"img"},
+      h("div",{className:"ruler",style:{width:"400px"}}),
+      h("div",{className:"sz"},h("span",{className:"lbl"},"content-box: 400 + 80 + 16 = 496px"),h("div",{className:"bar",style:{width:"400px"}},h("span",null,"400"))),
+      h("div",{className:"sz border-box"},h("span",{className:"lbl"},"border-box: 400px, as set"),h("div",{className:"bar",style:{width:"400px"}},h("span",null,"304")))),
+    h("div",{className:"stack"},
+      code("style.css (at the top)","*, *::before, *::after {\n  box-sizing: border-box;\n}"),
+      p("Width now means the whole box, as it does in Figma.","lead"))))}},
+
+/* ================= Flexbox ================= */
+{id:"flexbox",sec:"Flexbox",title:"A first look at Flexbox",
+ notes:"Only four properties today: display: flex, flex-direction, gap and flex-wrap. justify-content, align-items, grow and shrink wait until next Friday. Flexbox is the code side of Figma's auto layout, which Johannes covers next Thursday.",
+ render:function(){return h(P.SectionSlide,{title:["A first look","at Flexbox"],tone:"pink",footer:FOOT})}},
+
+{id:"flex-form",sec:"Flexbox",title:"A column, with gap",demo:"Flex form",ex:"Space the form",
+ notes:"Turn flex off first: label and input are inline, so they sit side by side and wrap however they like. Turn it on: the form is a column, each field is a column. gap puts space between the items, and only between them: no margin on the first or last item to cancel out, no margins collapsing into each other. A bigger gap between fields than inside a field groups each label with its input (proximity, from week 1). Dashed: each field's box.",
+ render:function(n){return h(P.ContentSlide,{title:"A column, with gap",number:n,footer:FOOT},h(FlexForm))}},
+
+{id:"flex-wrap",sec:"Flexbox",title:"A row that wraps",demo:"Wrap",
+ notes:"The filter chips in a row. Drag the width down: with flex-wrap: wrap, chips that don't fit move to the next line, and gap spaces the lines too. Turn wrap off: the chips squeeze and then spill out of the box. That's what happens on a phone if you forget it. The nav is the same idea: display: flex on the ul turns the list of links into a row (plus list-style: none to drop the bullets).",
+ render:function(n){return h(P.ContentSlide,{title:"A row that wraps",tone:"teal",number:n,footer:FOOT},h(WrapDemo))}},
+
+{id:"flex-later",sec:"Flexbox",title:"What comes later",
+ notes:"Say it explicitly so nobody worries: this is a first taste. Next Thursday Johannes covers auto layout in Figma, next Friday the rest of Flexbox mapped onto auto layout, plus CSS Grid. For this afternoon, these four properties are enough to lay out both forms and the nav.",
+ render:function(n){return h(P.ContentSlide,{title:"Enough for today, more next week",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    solid("Today",h("ul",null,h("li",null,c("display: flex")),h("li",null,c("flex-direction")),h("li",null,c("gap")),h("li",null,c("flex-wrap"))),"teal"),
+    card("Next week",h("ul",null,
+      h("li",null,"Thursday: auto layout in Figma"),
+      h("li",null,"Friday: aligning and growing, and CSS Grid"),
+      h("li",null,"The nav as a row: ",c("nav ul { display: flex; }"))))))}},
+
+/* ================= SVG icons ================= */
+{id:"svg",sec:"SVG icons",title:"SVG icons",
+ notes:"The icons you chose yesterday, in the page.",
+ render:function(){return h(P.SectionSlide,{title:["SVG icons"],tone:"teal",footer:FOOT})}},
+
+{id:"svg-code",sec:"SVG icons",title:"An SVG is a picture written as code",
+ notes:"Open any SVG in VS Code and it's text: shapes with coordinates on a 24 by 24 grid (the viewBox). This is the mail icon in Lucide's style. Because it's shapes, it stays sharp at any size. Get yours from the set you chose yesterday: Lucide and Phosphor both have a copy-SVG button on each icon. Material Symbols works too. Don't draw your own; a set keeps the stroke width and style consistent. Note stroke=\"currentColor\": that's the next slide but one.",
+ render:function(n){return h(P.ContentSlide,{title:"An SVG is a picture written as code",tone:"plum",number:n,footer:FOOT},
+  h("div",{className:"wide svgdemo"},
+    h("div",{className:"bigicon"},h(Icon,{name:"mail"})),
+    code("mail.svg",SVG_SRC)),
+  p(["Copy icons from ",link("https://lucide.dev/","Lucide")," or ",link("https://phosphoricons.com/","Phosphor"),"."],"muted"))}},
+
+{id:"inline-img",sec:"SVG icons",title:"Inline, or as an image",
+ notes:"Two ways in. As an img, the SVG is a separate file: tidy, cached, but CSS can't reach inside it, so its colour is fixed. Inline, the svg element is pasted straight into the HTML: more markup, but CSS can style it, including the colour. For icons in buttons, chips and the nav, use inline, so they follow your colours and the dark mode and reading mode from last week. For a logo or an illustration, img is fine, with alt text.",
+ render:function(n){return h(P.ContentSlide,{title:"Inline, or as an image",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h("div",{className:"stack"},code("index.html",'<img src="icons/mail.svg" alt="">'),card("As an image",h("ul",null,h("li",null,"A separate file"),h("li",null,"CSS can't change its colour"),h("li",null,"Fine for logos and illustrations")))),
+    h("div",{className:"stack"},code("index.html",'<svg viewBox="0 0 24 24" …>\n  <path d="…"/>\n</svg>'),solid("Inline",h("ul",null,h("li",null,"Pasted into the HTML"),h("li",null,"CSS can style it"),h("li",null,"Use this for icons")),"teal"))))}},
+
+{id:"current-color",sec:"SVG icons",title:"currentColor: icons follow the text",demo:"currentColor",
+ notes:"currentColor means 'whatever the text colour is here'. Set the SVG's stroke (or fill, for filled icon sets) to currentColor and the icon always matches the text next to it: in a link, in an error message, in dark mode, in last week's reading mode, in high contrast. Change the colour on the slide, and press T for the themes. Size icons in em so they scale with the text, roughly the height of a capital letter or a little more. Lucide's SVGs already use currentColor; some sets have a fixed hex colour you need to replace.",
+ render:function(n){return h(P.ContentSlide,{title:[[c("currentColor"),": icons follow the text"]],tone:"teal",number:n,footer:FOOT},h(CurrentColor))}},
+
+{id:"icon-names",sec:"SVG icons",title:"Hide the icon, or name the button",
+ notes:"Closing the loop on the screen reader demo. Two cases. An icon next to a text label is decoration: the text already says it, so hide the icon with aria-hidden=\"true\", otherwise some screen readers read it as 'image' or read its path. An icon on its own, like a close button, has to give the button a name: aria-label on the button, and still aria-hidden on the SVG. Or visually hidden text inside the button, with the same vh class as the filter. Yesterday's question applies: can people tell what the icon means without a label? If not, add the label.",
+ render:function(n){return h(P.ContentSlide,{title:"Hide the icon, or name the button",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h("div",{className:"stack"},
+      p("Icon with a text label","h3"),
+      code("index.html",'<button type="submit">\n  <svg aria-hidden="true" …>…</svg>\n  Send message\n</button>'),
+      h(Result,null,h("button",{key:1,type:"submit",className:"pn-btn pn-btn--primary",tabIndex:-1},h(Icon,{name:"send"}),"Send message")),
+      h("p",{className:"say"},h(Icon,{name:"speaker"}),h("q",null,"Send message, button"))),
+    h("div",{className:"stack"},
+      p("Icon on its own","h3"),
+      code("index.html",'<button type="button"\n        aria-label="Close">\n  <svg aria-hidden="true" …>…</svg>\n</button>'),
+      h(Result,null,h("button",{key:1,type:"button",className:"pn-btn pn-btn--secondary iconbtn",tabIndex:-1,"aria-label":"Close"},h(Icon,{name:"close"}))),
+      h("p",{className:"say"},h(Icon,{name:"speaker"}),h("q",null,"Close, button")))))}},
+
+/* ================= Wrap-up ================= */
+{id:"afternoon",sec:"Wrap-up",title:"This afternoon",
+ notes:"Individual work, sitting together; the TAs are there. Build yesterday's two designs in the portfolio repository. No new design work: use the Figma frames and the microcopy list from yesterday. If you don't have them, keep it simple and get the HTML right. The full brief is on Canvas. Commit and push as you go, not just at the end.",
+ render:function(n){return h(P.ContentSlide,{title:"This afternoon: build yesterday's forms",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h("div",{className:"stack"},
+      h(P.Card,{interactive:true,className:"linkcard fill-teal"},
+        link(CANVAS_EX,"The brief, on Canvas"),
+        p("Steps, links and the stretch goal")),
+      h(P.Alert,{tone:"info",title:"Use Thursday's work"},"Your Figma frames and your microcopy list. No new design.")),
+    h("ol",{className:"steps"},
+      h("li",null,"Contact form: labels, types, ",c("required")),
+      h("li",null,"Make it send with Formspree"),
+      h("li",null,"Lay it out: ",c("border-box"),", Flexbox, ",c("gap")),
+      h("li",null,"Project filter: fieldset, chips, JavaScript"),
+      h("li",null,"Icons inline, hidden or named"),
+      h("li",null,"Validate, then tag ",c("v0.3")))))}},
+
+{id:"deliverables",sec:"Wrap-up",title:"Done when",
+ notes:"The deliverables from the brief. A test message actually received from the live GitHub Pages site, not from a local file. The validation check in the repo must pass. Stretch goal: your own error messages from yesterday instead of the browser's bubbles, using setCustomValidity() or novalidate plus your own error element. Helping a classmate counts.",
+ render:function(n){return h(P.ContentSlide,{title:"Done when",tone:"plum",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    h(P.Card,{title:"Deliverables"},h("ul",null,
+      h("li",null,"The contact form sends from your live site"),
+      h("li",null,"The filter hides and shows projects"),
+      h("li",null,"Every input labelled, icons handled"),
+      h("li",null,"Valid HTML, commits pushed, tag v0.3"))),
+    h(P.Card,{title:"Going further"},h("ul",null,
+      h("li",null,"Your own error messages, not the browser's"),
+      h("li",null,"Try your page with VoiceOver or NVDA"),
+      h("li",null,"Help a classmate")))))}},
+
+{id:"tag",sec:"Wrap-up",title:"End of the week: tag v0.3",
+ notes:"Same as the last two weeks. Merge your branch into main first if you used one, then the annotated tag with the message Forms, and push the tag by name. Check that v0.3 appears under Tags on GitHub.",
+ render:function(n){return h(P.ContentSlide,{title:"End of the week: tag it",tone:"teal",number:n,footer:FOOT},
+  h("div",{className:"wide grid2"},
+    code("Terminal",'git add .\ngit commit -m "Add contact form and filter"\ngit push\n\ngit tag -a v0.3 -m "Forms"\ngit push origin v0.3'),
+    h("div",{className:"stack"},
+      p("Your portfolio at the end of week 48."),
+      h(P.Alert,{tone:"info",title:"Working on a branch?"},"Merge it into main before you tag."))))}}
+]);
+})();
+</script>
+</body>
+</html>
