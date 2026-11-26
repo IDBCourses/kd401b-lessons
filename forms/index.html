@@ -109,7 +109,17 @@
 /* ---------- What a screen reader hears ---------- */
 .heard{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6)}
 .heard .pn-card{display:flex;flex-direction:column;gap:var(--space-4)}
-.heard pre{margin:0;font:400 28px/40px var(--font-mono);white-space:pre-wrap;background:var(--surface-300);color:var(--ink);border:2px solid var(--ink);border-radius:var(--radius-sm);padding:var(--space-3) var(--space-4);min-height:180px}
+.heard pre{margin:0;font:400 28px/40px var(--font-mono);white-space:pre-wrap;background:var(--surface-300);color:var(--ink);border:2px solid var(--ink);border-radius:var(--radius-sm);padding:var(--space-3) var(--space-4)}
+.heard .pn-card{gap:var(--space-3)}
+.heard-wrap .pn-slide .pn-tabs__panel,.heard-wrap .pn-tabs__panel{padding-top:var(--space-5)}
+/* the rendered result of a code sample: a plain page, dashed, not interactive */
+.res{display:flex;flex-direction:column;gap:var(--space-2);align-items:flex-start;background:var(--surface-100);color:var(--ink);border:2px dashed var(--border-control);border-radius:var(--radius-sm);padding:var(--space-3) var(--space-4)}
+.res .lbl{margin:0}
+.res .flabel,.res label{font:600 30px/38px var(--font-display);margin:0}
+.res input{box-sizing:border-box;width:100%;min-height:56px;font:400 28px/38px var(--font-display);background:var(--surface-200);color:var(--ink);border:var(--border-width) solid var(--border-control);border-radius:var(--radius-md)}
+.res .pn-btn{font-size:30px;line-height:38px;padding:var(--space-2) var(--space-5);display:inline-flex;gap:var(--space-3);align-items:center}
+.res .pn-btn.iconbtn{padding:var(--space-2) var(--space-3)}
+.res .btns{display:flex;gap:var(--space-4);align-items:center}
 .say{display:flex;gap:var(--space-3);align-items:center;font:600 36px/48px var(--font-display);margin:0}
 .say .ic{width:44px;height:44px}
 .say q{quotes:"“" "”"}
@@ -184,7 +194,7 @@ input:focus-visible + .chip{outline:var(--focus-width) solid var(--focus);outlin
 .ruler::before{left:0}.ruler::after{right:0}
 
 /* ---------- Flexbox ---------- */
-.fx-page{background:var(--surface-100);color:var(--ink);border:2px solid var(--ink);box-shadow:var(--shadow-pane-md);padding:var(--space-5)}
+.fx-page{background:var(--surface-100);color:var(--ink);border:2px solid var(--ink);box-shadow:var(--shadow-pane-md);padding:var(--space-4) var(--space-5)}
 .fx-form{margin:0}
 .fx-form .field{background:var(--teal-tint);outline:2px dashed var(--ink)}
 .fx-form label{font:600 30px/38px var(--font-display)}
@@ -300,14 +310,29 @@ var HEARD=[
    bad:'<button>\n  <svg>…</svg>\n</button>',badSay:"button",badWhy:"A button that does what?",
    good:'<button aria-label="Close">\n  <svg aria-hidden="true">…</svg>\n</button>',goodSay:"Close, button",goodWhy:"The icon is hidden; the name is read."}
 ];
+function Result(props){
+  return h("div",{className:"res",inert:"","aria-hidden":"true"},h("p",{className:"lbl"},"Result"),props.children);
+}
+var HEARD_RES={
+  field:[
+    function(){return h(Result,null,h("p",{key:1,className:"flabel"},"Email"),h("input",{key:2,type:"text",tabIndex:-1,readOnly:true}))},
+    function(){return h(Result,null,h("label",{key:1,htmlFor:"hr-email"},"Email"),h("input",{key:2,type:"email",id:"hr-email",tabIndex:-1,readOnly:true}))}],
+  button:[
+    function(){return h(Result,null,h("div",{key:1,className:"pn-btn pn-btn--primary"},"Send"))},
+    function(){return h(Result,null,h("button",{key:1,type:"submit",className:"pn-btn pn-btn--primary",tabIndex:-1},"Send"))}],
+  icon:[
+    function(){return h(Result,null,h("button",{key:1,type:"button",className:"pn-btn pn-btn--secondary iconbtn",tabIndex:-1},h(Icon,{name:"close"})))},
+    function(){return h(Result,null,h("button",{key:1,type:"button",className:"pn-btn pn-btn--secondary iconbtn",tabIndex:-1,"aria-label":"Close"},h(Icon,{name:"close"})))}]
+};
 function Heard(){
-  function side(title,src,say,why,ok){
+  function side(title,src,say,why,ok,res){
     return h(P.Card,{title:title},
       h("pre",null,src),
+      res(),
       h("p",{className:"say"},h(Icon,{name:"speaker"}),h("span",null,h("q",null,say),h("small",{className:ok?"status":"status"},h("span",{className:ok?"ok":"bad"},ok?"✓ ":"✗ "),why))));
   }
-  return h("div",{className:"wide"},h(P.Tabs,{label:"Examples",tabs:HEARD.map(function(x){return {id:x.id,label:x.label,content:
-    h("div",{className:"heard"},side("Built from divs",x.bad,x.badSay,x.badWhy,false),side("Built from HTML",x.good,x.goodSay,x.goodWhy,true))}})}));
+  return h("div",{className:"wide heard-wrap"},h(P.Tabs,{label:"Examples",tabs:HEARD.map(function(x){return {id:x.id,label:x.label,content:
+    h("div",{className:"heard"},side("Built from divs",x.bad,x.badSay,x.badWhy,false,HEARD_RES[x.id][0]),side("Built from HTML",x.good,x.goodSay,x.goodWhy,true,HEARD_RES[x.id][1]))}})}));
 }
 
 /* ---------- Keyboard: tab through a small page ---------- */
@@ -463,11 +488,13 @@ function FlexForm(){
     ?"form, .field {\n  display: flex;\n  flex-direction: column;\n}\nform   { gap: "+fg[0]+"px; }\n.field { gap: "+ig[0]+"px; }"
     :"/* no flex: label and input\n   sit side by side, inline */";
   return h("div",{className:"wide demo2"},
+    h("div",{className:"stack fx-left",style:{gap:"var(--space-4)"}},
+    h("pre",{className:"fx-code"},'<form>\n  <div class="field">\n    <label for="name">Name</label>\n    <input type="text" id="name">\n  </div>\n  …\n</form>'),
     h("div",{className:"fx-page"},
       h("form",{className:"fx-form"+(fl[0]?" flex":""),style:form,onSubmit:stop},
         h("div",{className:"field",style:field},h("label",{htmlFor:"fx-name"},"Name"),h("input",{type:"text",id:"fx-name",name:"name"})),
         h("div",{className:"field",style:field},h("label",{htmlFor:"fx-email"},"Email"),h("input",{type:"email",id:"fx-email",name:"email"})),
-        h("div",null,h("button",{type:"submit",className:"pn-btn pn-btn--primary"},"Send message")))),
+        h("div",null,h("button",{type:"submit",className:"pn-btn pn-btn--primary"},"Send message"))))),
     h("div",{className:"stack"},
       h(Toggle,{label:"display: flex",on:fl[0],set:fl[1]}),
       fl[0]?h("div",{className:"sliders"},
@@ -728,10 +755,12 @@ Deck.start([
     h("div",{className:"stack"},
       p("Icon with a text label","h3"),
       code("index.html",'<button type="submit">\n  <svg aria-hidden="true" …>…</svg>\n  Send message\n</button>'),
+      h(Result,null,h("button",{key:1,type:"submit",className:"pn-btn pn-btn--primary",tabIndex:-1},h(Icon,{name:"send"}),"Send message")),
       h("p",{className:"say"},h(Icon,{name:"speaker"}),h("q",null,"Send message, button"))),
     h("div",{className:"stack"},
       p("Icon on its own","h3"),
       code("index.html",'<button type="button"\n        aria-label="Close">\n  <svg aria-hidden="true" …>…</svg>\n</button>'),
+      h(Result,null,h("button",{key:1,type:"button",className:"pn-btn pn-btn--secondary iconbtn",tabIndex:-1,"aria-label":"Close"},h(Icon,{name:"close"}))),
       h("p",{className:"say"},h(Icon,{name:"speaker"}),h("q",null,"Close, button")))))}},
 
 /* ================= Wrap-up ================= */
